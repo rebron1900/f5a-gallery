@@ -40,7 +40,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         const dotColor = theme.colors.accentKeyBackgroundColor;
 
         return (
-          <a href={`${base}theme/${slug}`} class="theme-card" style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}>
+          <a href={`${base}/theme/${slug}`} class="theme-card" style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}>
             <div class="theme-card-name">{theme.name}</div>
             <div class="theme-card-bar" style={`background:${barColor}`}></div>
             <div class="theme-card-dot" style={`background:${dotColor}`}></div>
