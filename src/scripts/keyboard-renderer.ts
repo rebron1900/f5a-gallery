@@ -4,6 +4,10 @@
  * Colors use hex strings instead of ARGB int32.
  *
  * Icons use Lucide SVG (via CDN) instead of emoji characters.
+ *
+ * HTML structure matches f5a-see-me exactly:
+ *   .layout-row > .keys > .layout-key-slot > .layout-key
+ * CSS class names: layout-row, keys, layout-key-slot, layout-key
  */
 
 export interface ThemeColors {
@@ -163,13 +167,21 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function escapeAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 /**
- * Render keyboard HTML — matches f5a-see-me's CSS approach:
- * - flex: 0 0 <percentage> on slots (fixed width, no shrink/grow)
- * - padding on slots for horizontal gaps (NOT gap on row)
- * - .keyboard-keys wrapper per row
- * - CSS variables for hgap/vgap/radius (set by caller or CSS)
- * - Lucide icons for special keys (data-lucide attribute)
+ * Render keyboard HTML — matches f5a-see-me exactly:
+ *   .layout-row > .keys > .layout-key-slot > .layout-key
+ *
+ * CSS variables set on .layout-row:
+ *   --row-height, --key-height
+ *
+ * CSS variables set on .layout-key-slot:
+ *   --key-width (percentage), --preview-key-hgap
+ *
+ * Lucide icons for special keys via data-lucide attribute.
  */
 export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   keyHGap?: number;
@@ -184,6 +196,9 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
     borderEnabled = true,
   } = options || {};
 
+  const rowHeight = 42;
+  const keyHeight = rowHeight - keyVGap * 2;
+
   const html = layout.map((row) => {
     const widths = resolveRowWidths(row);
     const keysHtml = row.map((key, i) => {
@@ -197,18 +212,18 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
       const sub = keySubText(key);
 
       const mainHtml = icon
-        ? `<i data-lucide="${icon}" class="keyboard-icon"></i>`
-        : `<span class="keyboard-main">${escapeHtml(title)}</span>`;
+        ? `<i data-lucide="${icon}" class="layout-key-icon"></i>`
+        : `<span class="layout-key-main">${escapeHtml(title)}</span>`;
 
       const altHtml = sub
-        ? `<span class="keyboard-alt" style="color:${c.altText}">${escapeHtml(sub)}</span>`
+        ? `<span class="layout-key-alt" style="color:${escapeAttr(c.altText)}">${escapeHtml(sub)}</span>`
         : "";
 
-      return `<div class="keyboard-slot" style="--key-width:${widthPercent};--hgap:${keyHGap}px"><div class="keyboard-key ${variant}" style="background:${c.background};color:${c.text};border-color:${c.border};border-width:${bw}px;border-style:${bs};border-radius:${keyRadius}px">${mainHtml}${altHtml}</div></div>`;
+      return `<div class="layout-key-slot" style="--key-width:${widthPercent}"><div class="layout-key ${variant}" style="background:${escapeAttr(c.background)};color:${escapeAttr(c.text)};border-color:${escapeAttr(c.border)};border-width:${bw}px;border-style:${bs};border-radius:${keyRadius}px">${mainHtml}${altHtml}</div></div>`;
     }).join("");
 
-    return `<div class="keyboard-row"><div class="keyboard-keys">${keysHtml}</div></div>`;
+    return `<div class="layout-row" style="--row-height:${rowHeight}px;--key-height:${keyHeight}px"><div class="keys">${keysHtml}</div></div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" style="background:${colors.keyboardColor}">${html}</div>`;
+  return `<div class="keyboard-preview" style="background:${escapeAttr(colors.keyboardColor)};--preview-key-hgap:${keyHGap}px;--preview-key-vgap:${keyVGap}px;--preview-key-radius:${keyRadius}px">${html}</div>`;
 }

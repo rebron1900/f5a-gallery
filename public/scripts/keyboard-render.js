@@ -1,6 +1,7 @@
 /**
  * Keyboard renderer — browser-side version.
- * Matches f5a-see-me's CSS: flex 0 0 %, padding-based gaps.
+ * Matches f5a-see-me HTML structure exactly:
+ *   .layout-row > .keys > .layout-key-slot > .layout-key
  * Uses Lucide icons for special keys.
  */
 (function (root) {
@@ -8,6 +9,10 @@
 
   function escapeHtml(s) {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function escapeAttr(s) {
+    return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
   function keyVariantClass(key) {
@@ -110,6 +115,9 @@
     var radius = opts.keyRadius != null ? opts.keyRadius : 4;
     var border = opts.borderEnabled !== false;
 
+    var rowHeight = 42;
+    var keyHeight = rowHeight - vGap * 2;
+
     var html = layout.map(function (row) {
       var widths = resolveRowWidths(row);
       var keysHtml = row.map(function (key, i) {
@@ -123,18 +131,20 @@
         var sub = keySubText(key);
 
         var mainHtml = icon
-          ? '<i data-lucide="' + icon + '" class="keyboard-icon"></i>'
-          : '<span class="keyboard-main">' + escapeHtml(title) + '</span>';
+          ? '<i data-lucide="' + icon + '" class="layout-key-icon"></i>'
+          : '<span class="layout-key-main">' + escapeHtml(title) + '</span>';
 
-        var altHtml = sub ? '<span class="keyboard-alt" style="color:' + c.altText + '">' + escapeHtml(sub) + '</span>' : "";
+        var altHtml = sub
+          ? '<span class="layout-key-alt" style="color:' + escapeAttr(c.altText) + '">' + escapeHtml(sub) + '</span>'
+          : "";
 
-        return '<div class="keyboard-slot" style="--key-width:' + wp + ';--hgap:' + hGap + 'px"><div class="keyboard-key ' + vc + '" style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">' + mainHtml + altHtml + '</div></div>';
+        return '<div class="layout-key-slot" style="--key-width:' + wp + '"><div class="layout-key ' + vc + '" style="background:' + escapeAttr(c.background) + ';color:' + escapeAttr(c.text) + ';border-color:' + escapeAttr(c.border) + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">' + mainHtml + altHtml + '</div></div>';
       }).join("");
 
-      return '<div class="keyboard-row"><div class="keyboard-keys">' + keysHtml + '</div></div>';
+      return '<div class="layout-row" style="--row-height:' + rowHeight + 'px;--key-height:' + keyHeight + 'px"><div class="keys">' + keysHtml + '</div></div>';
     }).join("");
 
-    return '<div class="keyboard-preview" style="background:' + colors.keyboardColor + '">' + html + '</div>';
+    return '<div class="keyboard-preview" style="background:' + escapeAttr(colors.keyboardColor) + ';--preview-key-hgap:' + hGap + 'px;--preview-key-vgap:' + vGap + 'px;--preview-key-radius:' + radius + 'px">' + html + '</div>';
   }
 
   root.renderKeyboard = renderKeyboard;
