@@ -4,7 +4,6 @@ import KeyboardPreview from '../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-// Read all theme JSON files
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 
@@ -24,28 +23,41 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
-<Layout title="fcitx5-android 主题画廊">
+
+<Layout title="f5a-gallery">
   <div class="container">
     <header class="site-header">
       <h1>f5a-gallery</h1>
-      <p>fcitx5-android 主题画廊 — 浏览、预览、下载键盘主题</p>
+      <p>fcitx5-android 键盘主题画廊</p>
     </header>
 
     <div class="theme-grid">
-      {themes.map(({ slug, theme }) => (
-        <a href={`${base}/theme/${slug}`} class="theme-card">
-          <div class="theme-card-preview">
-            <KeyboardPreview colors={theme.colors} />
-          </div>
-          <div class="theme-card-info">
+      {themes.map(({ slug, theme }) => {
+        // f5a-see-me style card: bg = keyboard color, accent bar = altKeyBg, dot = accentKeyBg
+        const cardBg = theme.colors.keyboardColor || theme.colors.backgroundColor;
+        const textColor = theme.isDark ? '#ffffff' : '#1a1a1a';
+        const barColor = theme.colors.altKeyBackgroundColor || theme.colors.barColor;
+        const dotColor = theme.colors.accentKeyBackgroundColor;
+
+        return (
+          <a href={`${base}theme/${slug}`} class="theme-card" style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}>
             <div class="theme-card-name">{theme.name}</div>
-            <div class="theme-card-meta">
-              <span>@{theme.author}</span>
-              {theme.builtin && <span class="builtin-badge">内置</span>}
-              <span>{theme.isDark ? '暗色' : '亮色'}</span>
-            </div>
-          </div>
-        </a>
+            <div class="theme-card-bar" style={`background:${barColor}`}></div>
+            <div class="theme-card-dot" style={`background:${dotColor}`}></div>
+          </a>
+        );
+      })}
+    </div>
+
+    {/* Show theme meta below grid */}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-12px">
+      {themes.map(({ slug, theme }) => (
+        <div class="theme-card-footer">
+          <span class="theme-card-meta">
+            @{theme.author}
+            {theme.builtin && <span class="builtin-badge">内置</span>}
+          </span>
+        </div>
       ))}
     </div>
   </div>
