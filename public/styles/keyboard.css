@@ -1,15 +1,4 @@
-/* Keyboard preview styles — extracted from f5a-see-me/style.css */
-
-.keyboard-preview {
-  display: flex;
-  flex-direction: column;
-  border-radius: 10px;
-  overflow: hidden;
-  padding: 6px 4px;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-}
+/* Keyboard preview styles — configurator mode */
 
 .keyboard-row {
   display: flex;
@@ -27,9 +16,10 @@
   align-items: center;
   justify-content: center;
   height: var(--key-height, 42px);
-  position: relative;
+  border-radius: 6px;
   user-select: none;
-  transition: transform 0.08s ease;
+  transition: transform 0.08s ease, opacity 0.08s ease;
+  border: 1px solid transparent;
 }
 
 .keyboard-key:active {
@@ -39,7 +29,7 @@
 
 .keyboard-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: clamp(13px, 3.5vw, 20px);
+  font-size: clamp(14px, 3.8vw, 21px);
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -51,24 +41,19 @@
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  opacity: 0.8;
-}
-
-/* Key variant styles */
-.keyboard-key.space-key .keyboard-main {
-  font-size: clamp(11px, 2.5vw, 14px);
-  font-weight: 400;
   opacity: 0.7;
 }
 
+.keyboard-key.space-key .keyboard-main {
+  font-size: clamp(11px, 2.5vw, 14px);
+  font-weight: 400;
+  opacity: 0.6;
+}
+
 .keyboard-key.accent-key .keyboard-main {
-  font-size: clamp(16px, 4vw, 22px);
+  font-size: clamp(17px, 4.2vw, 23px);
 }
 
 .keyboard-key.alt-key .keyboard-main {
-  font-size: clamp(12px, 3vw, 16px);
-}
-
-.keyboard-key.language-key .keyboard-main {
   font-size: clamp(12px, 3vw, 16px);
 }

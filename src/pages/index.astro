@@ -1,10 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import KeyboardPreview from '../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-// Read all theme JSON files
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 
@@ -22,31 +20,226 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
   return { slug, theme: data as Theme };
 });
 
+const colorLabels: Record<string, string> = {
+  backgroundColor: '背景颜色', barColor: '工具栏颜色', keyboardColor: '键盘底色',
+  keyBackgroundColor: '按键背景', keyTextColor: '按键文字', candidateTextColor: '候选文字',
+  candidateLabelColor: '候选标签', candidateCommentColor: '候选注释',
+  altKeyBackgroundColor: '功能键背景', altKeyTextColor: '功能键文字',
+  accentKeyBackgroundColor: '强调键背景', accentKeyTextColor: '强调键文字',
+  keyPressHighlightColor: '按压高亮', keyShadowColor: '按键边框',
+  popupBackgroundColor: '弹出背景', popupTextColor: '弹出文字',
+  spaceBarColor: '空格键背景', dividerColor: '分割线',
+  clipboardEntryColor: '剪贴板项', genericActiveBackgroundColor: '激活背景',
+  genericActiveForegroundColor: '激活文字',
+};
+
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
-<Layout title="fcitx5-android 主题画廊">
+
+<Layout title="f5a-gallery">
   <div class="container">
     <header class="site-header">
       <h1>f5a-gallery</h1>
-      <p>fcitx5-android 主题画廊 — 浏览、预览、下载键盘主题</p>
+      <p>fcitx5-android 键盘主题画廊</p>
     </header>
 
-    <div class="theme-grid">
-      {themes.map(({ slug, theme }) => (
-        <a href={`${base}/theme/${slug}`} class="theme-card">
-          <div class="theme-card-preview">
-            <KeyboardPreview colors={theme.colors} />
-          </div>
-          <div class="theme-card-info">
-            <div class="theme-card-name">{theme.name}</div>
-            <div class="theme-card-meta">
-              <span>@{theme.author}</span>
-              {theme.builtin && <span class="builtin-badge">内置</span>}
-              <span>{theme.isDark ? '暗色' : '亮色'}</span>
-            </div>
-          </div>
-        </a>
-      ))}
-    </div>
+    <section class="hero">
+      <div class="keyboard-stage" id="keyboard-stage"></div>
+
+      <div class="theme-info">
+        <div class="theme-name" id="theme-name"></div>
+        <div class="theme-meta" id="theme-meta"></div>
+        <div class="theme-actions">
+          <button class="btn" id="copy-json">复制 JSON</button>
+          <button class="btn" id="download-json">下载主题</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="theme-selector">
+      <div class="selector-label">选择主题</div>
+      <div class="theme-dots" id="theme-dots"></div>
+    </section>
+
+    <section class="color-details">
+      <div class="color-section-header" id="color-toggle">
+        <h2>色值详情</h2>
+        <span class="toggle">▾</span>
+      </div>
+      <div class="color-grid" id="color-grid"></div>
+    </section>
   </div>
+
+  <script define:vars={{ themes, colorLabels, base }}>
+    const THEMES = themes;
+    const COLOR_LABELS = colorLabels;
+    const BASE = base;
+    let currentIdx = 0;
+
+    // --- Keyboard renderer ---
+    function keyVariantClass(key) {
+      switch (key.type) {
+        case "CapsKey": case "LayoutSwitchKey": case "LayerSwitchKey":
+        case "CommaKey": case "SymbolKey": case "LanguageKey": case "BackspaceKey":
+          return "alt-key";
+        case "SpaceKey": return "space-key";
+        case "ReturnKey": return "accent-key";
+        default: return "";
+      }
+    }
+
+    function previewTitle(key) {
+      if (!key) return "?";
+      switch (key.type) {
+        case "CapsKey": return "⇧";
+        case "LayoutSwitchKey": case "LayerSwitchKey": return key.label || "?123";
+        case "CommaKey": return ",";
+        case "LanguageKey": return "🌐";
+        case "SpaceKey": return "space";
+        case "SymbolKey": return key.label || ".";
+        case "ReturnKey": return "↵";
+        case "BackspaceKey": return "⌫";
+        case "AlphabetKey": return key.main || "?";
+        default: return key.type;
+      }
+    }
+
+    function defaultKeyWeight(key) {
+      switch (key.type) {
+        case "CapsKey": case "LayoutSwitchKey": case "LayerSwitchKey":
+        case "ReturnKey": case "BackspaceKey": return 0.15;
+        case "SpaceKey": return 0;
+        default: return 0.1;
+      }
+    }
+
+    function resolveRowWidths(row) {
+      const entries = row.map(key => {
+        const has = "weight" in key;
+        const def = defaultKeyWeight(key);
+        const w = has ? Math.max(0, Number(key.weight) || 0) : def;
+        return { w, auto: has ? w <= 0 : def <= 0 };
+      });
+      const fixed = entries.reduce((s, e) => s + (e.auto ? 0 : e.w), 0);
+      const flex = entries.filter(e => e.auto).length;
+      const rem = Math.max(0, 1 - fixed);
+      const fw = flex > 0 ? rem / flex : 0;
+      return entries.map(e => e.auto ? fw : e.w);
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function renderKeyboard(colors, layout) {
+      const rows = layout;
+      const rc = rows.length;
+      const rh = rc > 0 ? Math.max(34, Math.round(48 * (100 / rc) / 25)) : 42;
+      const kh = Math.max(1, rh - 6);
+
+      return rows.map(row => {
+        const widths = resolveRowWidths(row);
+        return '<div class="keyboard-row" style="--key-height:' + kh + 'px;gap:3px">' +
+          row.map((key, i) => {
+            const v = keyVariantClass(key);
+            const isAlt = v.includes("alt-key");
+            const isAccent = v.includes("accent-key");
+            const isSpace = v.includes("space-key");
+            const isReturn = key.type === "ReturnKey";
+
+            let bg, fg;
+            if (isSpace) { bg = colors.spaceBarColor; fg = colors.keyTextColor; }
+            else if (isReturn || isAccent) { bg = colors.accentKeyBackgroundColor; fg = colors.accentKeyTextColor; }
+            else if (isAlt) { bg = colors.altKeyBackgroundColor; fg = colors.altKeyTextColor; }
+            else { bg = colors.keyBackgroundColor; fg = colors.keyTextColor; }
+
+            const alt = key.type === "AlphabetKey" && key.alt
+              ? '<span class="keyboard-alt" style="color:' + colors.altKeyTextColor + '">' + escapeHtml(key.alt) + '</span>'
+              : "";
+
+            return '<div class="keyboard-slot" style="--key-width:' + (widths[i] * 100).toFixed(6) + '%">' +
+              '<div class="keyboard-key ' + v + '" style="background:' + bg + ';color:' + fg + ';border-color:' + colors.keyShadowColor + '">' +
+              '<span class="keyboard-main">' + escapeHtml(previewTitle(key)) + '</span>' + alt +
+              '</div></div>';
+          }).join("") +
+          '</div>';
+      }).join("");
+    }
+
+    // --- Default QWERTY layout ---
+    const DEFAULT_LAYOUT = [[{type:"AlphabetKey",main:"Q",alt:"1"},{type:"AlphabetKey",main:"W",alt:"2"},{type:"AlphabetKey",main:"E",alt:"3"},{type:"AlphabetKey",main:"R",alt:"4"},{type:"AlphabetKey",main:"T",alt:"5"},{type:"AlphabetKey",main:"Y",alt:"6"},{type:"AlphabetKey",main:"U",alt:"7"},{type:"AlphabetKey",main:"I",alt:"8"},{type:"AlphabetKey",main:"O",alt:"9"},{type:"AlphabetKey",main:"P",alt:"0"}],[{type:"AlphabetKey",main:"A",alt:"@"},{type:"AlphabetKey",main:"S",alt:"*"},{type:"AlphabetKey",main:"D",alt:"+"},{type:"AlphabetKey",main:"F",alt:"-"},{type:"AlphabetKey",main:"G",alt:"="},{type:"AlphabetKey",main:"H",alt:"/"},{type:"AlphabetKey",main:"J",alt:"#"},{type:"AlphabetKey",main:"K",alt:"("},{type:"AlphabetKey",main:"L",alt:")"}],[{type:"CapsKey"},{type:"AlphabetKey",main:"Z",alt:"'"},{type:"AlphabetKey",main:"X",alt:":"},{type:"AlphabetKey",main:"C",alt:'"'},{type:"AlphabetKey",main:"V",alt:"?"},{type:"AlphabetKey",main:"B",alt:"!"},{type:"AlphabetKey",main:"N",alt:"~"},{type:"AlphabetKey",main:"M",alt:"\\"},{type:"BackspaceKey"}],[{type:"LayoutSwitchKey",label:"?123"},{type:"CommaKey",weight:0.1},{type:"LanguageKey"},{type:"SpaceKey"},{type:"SymbolKey",label:".",weight:0.1},{type:"ReturnKey"}]];
+
+    // --- Init ---
+    function selectTheme(idx) {
+      currentIdx = idx;
+      const t = THEMES[idx];
+      const stage = document.getElementById("keyboard-stage");
+      stage.innerHTML = renderKeyboard(t.theme.colors, DEFAULT_LAYOUT);
+      stage.style.background = t.theme.colors.keyboardColor;
+
+      document.getElementById("theme-name").textContent = t.theme.name;
+      document.getElementById("theme-meta").innerHTML =
+        "@" + t.theme.author +
+        (t.theme.builtin ? ' <span class="badge">内置</span>' : "") +
+        " · " + (t.theme.isDark ? "暗色" : "亮色");
+
+      // Update dots
+      document.querySelectorAll(".theme-dot").forEach((d, i) => {
+        d.classList.toggle("active", i === idx);
+      });
+
+      // Update color grid
+      const grid = document.getElementById("color-grid");
+      grid.innerHTML = Object.entries(t.theme.colors).map(([k, v]) =>
+        '<div class="color-item">' +
+        '<div class="color-swatch" style="background:' + v + '"></div>' +
+        '<div><div class="color-label">' + (COLOR_LABELS[k] || k) + '</div>' +
+        '<div class="color-value">' + v + '</div></div></div>'
+      ).join("");
+    }
+
+    // Build dots
+    const dotsEl = document.getElementById("theme-dots");
+    THEMES.forEach((t, i) => {
+      const accent = t.theme.colors.accentKeyBackgroundColor || t.theme.colors.accentKeyBackgroundColor;
+      const dot = document.createElement("button");
+      dot.className = "theme-dot" + (i === 0 ? " active" : "");
+      dot.style.background = accent;
+      dot.innerHTML = '<span class="theme-dot-tooltip">' + t.theme.name + '</span>';
+      dot.addEventListener("click", () => selectTheme(i));
+      dotsEl.appendChild(dot);
+    });
+
+    // Color toggle
+    document.getElementById("color-toggle").addEventListener("click", function() {
+      this.classList.toggle("open");
+      document.getElementById("color-grid").classList.toggle("open");
+    });
+
+    // Copy JSON
+    document.getElementById("copy-json").addEventListener("click", () => {
+      const json = JSON.stringify(THEMES[currentIdx].theme, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        const btn = document.getElementById("copy-json");
+        btn.textContent = "已复制";
+        setTimeout(() => { btn.textContent = "复制 JSON"; }, 2000);
+      });
+    });
+
+    // Download JSON
+    document.getElementById("download-json").addEventListener("click", () => {
+      const t = THEMES[currentIdx];
+      const json = JSON.stringify(t.theme, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = t.slug + ".json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Initial render
+    selectTheme(0);
+  </script>
 </Layout>
