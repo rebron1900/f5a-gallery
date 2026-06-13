@@ -1,23 +1,24 @@
-/* Keyboard preview — matches f5a-see-me CSS exactly */
+/* Keyboard preview — faithful port from f5a-see-me */
 
 .keyboard-preview {
   border-radius: 10px;
   overflow: hidden;
-  padding: 4px 2px;
+  padding: 6px 4px;
   width: 100%;
   box-sizing: border-box;
 }
 
+/* Row: flex center, 8px gap between rows */
 .layout-row {
-  margin-bottom: 3px;
+  margin-bottom: var(--preview-row-gap, 8px);
   display: flex;
   justify-content: center;
 }
-
 .layout-row:last-child {
   margin-bottom: 0;
 }
 
+/* Keys container: centered, max 720px */
 .layout-row .keys {
   display: flex;
   gap: 0;
@@ -26,13 +27,15 @@
   justify-content: center;
 }
 
+/* Key slot: fixed percentage width, padding for horizontal gap */
 .layout-key-slot {
   flex: 0 0 var(--key-width, 0%);
   min-width: 0;
-  padding: 0 var(--preview-key-hgap, 3px);
+  padding: 0 var(--preview-key-hgap, 0px);
   display: flex;
 }
 
+/* Key: full-size fill, responsive font via container query */
 .layout-key {
   height: var(--key-height, calc(var(--row-height, 42px) - var(--preview-key-vgap, 0px) * 2));
   width: 100%;
@@ -46,11 +49,11 @@
   overflow: hidden;
   font-weight: 600;
   padding: 0;
-  /* container query for responsive font sizing */
   container-type: inline-size;
   font-size: clamp(14px, 42cqw, 23px);
 }
 
+/* Main label */
 .layout-key-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-weight: 600;
@@ -58,12 +61,14 @@
   text-align: center;
 }
 
+/* Lucide icon — same sizing as main text */
 .layout-key-icon {
-  width: clamp(14px, 42cqw, 23px);
-  height: clamp(14px, 42cqw, 23px);
+  width: 1em;
+  height: 1em;
   stroke-width: 2.2;
 }
 
+/* Alt text (top-right, like f5a-see-me) */
 .layout-key-alt {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-weight: 400;
@@ -79,47 +84,35 @@
   font-size: clamp(7px, 18cqw, 10px);
 }
 
-/* Key variant styles */
-.layout-key.space-key .layout-key-main {
+/* Variant: space key */
+.layout-key.space-key {
   font-size: clamp(12px, 20cqw, 18px);
+}
+.layout-key.space-key .layout-key-main {
   font-weight: 400;
   opacity: 0.7;
 }
 
-.layout-key.space-key .layout-key-icon {
-  width: clamp(12px, 20cqw, 18px);
-  height: clamp(12px, 20cqw, 18px);
-}
-
-.layout-key.accent-key .layout-key-main,
-.layout-key.accent-key .layout-key-icon {
+/* Variant: accent (return/enter) */
+.layout-key.accent-key {
   font-size: clamp(13px, 38cqw, 20px);
-  width: clamp(13px, 38cqw, 20px);
-  height: clamp(13px, 38cqw, 20px);
 }
 
-.layout-key.alt-key .layout-key-main,
-.layout-key.alt-key .layout-key-icon {
+/* Variant: alt (shift, backspace, etc.) */
+.layout-key.alt-key {
   font-size: clamp(12px, 34cqw, 16px);
-  width: clamp(12px, 34cqw, 16px);
-  height: clamp(12px, 34cqw, 16px);
+  font-weight: 700;
 }
 
-.layout-key.language-key .layout-key-main,
-.layout-key.language-key .layout-key-icon {
+/* Variant: language */
+.layout-key.language-key {
   font-size: clamp(12px, 34cqw, 16px);
-  width: clamp(12px, 34cqw, 16px);
-  height: clamp(12px, 34cqw, 16px);
 }
 
-/* Mobile */
+/* Mobile tweaks */
 @media (max-width: 480px) {
   .keyboard-preview {
-    padding: 3px 1px;
+    padding: 4px 2px;
     border-radius: 8px;
-  }
-
-  .layout-row {
-    margin-bottom: 2px;
   }
 }

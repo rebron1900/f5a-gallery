@@ -1,13 +1,11 @@
 /**
- * Keyboard renderer extracted from fxliang/f5a-see-me
- * Pure display only — no editing, no state management.
- * Colors use hex strings instead of ARGB int32.
+ * Keyboard renderer — faithful port from fxliang/f5a-see-me
+ * renderLayoutPreview() in js/app.js
  *
- * Icons use Lucide SVG (via CDN) instead of emoji characters.
- *
- * HTML structure matches f5a-see-me exactly:
- *   .layout-row > .keys > .layout-key-slot > .layout-key
- * CSS class names: layout-row, keys, layout-key-slot, layout-key
+ * HTML: .layout-row > .keys > .layout-key-slot > .layout-key
+ * CSS variables set on .keyboard-preview: --preview-key-hgap, --preview-key-vgap, --preview-key-radius, --preview-row-gap
+ * CSS variables set on .layout-row: --row-height, --key-height
+ * CSS variables set on .layout-key-slot: --key-width
  */
 
 export interface ThemeColors {
@@ -45,6 +43,8 @@ export interface KeyDef {
 
 export type Layout = KeyDef[][];
 
+/* --- helpers --- */
+
 function keyVariantClass(key: KeyDef): string {
   switch (key.type) {
     case "CapsKey":
@@ -70,7 +70,7 @@ function previewVariantClass(key: KeyDef): string {
   return cls;
 }
 
-/** Lucide icon names for special keys */
+/** Lucide icon name for special keys */
 function lucideIcon(key: KeyDef): string | null {
   switch (key.type) {
     case "CapsKey": return "arrow-up";
@@ -136,14 +136,7 @@ function resolveRowWidths(row: KeyDef[]): number[] {
   return entries.map((e) => (e.auto ? flexW : e.width));
 }
 
-interface PreviewColors {
-  background: string;
-  text: string;
-  altText: string;
-  border: string;
-}
-
-function resolveColors(key: KeyDef, colors: ThemeColors): PreviewColors {
+function resolveColors(key: KeyDef, colors: ThemeColors) {
   const variant = keyVariantClass(key);
   const isAlt = variant === "alt-key";
   const isAccent = variant === "accent-key";
@@ -160,70 +153,61 @@ function resolveColors(key: KeyDef, colors: ThemeColors): PreviewColors {
     : isAlt || isLayoutSwitch ? colors.altKeyTextColor
     : colors.keyTextColor;
 
-  return { background: bg, text: tx, altText: colors.altKeyTextColor, border: colors.keyShadowColor };
+  return { bg, tx, altTx: colors.altKeyTextColor, border: colors.keyShadowColor };
 }
 
-function escapeHtml(s: string): string {
+function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function escapeAttr(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 /**
- * Render keyboard HTML — matches f5a-see-me exactly:
- *   .layout-row > .keys > .layout-key-slot > .layout-key
+ * Render keyboard HTML — matches f5a-see-me's renderLayoutPreview() exactly.
  *
- * CSS variables set on .layout-row:
- *   --row-height, --key-height
- *
- * CSS variables set on .layout-key-slot:
- *   --key-width (percentage), --preview-key-hgap
- *
- * Lucide icons for special keys via data-lucide attribute.
+ * Defaults match f5a-see-me's defaults:
+ *   keyHGap=0, keyVGap=0, keyRadius=4, rowGap=8
+ * These are set as CSS custom properties on .keyboard-preview.
  */
-export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
-  keyHGap?: number;
-  keyVGap?: number;
-  keyRadius?: number;
-  borderEnabled?: boolean;
-}): string {
-  const {
-    keyHGap = 3,
-    keyVGap = 3,
-    keyRadius = 4,
-    borderEnabled = true,
-  } = options || {};
+export function renderKeyboard(
+  colors: ThemeColors,
+  layout: Layout,
+  options?: { keyHGap?: number; keyVGap?: number; keyRadius?: number; borderEnabled?: boolean }
+): string {
+  const hGap = options?.keyHGap ?? 0;
+  const vGap = options?.keyVGap ?? 0;
+  const radius = options?.keyRadius ?? 4;
+  const border = options?.borderEnabled !== false;
 
   const rowHeight = 42;
-  const keyHeight = rowHeight - keyVGap * 2;
+  const keyHeight = rowHeight - vGap * 2;
+  const rowGap = 8;
 
   const html = layout.map((row) => {
     const widths = resolveRowWidths(row);
     const keysHtml = row.map((key, i) => {
-      const widthPercent = `${(widths[i] * 100).toFixed(6)}%`;
+      const wp = `${(widths[i] * 100).toFixed(6)}%`;
       const c = resolveColors(key, colors);
-      const variant = previewVariantClass(key);
-      const bw = borderEnabled ? 1 : 0;
-      const bs = borderEnabled ? "solid" : "none";
-      const title = previewTitle(key);
+      const vc = previewVariantClass(key);
+      const bw = border ? 1 : 0;
+      const bs = border ? "solid" : "none";
       const icon = lucideIcon(key);
+      const title = previewTitle(key);
       const sub = keySubText(key);
 
       const mainHtml = icon
         ? `<i data-lucide="${icon}" class="layout-key-icon"></i>`
-        : `<span class="layout-key-main">${escapeHtml(title)}</span>`;
+        : `<span class="layout-key-main">${esc(title)}</span>`;
 
       const altHtml = sub
-        ? `<span class="layout-key-alt" style="color:${escapeAttr(c.altText)}">${escapeHtml(sub)}</span>`
+        ? `<span class="layout-key-alt" style="color:${esc(c.altTx)}">${esc(sub)}</span>`
         : "";
 
-      return `<div class="layout-key-slot" style="--key-width:${widthPercent}"><div class="layout-key ${variant}" style="background:${escapeAttr(c.background)};color:${escapeAttr(c.text)};border-color:${escapeAttr(c.border)};border-width:${bw}px;border-style:${bs};border-radius:${keyRadius}px">${mainHtml}${altHtml}</div></div>`;
+      return `<div class="layout-key-slot" style="--key-width:${wp}">` +
+        `<div class="layout-key ${vc}" style="background:${esc(c.bg)};color:${esc(c.tx)};border-color:${esc(c.border)};border-width:${bw}px;border-style:${bs};border-radius:${radius}px">` +
+        `${mainHtml}${altHtml}</div></div>`;
     }).join("");
 
     return `<div class="layout-row" style="--row-height:${rowHeight}px;--key-height:${keyHeight}px"><div class="keys">${keysHtml}</div></div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" style="background:${escapeAttr(colors.keyboardColor)};--preview-key-hgap:${keyHGap}px;--preview-key-vgap:${keyVGap}px;--preview-key-radius:${keyRadius}px">${html}</div>`;
+  return `<div class="keyboard-preview" style="background:${esc(colors.keyboardColor)};--preview-key-hgap:${hGap}px;--preview-key-vgap:${vGap}px;--preview-key-radius:${radius}px;--preview-row-gap:${rowGap}px">${html}</div>`;
 }

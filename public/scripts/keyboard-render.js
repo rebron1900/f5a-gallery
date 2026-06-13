@@ -1,18 +1,12 @@
 /**
  * Keyboard renderer — browser-side version.
- * Matches f5a-see-me HTML structure exactly:
- *   .layout-row > .keys > .layout-key-slot > .layout-key
- * Uses Lucide icons for special keys.
+ * Faithful port from f5a-see-me renderLayoutPreview().
  */
 (function (root) {
   "use strict";
 
-  function escapeHtml(s) {
+  function esc(s) {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
-
-  function escapeAttr(s) {
-    return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
   function keyVariantClass(key) {
@@ -105,18 +99,19 @@
       : isAlt || isLayoutSwitch ? colors.altKeyTextColor
       : colors.keyTextColor;
 
-    return { background: bg, text: tx, altText: colors.altKeyTextColor, border: colors.keyShadowColor };
+    return { bg: bg, tx: tx, altTx: colors.altKeyTextColor, border: colors.keyShadowColor };
   }
 
   function renderKeyboard(colors, layout, opts) {
     opts = opts || {};
-    var hGap = opts.keyHGap != null ? opts.keyHGap : 3;
-    var vGap = opts.keyVGap != null ? opts.keyVGap : 3;
+    var hGap = opts.keyHGap != null ? opts.keyHGap : 0;
+    var vGap = opts.keyVGap != null ? opts.keyVGap : 0;
     var radius = opts.keyRadius != null ? opts.keyRadius : 4;
     var border = opts.borderEnabled !== false;
 
     var rowHeight = 42;
     var keyHeight = rowHeight - vGap * 2;
+    var rowGap = 8;
 
     var html = layout.map(function (row) {
       var widths = resolveRowWidths(row);
@@ -126,25 +121,27 @@
         var vc = previewVariantClass(key);
         var bw = border ? 1 : 0;
         var bs = border ? "solid" : "none";
-        var title = previewTitle(key);
         var icon = lucideIcon(key);
+        var title = previewTitle(key);
         var sub = keySubText(key);
 
         var mainHtml = icon
           ? '<i data-lucide="' + icon + '" class="layout-key-icon"></i>'
-          : '<span class="layout-key-main">' + escapeHtml(title) + '</span>';
+          : '<span class="layout-key-main">' + esc(title) + '</span>';
 
         var altHtml = sub
-          ? '<span class="layout-key-alt" style="color:' + escapeAttr(c.altText) + '">' + escapeHtml(sub) + '</span>'
+          ? '<span class="layout-key-alt" style="color:' + esc(c.altTx) + '">' + esc(sub) + '</span>'
           : "";
 
-        return '<div class="layout-key-slot" style="--key-width:' + wp + '"><div class="layout-key ' + vc + '" style="background:' + escapeAttr(c.background) + ';color:' + escapeAttr(c.text) + ';border-color:' + escapeAttr(c.border) + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">' + mainHtml + altHtml + '</div></div>';
+        return '<div class="layout-key-slot" style="--key-width:' + wp + '">' +
+          '<div class="layout-key ' + vc + '" style="background:' + esc(c.bg) + ';color:' + esc(c.tx) + ';border-color:' + esc(c.border) + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">' +
+          mainHtml + altHtml + '</div></div>';
       }).join("");
 
       return '<div class="layout-row" style="--row-height:' + rowHeight + 'px;--key-height:' + keyHeight + 'px"><div class="keys">' + keysHtml + '</div></div>';
     }).join("");
 
-    return '<div class="keyboard-preview" style="background:' + escapeAttr(colors.keyboardColor) + ';--preview-key-hgap:' + hGap + 'px;--preview-key-vgap:' + vGap + 'px;--preview-key-radius:' + radius + 'px">' + html + '</div>';
+    return '<div class="keyboard-preview" style="background:' + esc(colors.keyboardColor) + ';--preview-key-hgap:' + hGap + 'px;--preview-key-vgap:' + vGap + 'px;--preview-key-radius:' + radius + 'px;--preview-row-gap:' + rowGap + 'px">' + html + '</div>';
   }
 
   root.renderKeyboard = renderKeyboard;
