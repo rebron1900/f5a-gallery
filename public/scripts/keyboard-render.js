@@ -130,7 +130,7 @@
           + '</div></div>';
       }).join("");
 
-      return '<div class="keyboard-row" style="--key-height:' + keyH + 'px;gap:' + hGap + 'px">' + keysHtml + '</div>';
+      return '<div class="keyboard-row" style="gap:' + hGap + 'px">' + keysHtml + '</div>';
     }).join("");
 
     return '<div class="keyboard-preview" style="background:' + colors.keyboardColor + ';gap:' + vGap + 'px">' + html + '</div>';

@@ -249,7 +249,7 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
       </div>`;
     }).join("");
 
-    return `<div class="keyboard-row" style="--key-height:${keyHeight}px;gap:${keyHGap}px">${keysHtml}</div>`;
+    return `<div class="keyboard-row" style="gap:${keyHGap}px">${keysHtml}</div>`;
   }).join("");
 
   return `<div class="keyboard-preview" style="background:${colors.keyboardColor};gap:${keyVGap}px">${html}</div>`;

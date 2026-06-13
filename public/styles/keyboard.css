@@ -26,7 +26,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: var(--key-height, 42px);
+  height: 42px;
   position: relative;
   user-select: none;
   box-sizing: border-box;
@@ -34,7 +34,7 @@
 
 .keyboard-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: clamp(13px, 3.2vw, 20px);
+  font-size: 18px;
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -42,7 +42,7 @@
 
 .keyboard-alt {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: clamp(9px, 1.8vw, 12px);
+  font-size: 11px;
   font-weight: 400;
   line-height: 1;
   text-align: center;
@@ -51,21 +51,21 @@
 
 /* Key variant styles */
 .keyboard-key.space-key .keyboard-main {
-  font-size: clamp(11px, 2.2vw, 14px);
+  font-size: 13px;
   font-weight: 400;
   opacity: 0.7;
 }
 
 .keyboard-key.accent-key .keyboard-main {
-  font-size: clamp(16px, 3.5vw, 22px);
+  font-size: 20px;
 }
 
 .keyboard-key.alt-key .keyboard-main {
-  font-size: clamp(12px, 2.5vw, 16px);
+  font-size: 15px;
 }
 
 .keyboard-key.language-key .keyboard-main {
-  font-size: clamp(12px, 2.5vw, 16px);
+  font-size: 15px;
 }
 
 /* Mobile */
@@ -79,23 +79,51 @@
     gap: 2px;
   }
 
+  .keyboard-key {
+    height: 36px;
+  }
+
   .keyboard-main {
-    font-size: clamp(10px, 3vw, 15px);
+    font-size: 14px;
   }
 
   .keyboard-alt {
-    font-size: clamp(7px, 1.6vw, 9px);
-  }
-
-  .keyboard-key {
-    height: var(--key-height, 36px);
+    font-size: 9px;
   }
 
   .keyboard-key.accent-key .keyboard-main {
-    font-size: clamp(13px, 3vw, 18px);
+    font-size: 16px;
   }
 
   .keyboard-key.space-key .keyboard-main {
-    font-size: clamp(9px, 2vw, 12px);
+    font-size: 11px;
+  }
+
+  .keyboard-key.alt-key .keyboard-main,
+  .keyboard-key.language-key .keyboard-main {
+    font-size: 12px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+  .keyboard-key {
+    height: 32px;
+  }
+
+  .keyboard-main {
+    font-size: 12px;
+  }
+
+  .keyboard-alt {
+    font-size: 8px;
+  }
+
+  .keyboard-row {
+    gap: 1px;
+  }
+
+  .keyboard-preview {
+    padding: 3px 1px;
   }
 }
