@@ -2,10 +2,14 @@
 /**
  * merge-theme.ts
  * Extracts theme JSON from a GitHub Issue body and writes it to src/content/themes/
- * Usage: node merge-theme.ts --issue=<number>
  *
- * Expects GITHUB_TOKEN env var and issue body accessible via GitHub API.
- * In CI, the issue body is passed via stdin or env.
+ * Supports two input formats:
+ *   - Native fcitx5-android: colors as signed 32-bit integers (ARGB), top-level
+ *   - Gallery format: colors as hex strings inside a colors object
+ *
+ * Output is always gallery format with hex strings.
+ *
+ * Usage: node merge-theme.ts --issue=<number>
  */
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
@@ -21,13 +25,51 @@ const THEME_COLORS = [
   "genericActiveBackgroundColor", "genericActiveForegroundColor",
 ];
 
+/** Convert signed 32-bit ARGB integer to #RRGGBB hex string */
+function intToHex(argb: number): string {
+  // Mask to unsigned 32-bit, extract RGB (drop alpha)
+  const unsigned = argb >>> 0;
+  const r = (unsigned >> 16) & 0xff;
+  const g = (unsigned >> 8) & 0xff;
+  const b = unsigned & 0xff;
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
+}
+
+/** Detect if a color value is a signed 32-bit integer (not a hex string) */
+function isIntColor(v: unknown): v is number {
+  return typeof v === "number";
+}
+
+/** Normalize theme data to gallery format (hex strings, colors wrapper) */
+function normalizeTheme(data: any, author?: string): any {
+  const result: any = {
+    name: data.name,
+    author: author || data.author || "unknown",
+    isDark: data.isDark,
+    builtin: false,
+  };
+
+  // Detect format: if colors exist at top level as integers, convert
+  const rawColors = data.colors || data;
+  const colors: Record<string, string> = {};
+
+  for (const token of THEME_COLORS) {
+    const v = rawColors[token];
+    if (v === undefined) continue;
+    colors[token] = isIntColor(v) ? intToHex(v) : v;
+  }
+
+  result.colors = colors;
+  return result;
+}
+
 function extractJsonFromIssueBody(body: string): string | null {
   // Match JSON inside ```json ... ``` code block
   const codeBlockMatch = body.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
   if (codeBlockMatch) return codeBlockMatch[1].trim();
 
   // Fallback: try to find raw JSON object
-  const jsonMatch = body.match(/\{[\s\S]*"colors"[\s\S]*\}/);
+  const jsonMatch = body.match(/\{[\s\S]*\}/);
   if (jsonMatch) return jsonMatch[0];
 
   return null;
@@ -42,15 +84,13 @@ function slugify(name: string): string {
 
 function validateTheme(data: any): string[] {
   const errors: string[] = [];
-  if (!data.name || typeof data.name !== "string") errors.push("Missing or invalid 'name'");
-  if (!data.author || typeof data.author !== "string") errors.push("Missing or invalid 'author'");
-  if (typeof data.isDark !== "boolean") errors.push("Missing or invalid 'isDark'");
-  if (!data.colors || typeof data.colors !== "object") {
-    errors.push("Missing 'colors' object");
-  } else {
-    for (const token of THEME_COLORS) {
-      if (!data.colors[token]) errors.push(`Missing color token: ${token}`);
-    }
+  if (!data.name || typeof data.name !== "string") errors.push("Missing 'name'");
+  if (typeof data.isDark !== "boolean") errors.push("Missing 'isDark'");
+
+  // Check colors exist (either in wrapper or top-level)
+  const rawColors = data.colors || data;
+  for (const token of THEME_COLORS) {
+    if (rawColors[token] === undefined) errors.push(`Missing color: ${token}`);
   }
   return errors;
 }
@@ -104,10 +144,10 @@ async function main() {
     process.exit(1);
   }
 
-  // Add builtin flag
-  data.builtin = false;
-
-  const slug = slugify(data.name);
+  // Normalize to gallery format, use issue author as theme author
+  const issueAuthor = issue.user?.login || "unknown";
+  const theme = normalizeTheme(data, issueAuthor);
+  const slug = slugify(theme.name);
   const themesDir = join(process.cwd(), "src", "content", "themes");
   const filePath = join(themesDir, `${slug}.json`);
 
@@ -116,11 +156,11 @@ async function main() {
     process.exit(1);
   }
 
-  writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n");
+  writeFileSync(filePath, JSON.stringify(theme, null, 2) + "\n");
   console.log(`✅ Theme written: src/content/themes/${slug}.json`);
-  console.log(`   Name: ${data.name}`);
-  console.log(`   Author: ${data.author}`);
-  console.log(`   Slug: ${slug}`);
+  console.log(`   Name: ${theme.name}`);
+  console.log(`   Author: ${theme.author}`);
+  console.log(`   Format: normalized to hex strings`);
 }
 
 main().catch((e) => {

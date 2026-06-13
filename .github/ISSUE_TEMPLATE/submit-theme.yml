@@ -7,36 +7,36 @@ body:
     attributes:
       label: 主题 JSON
       description: |
-        粘贴完整的主题 JSON。必须包含 name、author、isDark 和 colors 中的全部 21 个色值。
-        颜色值使用 hex 格式（如 #2E3440）。
+        粘贴完整的主题 JSON。支持两种格式：
+        1. fcitx5-android 原生格式（颜色为整数，如 -526345）
+        2. 本站格式（颜色为 hex 字符串，如 #F7F7F7）
+
+        必须包含 name 和 isDark 字段，以及全部 21 个颜色 token。
       placeholder: |
         {
           "name": "我的主题",
-          "author": "你的名字",
           "isDark": true,
-          "colors": {
-            "backgroundColor": "#000000",
-            "barColor": "#111111",
-            "keyboardColor": "#000000",
-            "keyBackgroundColor": "#1A1A1A",
-            "keyTextColor": "#FFFFFF",
-            "candidateTextColor": "#FFFFFF",
-            "candidateLabelColor": "#888888",
-            "candidateCommentColor": "#666666",
-            "altKeyBackgroundColor": "#222222",
-            "altKeyTextColor": "#CCCCCC",
-            "accentKeyBackgroundColor": "#1A73E8",
-            "accentKeyTextColor": "#FFFFFF",
-            "keyPressHighlightColor": "#333333",
-            "keyShadowColor": "#000000",
-            "popupBackgroundColor": "#1A1A1A",
-            "popupTextColor": "#FFFFFF",
-            "spaceBarColor": "#1A1A1A",
-            "dividerColor": "#222222",
-            "clipboardEntryColor": "#1A1A1A",
-            "genericActiveBackgroundColor": "#1A73E8",
-            "genericActiveForegroundColor": "#FFFFFF"
-          }
+          "backgroundColor": -16777216,
+          "barColor": -16777216,
+          "keyboardColor": -16777216,
+          "keyBackgroundColor": -15658735,
+          "keyTextColor": -1,
+          "candidateTextColor": -1,
+          "candidateLabelColor": -8355712,
+          "candidateCommentColor": -6710887,
+          "altKeyBackgroundColor": -14474461,
+          "altKeyTextColor": -3355444,
+          "accentKeyBackgroundColor": -14922241,
+          "accentKeyTextColor": -1,
+          "keyPressHighlightColor": 436207615,
+          "keyShadowColor": -16777216,
+          "popupBackgroundColor": -15658735,
+          "popupTextColor": -1,
+          "spaceBarColor": -15658735,
+          "dividerColor": -14474461,
+          "clipboardEntryColor": -15658735,
+          "genericActiveBackgroundColor": -14922241,
+          "genericActiveForegroundColor": -1
         }
     validations:
       required: true

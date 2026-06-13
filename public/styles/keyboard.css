@@ -46,60 +46,70 @@
   overflow: hidden;
   font-weight: 600;
   padding: 0;
+  /* container query for responsive font sizing */
+  container-type: inline-size;
+  font-size: clamp(14px, 42cqw, 23px);
 }
 
 .layout-key-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 18px;
   font-weight: 600;
   line-height: 1;
   text-align: center;
 }
 
 .layout-key-icon {
-  width: 18px;
-  height: 18px;
+  width: clamp(14px, 42cqw, 23px);
+  height: clamp(14px, 42cqw, 23px);
   stroke-width: 2.2;
 }
 
 .layout-key-alt {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 11px;
   font-weight: 400;
   line-height: 1;
   text-align: center;
   opacity: 0.8;
   position: absolute;
-  bottom: 3px;
-  right: 5px;
+  top: 4px;
+  right: 6px;
+  max-width: calc(100% - 12px);
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: clamp(7px, 18cqw, 10px);
 }
 
 /* Key variant styles */
 .layout-key.space-key .layout-key-main {
-  font-size: 13px;
+  font-size: clamp(12px, 20cqw, 18px);
   font-weight: 400;
   opacity: 0.7;
 }
 
+.layout-key.space-key .layout-key-icon {
+  width: clamp(12px, 20cqw, 18px);
+  height: clamp(12px, 20cqw, 18px);
+}
+
 .layout-key.accent-key .layout-key-main,
 .layout-key.accent-key .layout-key-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  font-size: clamp(13px, 38cqw, 20px);
+  width: clamp(13px, 38cqw, 20px);
+  height: clamp(13px, 38cqw, 20px);
 }
 
 .layout-key.alt-key .layout-key-main,
 .layout-key.alt-key .layout-key-icon {
-  font-size: 15px;
-  width: 16px;
-  height: 16px;
+  font-size: clamp(12px, 34cqw, 16px);
+  width: clamp(12px, 34cqw, 16px);
+  height: clamp(12px, 34cqw, 16px);
 }
 
 .layout-key.language-key .layout-key-main,
 .layout-key.language-key .layout-key-icon {
-  font-size: 15px;
-  width: 16px;
-  height: 16px;
+  font-size: clamp(12px, 34cqw, 16px);
+  width: clamp(12px, 34cqw, 16px);
+  height: clamp(12px, 34cqw, 16px);
 }
 
 /* Mobile */
@@ -111,61 +121,5 @@
 
   .layout-row {
     margin-bottom: 2px;
-  }
-
-  .layout-key {
-    height: calc(36px - var(--preview-key-vgap, 0px) * 2);
-  }
-
-  .layout-key-main {
-    font-size: 14px;
-  }
-
-  .layout-key-icon {
-    width: 14px;
-    height: 14px;
-  }
-
-  .layout-key-alt {
-    font-size: 9px;
-  }
-
-  .layout-key.accent-key .layout-key-main,
-  .layout-key.accent-key .layout-key-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .layout-key.space-key .layout-key-main {
-    font-size: 11px;
-  }
-
-  .layout-key.alt-key .layout-key-main,
-  .layout-key.alt-key .layout-key-icon,
-  .layout-key.language-key .layout-key-main,
-  .layout-key.language-key .layout-key-icon {
-    font-size: 12px;
-    width: 13px;
-    height: 13px;
-  }
-}
-
-@media (max-width: 360px) {
-  .layout-key {
-    height: calc(32px - var(--preview-key-vgap, 0px) * 2);
-  }
-
-  .layout-key-main {
-    font-size: 12px;
-  }
-
-  .layout-key-icon {
-    width: 12px;
-    height: 12px;
-  }
-
-  .layout-key-alt {
-    font-size: 8px;
   }
 }

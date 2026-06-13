@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
  * validate-theme.ts
- * Validates all theme JSON files in src/content/themes/
+ * Validates theme JSON files in src/content/themes/
+ * Supports both formats:
+ *   - Native fcitx5-android: colors as signed 32-bit integers, no colors wrapper
+ *   - Gallery format: colors as hex strings inside a colors object
  */
 
 import { readdirSync, readFileSync } from "fs";
@@ -28,14 +31,16 @@ for (const file of files) {
   const errors: string[] = [];
 
   if (!data.name || typeof data.name !== "string") errors.push("missing name");
-  if (!data.author || typeof data.author !== "string") errors.push("missing author");
   if (typeof data.isDark !== "boolean") errors.push("missing isDark");
 
-  if (!data.colors || typeof data.colors !== "object") {
-    errors.push("missing colors");
+  // Support both formats: colors wrapper or top-level tokens
+  const colors = data.colors || data;
+  const hasColors = typeof colors === "object";
+  if (!hasColors) {
+    errors.push("missing color tokens");
   } else {
     for (const token of THEME_COLORS) {
-      if (!data.colors[token]) errors.push(`missing ${token}`);
+      if (colors[token] === undefined) errors.push(`missing ${token}`);
     }
   }
 
