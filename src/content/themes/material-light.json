@@ -1,0 +1,29 @@
+{
+  "name": "Material Light",
+  "author": "fxliang",
+  "isDark": false,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#FFFFFF",
+    "barColor": "#F5F5F5",
+    "keyboardColor": "#E8E8E8",
+    "keyBackgroundColor": "#FFFFFF",
+    "keyTextColor": "#212121",
+    "candidateTextColor": "#212121",
+    "candidateLabelColor": "#757575",
+    "candidateCommentColor": "#9E9E9E",
+    "altKeyBackgroundColor": "#D6D6D6",
+    "altKeyTextColor": "#424242",
+    "accentKeyBackgroundColor": "#4285F4",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#C8C8C8",
+    "keyShadowColor": "#BDBDBD",
+    "popupBackgroundColor": "#FFFFFF",
+    "popupTextColor": "#212121",
+    "spaceBarColor": "#FFFFFF",
+    "dividerColor": "#BDBDBD",
+    "clipboardEntryColor": "#F5F5F5",
+    "genericActiveBackgroundColor": "#4285F4",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}

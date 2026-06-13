@@ -1,0 +1,101 @@
+name: Validate Theme
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate theme JSON
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const THEME_COLORS = [
+              "backgroundColor", "barColor", "keyboardColor", "keyBackgroundColor",
+              "keyTextColor", "candidateTextColor", "candidateLabelColor",
+              "candidateCommentColor", "altKeyBackgroundColor", "altKeyTextColor",
+              "accentKeyBackgroundColor", "accentKeyTextColor", "keyPressHighlightColor",
+              "keyShadowColor", "popupBackgroundColor", "popupTextColor",
+              "spaceBarColor", "dividerColor", "clipboardEntryColor",
+              "genericActiveBackgroundColor", "genericActiveForegroundColor",
+            ];
+
+            const body = context.payload.issue.body || '';
+
+            // Extract JSON from code block or raw
+            let jsonStr = null;
+            const codeBlockMatch = body.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+            if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+            if (!jsonStr) {
+              const jsonMatch = body.match(/\{[\s\S]*"colors"[\s\S]*\}/);
+              if (jsonMatch) jsonStr = jsonMatch[0];
+            }
+
+            if (!jsonStr) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: '❌ 未找到有效的 JSON。请在 ```json 代码块中粘贴主题 JSON。'
+              });
+              return;
+            }
+
+            let data;
+            try {
+              data = JSON.parse(jsonStr);
+            } catch (e) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ JSON 解析失败：\n\`\`\`\n${e.message}\n\`\`\``
+              });
+              return;
+            }
+
+            const errors = [];
+            if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name 字段');
+            if (!data.author || typeof data.author !== 'string') errors.push('缺少或无效的 author 字段');
+            if (typeof data.isDark !== 'boolean') errors.push('缺少或无效的 isDark 字段（需要 true 或 false）');
+
+            if (!data.colors || typeof data.colors !== 'object') {
+              errors.push('缺少 colors 对象');
+            } else {
+              for (const token of THEME_COLORS) {
+                if (!data.colors[token]) errors.push(`缺少颜色: ${token}`);
+              }
+            }
+
+            if (errors.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ 主题校验失败：\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n请修正后重新编辑 Issue。`
+              });
+            } else {
+              // Check for existing comment from this workflow to avoid duplicates
+              const comments = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                per_page: 100,
+              });
+              const existing = comments.data.find(c =>
+                c.user.type === 'Bot' && c.body.includes('✅ JSON 格式校验通过')
+              );
+              if (!existing) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: '✅ JSON 格式校验通过！等待管理员审核。'
+                });
+              }
+            }

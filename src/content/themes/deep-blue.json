@@ -1,0 +1,29 @@
+{
+  "name": "Deep Blue",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#0D1B2A",
+    "barColor": "#1B2838",
+    "keyboardColor": "#0D1B2A",
+    "keyBackgroundColor": "#1B2838",
+    "keyTextColor": "#E0E1DD",
+    "candidateTextColor": "#E0E1DD",
+    "candidateLabelColor": "#778DA9",
+    "candidateCommentColor": "#415A77",
+    "altKeyBackgroundColor": "#253545",
+    "altKeyTextColor": "#A8B2C1",
+    "accentKeyBackgroundColor": "#415A77",
+    "accentKeyTextColor": "#E0E1DD",
+    "keyPressHighlightColor": "#2C3E50",
+    "keyShadowColor": "#0A1520",
+    "popupBackgroundColor": "#1B2838",
+    "popupTextColor": "#E0E1DD",
+    "spaceBarColor": "#1B2838",
+    "dividerColor": "#253545",
+    "clipboardEntryColor": "#253545",
+    "genericActiveBackgroundColor": "#415A77",
+    "genericActiveForegroundColor": "#E0E1DD"
+  }
+}

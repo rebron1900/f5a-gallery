@@ -1,0 +1,106 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import KeyboardPreview from '../../components/KeyboardPreview.astro';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+export async function getStaticPaths() {
+  const themesDir = join(process.cwd(), 'src/content/themes');
+  const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
+
+  return files.map(f => {
+    const slug = f.replace('.json', '');
+    const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
+    return { params: { slug }, props: { theme: data, slug } };
+  });
+}
+
+const { theme, slug } = Astro.props;
+
+const colorLabels: Record<string, string> = {
+  backgroundColor: '背景颜色',
+  barColor: '工具栏颜色',
+  keyboardColor: '键盘底色',
+  keyBackgroundColor: '普通按键背景',
+  keyTextColor: '普通按键文字',
+  candidateTextColor: '候选文字',
+  candidateLabelColor: '候选标签',
+  candidateCommentColor: '候选注释',
+  altKeyBackgroundColor: '功能键背景',
+  altKeyTextColor: '功能键文字',
+  accentKeyBackgroundColor: '强调键背景',
+  accentKeyTextColor: '强调键文字',
+  keyPressHighlightColor: '按压高亮',
+  keyShadowColor: '按键边框',
+  popupBackgroundColor: '弹出背景',
+  popupTextColor: '弹出文字',
+  spaceBarColor: '空格键背景',
+  dividerColor: '分割线',
+  clipboardEntryColor: '剪贴板项背景',
+  genericActiveBackgroundColor: '激活态背景',
+  genericActiveForegroundColor: '激活态文字',
+};
+---
+<Layout title={theme.name}>
+  <div class="container detail-page">
+    <a href="/" class="detail-back">← 返回画廊</a>
+
+    <div class="detail-preview">
+      <KeyboardPreview colors={theme.colors} />
+    </div>
+
+    <div class="detail-header">
+      <h1>{theme.name}</h1>
+      <div class="detail-meta">
+        <span>@{theme.author}</span>
+        {theme.builtin && <span class="builtin-badge">内置</span>}
+        <span>{theme.isDark ? '暗色主题' : '亮色主题'}</span>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn btn-primary" id="copy-json">📋 复制 JSON</button>
+      <button class="btn" id="download-json">💾 下载主题</button>
+    </div>
+
+    <div class="color-section">
+      <h2>色值一览</h2>
+      <div class="color-grid">
+        {Object.entries(theme.colors).map(([key, value]) => (
+          <div class="color-item">
+            <div class="color-swatch" style={`background:${value}`}></div>
+            <div>
+              <div class="color-label">{colorLabels[key] || key}</div>
+              <div class="color-value">{value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <script define:vars={{ theme, slug }}>
+    const themeData = theme;
+    const themeSlug = slug;
+
+    document.getElementById('copy-json').addEventListener('click', () => {
+      const json = JSON.stringify(themeData, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        const btn = document.getElementById('copy-json');
+        btn.textContent = '✅ 已复制';
+        setTimeout(() => { btn.textContent = '📋 复制 JSON'; }, 2000);
+      });
+    });
+
+    document.getElementById('download-json').addEventListener('click', () => {
+      const json = JSON.stringify(themeData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${themeSlug}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</Layout>

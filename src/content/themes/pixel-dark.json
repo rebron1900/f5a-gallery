@@ -1,0 +1,29 @@
+{
+  "name": "Pixel Dark",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#1A1A2E",
+    "barColor": "#16213E",
+    "keyboardColor": "#0F3460",
+    "keyBackgroundColor": "#1A1A2E",
+    "keyTextColor": "#E0E0E0",
+    "candidateTextColor": "#E0E0E0",
+    "candidateLabelColor": "#8899AA",
+    "candidateCommentColor": "#667788",
+    "altKeyBackgroundColor": "#16213E",
+    "altKeyTextColor": "#AABBCC",
+    "accentKeyBackgroundColor": "#E94560",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#0F3460",
+    "keyShadowColor": "#0A0A1A",
+    "popupBackgroundColor": "#1A1A2E",
+    "popupTextColor": "#E0E0E0",
+    "spaceBarColor": "#1A1A2E",
+    "dividerColor": "#16213E",
+    "clipboardEntryColor": "#16213E",
+    "genericActiveBackgroundColor": "#E94560",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}

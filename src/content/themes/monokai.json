@@ -1,0 +1,29 @@
+{
+  "name": "Monokai",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#272822",
+    "barColor": "#3E3D32",
+    "keyboardColor": "#272822",
+    "keyBackgroundColor": "#3E3D32",
+    "keyTextColor": "#F8F8F2",
+    "candidateTextColor": "#F8F8F2",
+    "candidateLabelColor": "#75715E",
+    "candidateCommentColor": "#90908A",
+    "altKeyBackgroundColor": "#49483E",
+    "altKeyTextColor": "#A6A590",
+    "accentKeyBackgroundColor": "#A6E22E",
+    "accentKeyTextColor": "#272822",
+    "keyPressHighlightColor": "#49483E",
+    "keyShadowColor": "#1E1F1C",
+    "popupBackgroundColor": "#3E3D32",
+    "popupTextColor": "#F8F8F2",
+    "spaceBarColor": "#3E3D32",
+    "dividerColor": "#49483E",
+    "clipboardEntryColor": "#49483E",
+    "genericActiveBackgroundColor": "#A6E22E",
+    "genericActiveForegroundColor": "#272822"
+  }
+}

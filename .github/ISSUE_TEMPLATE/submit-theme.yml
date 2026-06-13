@@ -1,0 +1,47 @@
+name: 提交主题
+description: 提交一个新的 fcitx5-android 键盘主题
+labels: ["theme-submission"]
+body:
+  - type: textarea
+    id: theme-json
+    attributes:
+      label: 主题 JSON
+      description: |
+        粘贴完整的主题 JSON。必须包含 name、author、isDark 和 colors 中的全部 21 个色值。
+        颜色值使用 hex 格式（如 #2E3440）。
+      placeholder: |
+        {
+          "name": "我的主题",
+          "author": "你的名字",
+          "isDark": true,
+          "colors": {
+            "backgroundColor": "#000000",
+            "barColor": "#111111",
+            "keyboardColor": "#000000",
+            "keyBackgroundColor": "#1A1A1A",
+            "keyTextColor": "#FFFFFF",
+            "candidateTextColor": "#FFFFFF",
+            "candidateLabelColor": "#888888",
+            "candidateCommentColor": "#666666",
+            "altKeyBackgroundColor": "#222222",
+            "altKeyTextColor": "#CCCCCC",
+            "accentKeyBackgroundColor": "#1A73E8",
+            "accentKeyTextColor": "#FFFFFF",
+            "keyPressHighlightColor": "#333333",
+            "keyShadowColor": "#000000",
+            "popupBackgroundColor": "#1A1A1A",
+            "popupTextColor": "#FFFFFF",
+            "spaceBarColor": "#1A1A1A",
+            "dividerColor": "#222222",
+            "clipboardEntryColor": "#1A1A1A",
+            "genericActiveBackgroundColor": "#1A73E8",
+            "genericActiveForegroundColor": "#FFFFFF"
+          }
+        }
+    validations:
+      required: true
+  - type: textarea
+    id: preview-screenshot
+    attributes:
+      label: 预览截图（可选）
+      description: 如果有主题在手机上的实际效果截图，请贴图片链接

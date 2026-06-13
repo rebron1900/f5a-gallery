@@ -1,0 +1,29 @@
+{
+  "name": "Nord Light",
+  "author": "fxliang",
+  "isDark": false,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#ECEFF4",
+    "barColor": "#E5E9F0",
+    "keyboardColor": "#D8DEE9",
+    "keyBackgroundColor": "#ECEFF4",
+    "keyTextColor": "#2E3440",
+    "candidateTextColor": "#2E3440",
+    "candidateLabelColor": "#4C566A",
+    "candidateCommentColor": "#7B88A1",
+    "altKeyBackgroundColor": "#D8DEE9",
+    "altKeyTextColor": "#4C566A",
+    "accentKeyBackgroundColor": "#5E81AC",
+    "accentKeyTextColor": "#ECEFF4",
+    "keyPressHighlightColor": "#C8D0E0",
+    "keyShadowColor": "#B8C4D8",
+    "popupBackgroundColor": "#ECEFF4",
+    "popupTextColor": "#2E3440",
+    "spaceBarColor": "#ECEFF4",
+    "dividerColor": "#D8DEE9",
+    "clipboardEntryColor": "#E5E9F0",
+    "genericActiveBackgroundColor": "#5E81AC",
+    "genericActiveForegroundColor": "#ECEFF4"
+  }
+}

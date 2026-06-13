@@ -1,0 +1,29 @@
+{
+  "name": "AMOLED Black",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#000000",
+    "barColor": "#0A0A0A",
+    "keyboardColor": "#000000",
+    "keyBackgroundColor": "#1A1A1A",
+    "keyTextColor": "#FFFFFF",
+    "candidateTextColor": "#FFFFFF",
+    "candidateLabelColor": "#888888",
+    "candidateCommentColor": "#666666",
+    "altKeyBackgroundColor": "#222222",
+    "altKeyTextColor": "#CCCCCC",
+    "accentKeyBackgroundColor": "#1A73E8",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#333333",
+    "keyShadowColor": "#000000",
+    "popupBackgroundColor": "#1A1A1A",
+    "popupTextColor": "#FFFFFF",
+    "spaceBarColor": "#1A1A1A",
+    "dividerColor": "#222222",
+    "clipboardEntryColor": "#1A1A1A",
+    "genericActiveBackgroundColor": "#1A73E8",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}

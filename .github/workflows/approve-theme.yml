@@ -1,0 +1,50 @@
+name: Approve Theme
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  merge-theme:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract and merge theme
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx tsx scripts/merge-theme.ts --issue=${{ github.event.issue.number }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/themes/
+          THEME_FILE=$(git diff --cached --name-only | head -1)
+          THEME_NAME=$(basename "$THEME_FILE" .json)
+          git commit -m "theme: add ${THEME_NAME} (from #${{ github.event.issue.number }})"
+          git push
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const themeFile = '${{ steps.commit.outputs.theme_file }}' || 'new theme';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `✅ 主题已合并！将在下一次部署后上线。\n\n查看: https://${context.repo.owner}.github.io/${context.repo.repo}/`
+            });

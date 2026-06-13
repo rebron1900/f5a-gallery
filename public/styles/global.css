@@ -1,0 +1,252 @@
+/* Global styles for f5a-gallery */
+
+:root {
+  --bg: #0f1115;
+  --bg-card: #171a21;
+  --bg-card-hover: #1d2230;
+  --text: #e8ebf2;
+  --text-sub: #9aa4ba;
+  --border: #2a3142;
+  --primary: #4f8cff;
+  --primary-hover: #6ba0ff;
+  --radius: 8px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.site-header {
+  padding: 32px 0 24px;
+  text-align: center;
+}
+
+.site-header h1 {
+  font-size: clamp(24px, 5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.site-header p {
+  color: var(--text-sub);
+  font-size: 15px;
+}
+
+/* Theme card grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0 60px;
+}
+
+.theme-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.theme-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(79, 140, 255, 0.1);
+}
+
+.theme-card-preview {
+  padding: 12px 8px 8px;
+}
+
+.theme-card-info {
+  padding: 12px 16px 16px;
+}
+
+.theme-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.theme-card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.theme-card-meta .builtin-badge {
+  display: inline-block;
+  background: rgba(79, 140, 255, 0.15);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Detail page */
+.detail-page {
+  padding: 20px 0 60px;
+}
+
+.detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-sub);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.detail-back:hover {
+  color: var(--text);
+}
+
+.detail-preview {
+  max-width: 480px;
+  margin: 0 0 32px;
+}
+
+.detail-header {
+  margin-bottom: 24px;
+}
+
+.detail-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-sub);
+}
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary);
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* Color palette */
+.color-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.color-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.color-label {
+  color: var(--text-sub);
+}
+
+.color-value {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .theme-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+  }
+
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Material Dark",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#121212",
+    "barColor": "#1E1E1E",
+    "keyboardColor": "#2C2C2C",
+    "keyBackgroundColor": "#383838",
+    "keyTextColor": "#E0E0E0",
+    "candidateTextColor": "#E0E0E0",
+    "candidateLabelColor": "#9E9E9E",
+    "candidateCommentColor": "#757575",
+    "altKeyBackgroundColor": "#424242",
+    "altKeyTextColor": "#BDBDBD",
+    "accentKeyBackgroundColor": "#8AB4F8",
+    "accentKeyTextColor": "#202124",
+    "keyPressHighlightColor": "#505050",
+    "keyShadowColor": "#1A1A1A",
+    "popupBackgroundColor": "#383838",
+    "popupTextColor": "#E0E0E0",
+    "spaceBarColor": "#383838",
+    "dividerColor": "#424242",
+    "clipboardEntryColor": "#2C2C2C",
+    "genericActiveBackgroundColor": "#8AB4F8",
+    "genericActiveForegroundColor": "#202124"
+  }
+}

@@ -1,0 +1,13 @@
+---
+import { renderKeyboard, type ThemeColors } from '../scripts/keyboard-renderer';
+import defaultLayout from '../data/default-layout.json';
+
+interface Props {
+  colors: ThemeColors;
+}
+
+const { colors } = Astro.props;
+const layout = defaultLayout.default;
+const html = renderKeyboard(colors, layout);
+---
+<div class="keyboard-preview-wrapper" set:html={html} />

@@ -1,0 +1,29 @@
+{
+  "name": "Nord Dark",
+  "author": "fxliang",
+  "isDark": true,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#2E3440",
+    "barColor": "#3B4252",
+    "keyboardColor": "#2E3440",
+    "keyBackgroundColor": "#3B4252",
+    "keyTextColor": "#ECEFF4",
+    "candidateTextColor": "#D8DEE9",
+    "candidateLabelColor": "#A3BE8C",
+    "candidateCommentColor": "#7B88A1",
+    "altKeyBackgroundColor": "#434C5E",
+    "altKeyTextColor": "#D8DEE9",
+    "accentKeyBackgroundColor": "#5E81AC",
+    "accentKeyTextColor": "#ECEFF4",
+    "keyPressHighlightColor": "#4C566A",
+    "keyShadowColor": "#242933",
+    "popupBackgroundColor": "#3B4252",
+    "popupTextColor": "#ECEFF4",
+    "spaceBarColor": "#3B4252",
+    "dividerColor": "#4C566A",
+    "clipboardEntryColor": "#434C5E",
+    "genericActiveBackgroundColor": "#5E81AC",
+    "genericActiveForegroundColor": "#ECEFF4"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Pixel Light",
+  "author": "fxliang",
+  "isDark": false,
+  "builtin": true,
+  "colors": {
+    "backgroundColor": "#FAFAFA",
+    "barColor": "#F0F0F0",
+    "keyboardColor": "#E0E0E0",
+    "keyBackgroundColor": "#FFFFFF",
+    "keyTextColor": "#333333",
+    "candidateTextColor": "#333333",
+    "candidateLabelColor": "#888888",
+    "candidateCommentColor": "#AAAAAA",
+    "altKeyBackgroundColor": "#CCCCCC",
+    "altKeyTextColor": "#555555",
+    "accentKeyBackgroundColor": "#4CAF50",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#B0B0B0",
+    "keyShadowColor": "#999999",
+    "popupBackgroundColor": "#FFFFFF",
+    "popupTextColor": "#333333",
+    "spaceBarColor": "#FFFFFF",
+    "dividerColor": "#CCCCCC",
+    "clipboardEntryColor": "#F0F0F0",
+    "genericActiveBackgroundColor": "#4CAF50",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}

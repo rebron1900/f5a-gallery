@@ -1,0 +1,50 @@
+---
+import Layout from '../layouts/Layout.astro';
+import KeyboardPreview from '../components/KeyboardPreview.astro';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+// Read all theme JSON files
+const themesDir = join(process.cwd(), 'src/content/themes');
+const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
+
+interface Theme {
+  name: string;
+  author: string;
+  isDark: boolean;
+  builtin?: boolean;
+  colors: Record<string, string>;
+}
+
+const themes: { slug: string; theme: Theme }[] = files.map(f => {
+  const slug = f.replace('.json', '');
+  const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
+  return { slug, theme: data as Theme };
+});
+---
+<Layout title="fcitx5-android 主题画廊">
+  <div class="container">
+    <header class="site-header">
+      <h1>f5a-gallery</h1>
+      <p>fcitx5-android 主题画廊 — 浏览、预览、下载键盘主题</p>
+    </header>
+
+    <div class="theme-grid">
+      {themes.map(({ slug, theme }) => (
+        <a href={`/theme/${slug}`} class="theme-card">
+          <div class="theme-card-preview">
+            <KeyboardPreview colors={theme.colors} />
+          </div>
+          <div class="theme-card-info">
+            <div class="theme-card-name">{theme.name}</div>
+            <div class="theme-card-meta">
+              <span>@{theme.author}</span>
+              {theme.builtin && <span class="builtin-badge">内置</span>}
+              <span>{theme.isDark ? '暗色' : '亮色'}</span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
