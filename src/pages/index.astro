@@ -21,8 +21,12 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
   return { slug, theme: data as Theme };
 });
 
-// Default preview: first dark theme, or first theme
 const defaultTheme = themes.find(t => t.theme.isDark)?.theme || themes[0].theme;
+const defaultSlug = themes.find(t => t.theme.isDark)?.slug || themes[0].slug;
+
+const layoutData = JSON.parse(readFileSync(join(process.cwd(), 'src/data/default-layout.json'), 'utf-8'));
+const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.theme])));
+const layoutJson = JSON.stringify(layoutData.default);
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
@@ -34,9 +38,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <p>fcitx5-android 键盘主题画廊</p>
     </header>
 
-    {/* Top keyboard preview — shows what a theme looks like on a real keyboard */}
+    {/* Top keyboard preview */}
     <div class="preview-section">
-      <KeyboardPreview colors={defaultTheme.colors} />
+      <div class="preview-label" id="preview-theme-name">{defaultTheme.name}</div>
+      <div id="keyboard-container">
+        <KeyboardPreview colors={defaultTheme.colors} />
+      </div>
     </div>
 
     {/* Theme card grid */}
@@ -48,25 +55,78 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         const dotColor = theme.colors.accentKeyBackgroundColor;
 
         return (
-          <a href={`${base}/theme/${slug}`} class="theme-card" style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}>
+          <div
+            class={`theme-card${slug === defaultSlug ? ' active' : ''}`}
+            data-slug={slug}
+            style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}
+          >
             <div class="theme-card-name">{theme.name}</div>
             <div class="theme-card-bar" style={`background:${barColor}`}></div>
+            <div class="theme-card-meta">
+              @{theme.author}
+              {theme.builtin && <span class="builtin-badge">内置</span>}
+            </div>
             <div class="theme-card-dot" style={`background:${dotColor}`}></div>
-          </a>
+          </div>
         );
       })}
     </div>
-
-    {/* Theme meta */}
-    <div class="theme-meta-grid">
-      {themes.map(({ slug, theme }) => (
-        <div class="theme-card-footer">
-          <span class="theme-card-meta">
-            @{theme.author}
-            {theme.builtin && <span class="builtin-badge">内置</span>}
-          </span>
-        </div>
-      ))}
-    </div>
   </div>
+
+  <script define:vars={{ themesJson, layoutJson, defaultSlug }}>
+    var themes = JSON.parse(themesJson);
+    var layout = JSON.parse(layoutJson);
+
+    function updateKeyboard(slug) {
+      if (!themes[slug]) return;
+      var theme = themes[slug];
+      var html = window.renderKeyboard(theme.colors, layout, {
+        keyHGap: 3, keyVGap: 3, keyRadius: 4, borderEnabled: true
+      });
+      document.getElementById('keyboard-container').innerHTML = html;
+      document.getElementById('preview-theme-name').textContent = theme.name;
+
+      document.querySelectorAll('.theme-card').forEach(function (card) {
+        card.classList.toggle('active', card.dataset.slug === slug);
+      });
+    }
+
+    document.querySelectorAll('.theme-card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        updateKeyboard(card.dataset.slug);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+
+  <style>
+    .preview-label {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .theme-card {
+      cursor: pointer;
+    }
+
+    .theme-card.active {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 8px 1px rgba(79, 140, 255, 0.3);
+    }
+
+    .theme-card-meta {
+      font-size: 11px;
+      color: inherit;
+      opacity: 0.5;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .theme-card-meta :global(.builtin-badge) {
+      opacity: 1;
+    }
+  </style>
 </Layout>

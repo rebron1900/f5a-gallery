@@ -17,5 +17,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   </head>
   <body>
     <slot />
+    <script is:inline src={`${base}/scripts/keyboard-render.js`}></script>
   </body>
 </html>
