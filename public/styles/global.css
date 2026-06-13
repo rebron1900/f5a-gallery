@@ -87,47 +87,52 @@ a:hover { opacity: 0.85; }
 /* Mini keyboard area inside card */
 .theme-card-keyboard {
   border-radius: 8px 8px 0 0;
-  padding: 4px 3px;
+  padding: 6px 4px 2px;
   overflow: hidden;
-  /* Scale down the keyboard to fit card */
-  transform: scale(0.72);
-  transform-origin: top center;
-  margin-bottom: -18px; /* compensate for scale empty space */
 }
 
 /* Override keyboard preview inside cards to be compact */
 .theme-card-keyboard .keyboard-preview {
   max-width: none;
   border-radius: 6px;
+  padding: 3px 2px;
+}
+
+.theme-card-keyboard .keyboard-row {
+  gap: 1.5px !important;
+}
+
+.theme-card-keyboard .keyboard-slot {
+  min-width: 0;
 }
 
 .theme-card-keyboard .keyboard-key {
-  height: 28px !important;
+  height: 26px !important;
   border-width: 0.5px !important;
 }
 
 .theme-card-keyboard .keyboard-main {
-  font-size: 10px !important;
+  font-size: 9px !important;
 }
 
 .theme-card-keyboard .keyboard-alt {
-  font-size: 7px !important;
+  font-size: 6px !important;
 }
 
 .theme-card-keyboard .keyboard-key.space-key .keyboard-main {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 .theme-card-keyboard .keyboard-key.accent-key .keyboard-main {
-  font-size: 11px !important;
+  font-size: 10px !important;
 }
 
 .theme-card-keyboard .keyboard-key.alt-key .keyboard-main {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 .theme-card-keyboard .keyboard-key.language-key .keyboard-main {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 /* Card footer: name + accent dot */
