@@ -3,13 +3,13 @@
 .keyboard-preview {
   border-radius: 10px;
   overflow: hidden;
-  padding: 6px 4px;
+  padding: 4px 2px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .layout-row {
-  margin-bottom: var(--preview-row-gap, 8px);
+  margin-bottom: 3px;
   display: flex;
   justify-content: center;
 }
@@ -105,8 +105,12 @@
 /* Mobile */
 @media (max-width: 480px) {
   .keyboard-preview {
-    padding: 4px 2px;
+    padding: 3px 1px;
     border-radius: 8px;
+  }
+
+  .layout-row {
+    margin-bottom: 2px;
   }
 
   .layout-key {

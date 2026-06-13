@@ -1,8 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import KeyboardPreview from '../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import Layout from '../layouts/Layout.astro';
+import KeyboardPreview from '../components/KeyboardPreview.astro';
 
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
@@ -38,29 +38,30 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <p>fcitx5-android 键盘主题画廊</p>
     </header>
 
-    {/* Top keyboard preview */}
+    {/* Keyboard + Legend side by side on PC, stacked on mobile */}
     <div class="preview-section">
       <div class="preview-label" id="preview-theme-name">{defaultTheme.name}</div>
-      <div id="keyboard-container">
-        <KeyboardPreview colors={defaultTheme.colors} />
-      </div>
-      {/* Color legend — f5a-see-me style */}
-      <div class="color-legend" id="color-legend">
-        <div class="legend-item">
-          <span class="legend-swatch" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}></span>
-          <span class="legend-label">候选注释 Comment</span>
+      <div class="preview-layout">
+        <div id="keyboard-container">
+          <KeyboardPreview colors={defaultTheme.colors} />
         </div>
-        <div class="legend-item">
-          <span class="legend-swatch" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}></span>
-          <span class="legend-label">弹出文字 Popup</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-swatch" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}></span>
-          <span class="legend-label">剪贴板项 Clipboard</span>
-        </div>
-        <div class="legend-item">
-          <span class="legend-swatch" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}></span>
-          <span class="legend-label">激活态 Active</span>
+        <div class="color-legend" id="color-legend">
+          <div class="legend-item">
+            <span class="legend-swatch" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}></span>
+            <span class="legend-label">候选注释</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}></span>
+            <span class="legend-label">弹出文字</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}></span>
+            <span class="legend-label">剪贴板项</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-swatch" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}></span>
+            <span class="legend-label">激活态</span>
+          </div>
         </div>
       </div>
     </div>
@@ -142,6 +143,27 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       font-weight: 500;
     }
 
+    .preview-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    #keyboard-container {
+      flex: 1;
+      max-width: 480px;
+      min-width: 0;
+    }
+
+    .color-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+      padding-top: 4px;
+    }
+
     /* Card interaction */
     .theme-card {
       cursor: pointer;
@@ -161,6 +183,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .theme-card-meta :global(.builtin-badge) {
       opacity: 1;
+    }
+
+    /* Mobile: legend below keyboard in 2 columns */
+    @media (max-width: 640px) {
+      .preview-layout {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .color-legend {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        justify-content: center;
+      }
     }
   </style>
 </Layout>
