@@ -1,0 +1,29 @@
+{
+  "name": "Braun Minimal Light",
+  "author": "rebron1900",
+  "isDark": false,
+  "builtin": false,
+  "colors": {
+    "backgroundColor": "#F7F7F7",
+    "barColor": "#F7F7F7",
+    "keyboardColor": "#FFFFFF",
+    "keyBackgroundColor": "#F7F7F7",
+    "keyTextColor": "#555555",
+    "candidateTextColor": "#555555",
+    "candidateLabelColor": "#FFFFFF",
+    "candidateCommentColor": "#B6AAC0",
+    "altKeyBackgroundColor": "#D2CBD7",
+    "altKeyTextColor": "#555555",
+    "accentKeyBackgroundColor": "#F98611",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#088211",
+    "keyShadowColor": "#B6AAC0",
+    "popupBackgroundColor": "#F7F7F7",
+    "popupTextColor": "#555555",
+    "spaceBarColor": "#F7F7F7",
+    "dividerColor": "#000000",
+    "clipboardEntryColor": "#F7F7F7",
+    "genericActiveBackgroundColor": "#F98611",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}
