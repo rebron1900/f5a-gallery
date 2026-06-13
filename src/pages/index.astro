@@ -90,11 +90,11 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
           <div class="preview-tabs">
             <button class="preview-tab active" data-device="desktop">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-              桌面
+              桌面预览
             </button>
             <button class="preview-tab" data-device="mobile">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
-              手机
+              手机预览
             </button>
           </div>
           <div class="preview-title" id="preview-theme-name">{defaultTheme.name}</div>
@@ -127,10 +127,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     <section class="themes-section">
       <div class="themes-header">
         <h2 class="section-title">主题色卡</h2>
-        <div class="themes-sort">
-          排序方式：最新提交
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+        <a href="#" class="themes-view-all">查看全部 →</a>
       </div>
 
       <div class="theme-grid">
@@ -159,6 +156,18 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       </div>
     </section>
 
+    <!-- ===== Bottom CTA (mobile) ===== -->
+    <div class="hero-actions hero-actions-bottom">
+      <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank" class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        提交主题
+      </a>
+      <a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        查看指南
+      </a>
+    </div>
+
     <!-- ===== Footer ===== -->
     <footer class="site-footer">
       <div class="footer-grid">
@@ -185,8 +194,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         </div>
       </div>
       <div class="footer-bottom">
-        <span class="footer-logo">f5a</span>
-        © 2024 f5a-gallery · MIT License
+        🔒 f5a-gallery.rebron.me
       </div>
     </footer>
 
@@ -407,13 +415,10 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       margin-bottom: 20px;
     }
 
-    .themes-sort {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: var(--text-sub);
-      cursor: pointer;
+    .themes-view-all {
+      font-size: 14px;
+      color: var(--green-mid);
+      font-weight: 500;
     }
 
     /* Card palette & likes */
@@ -531,11 +536,17 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       opacity: 0.5;
     }
 
+    /* Mobile: buttons at bottom */
+    .hero-actions-bottom {
+      display: none;
+      padding: 0 0 32px;
+    }
+
     /* ===== Mobile ===== */
     @media (max-width: 768px) {
       .hero {
         flex-direction: column;
-        gap: 32px;
+        gap: 24px;
         padding: 24px 0 32px;
       }
 
@@ -549,19 +560,19 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       .stat-card { padding: 10px 8px; }
       .stat-value { font-size: 22px; }
 
-      .hero-actions {
-        flex-direction: column;
-        gap: 8px;
+      /* Hide top buttons, show bottom buttons on mobile */
+      .hero-actions-top { display: none; }
+      .hero-actions-bottom {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
       }
-
-      .hero-actions .btn { justify-content: center; }
 
       .preview-card { padding: 12px; }
 
       .themes-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        flex-direction: row;
+        align-items: center;
       }
 
       .footer-grid {

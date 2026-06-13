@@ -350,13 +350,38 @@ img { max-width: 100%; display: block; }
   .container { padding: 0 16px; }
 
   .site-nav {
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-wrap: nowrap;
+    gap: 0;
   }
 
-  .nav-links { gap: 16px; }
+  .nav-links { display: none; }
+
+  .nav-right { gap: 8px; }
+
+  .nav-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: none;
+    color: var(--text-body);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-hamburger:hover {
+    background: var(--green-pale);
+  }
 
   .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+
+/* Hamburger hidden on desktop */
+.nav-hamburger { display: none; }
+@media (max-width: 768px) {
+  .nav-hamburger { display: flex; }
 }
 
 @media (max-width: 480px) {

@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   return files.map(f => {
     const slug = f.replace('.json', '');
     const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
-    return { params: { slug }, props: { theme: data, slug } };
+    return { params: { slug }, props: { theme: data, slug } } as const;
   });
 }
 
@@ -19,11 +19,11 @@ const { theme, slug } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const colorLabels: Record<string, string> = {
-  backgroundColor: '背景颜色',
-  barColor: '工具栏颜色',
+  backgroundColor: '背景',
+  barColor: '工具栏',
   keyboardColor: '键盘底色',
-  keyBackgroundColor: '普通按键背景',
-  keyTextColor: '普通按键文字',
+  keyBackgroundColor: '按键背景',
+  keyTextColor: '按键文字',
   candidateTextColor: '候选文字',
   candidateLabelColor: '候选标签',
   candidateCommentColor: '候选注释',
@@ -32,40 +32,41 @@ const colorLabels: Record<string, string> = {
   accentKeyBackgroundColor: '强调键背景',
   accentKeyTextColor: '强调键文字',
   keyPressHighlightColor: '按压高亮',
-  keyShadowColor: '按键边框',
+  keyShadowColor: '按键阴影',
   popupBackgroundColor: '弹出背景',
   popupTextColor: '弹出文字',
-  spaceBarColor: '空格键背景',
+  spaceBarColor: '空格键',
   dividerColor: '分割线',
-  clipboardEntryColor: '剪贴板项背景',
+  clipboardEntryColor: '剪贴板项',
   genericActiveBackgroundColor: '激活态背景',
   genericActiveForegroundColor: '激活态文字',
 };
 ---
 <Layout title={theme.name}>
   <div class="container detail-page">
-    <a href={base} class="detail-back">← 返回画廊</a>
 
-    <div class="detail-preview">
-      <KeyboardPreview colors={theme.colors} />
-    </div>
-
+    <!-- Theme Header -->
     <div class="detail-header">
       <h1>{theme.name}</h1>
       <div class="detail-meta">
         <span>@{theme.author}</span>
         {theme.builtin && <span class="builtin-badge">内置</span>}
-        <span>{theme.isDark ? '暗色主题' : '亮色主题'}</span>
+        <span class="detail-mode">{theme.isDark ? '暗色' : '亮色'}</span>
+      </div>
+      <div class="detail-actions">
+        <button class="btn" id="copy-json">📋 复制 JSON</button>
+        <button class="btn btn-primary" id="download-json">💾 下载主题</button>
       </div>
     </div>
 
-    <div class="detail-actions">
-      <button class="btn btn-primary" id="copy-json">📋 复制 JSON</button>
-      <button class="btn" id="download-json">💾 下载主题</button>
+    <!-- Keyboard Preview -->
+    <div class="detail-preview">
+      <KeyboardPreview colors={theme.colors} />
     </div>
 
+    <!-- Color Preview Grid -->
     <div class="color-section">
-      <h2>色值一览</h2>
+      <h2>颜色预览</h2>
       <div class="color-grid">
         {Object.entries(theme.colors).map(([key, value]) => (
           <div class="color-item">
@@ -78,30 +79,168 @@ const colorLabels: Record<string, string> = {
         ))}
       </div>
     </div>
+
+    <!-- Theme Info -->
+    <div class="theme-info-section">
+      <h2>主题信息</h2>
+      <div class="theme-info-grid">
+        <div class="theme-info-row">
+          <span class="theme-info-label">模式</span>
+          <span class="theme-info-value">{theme.isDark ? '暗色 (Dark)' : '亮色 (Light)'}</span>
+        </div>
+        <div class="theme-info-row">
+          <span class="theme-info-label">格式版本</span>
+          <span class="theme-info-value">{theme.version || '2.1'}</span>
+        </div>
+        <div class="theme-info-row">
+          <span class="theme-info-label">颜色数量</span>
+          <span class="theme-info-value">{Object.keys(theme.colors).length} 个 token</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="detail-cta">
+      <a href="https://github.com/rebron1900/f5a-gallery/blob/main/src/content/themes/${slug}.json" target="_blank" class="btn btn-primary btn-lg">
+        在 fcitx5-android 中使用
+      </a>
+    </div>
+
   </div>
 
-  <script define:vars={{ theme, slug }}>
-    const themeData = theme;
-    const themeSlug = slug;
-
-    document.getElementById('copy-json').addEventListener('click', () => {
-      const json = JSON.stringify(themeData, null, 2);
-      navigator.clipboard.writeText(json).then(() => {
-        const btn = document.getElementById('copy-json');
+  <script define:vars={{ theme, slug, base }}>
+    document.getElementById('copy-json').addEventListener('click', function() {
+      var json = JSON.stringify(theme, null, 2);
+      navigator.clipboard.writeText(json).then(function() {
+        var btn = document.getElementById('copy-json');
         btn.textContent = '✅ 已复制';
-        setTimeout(() => { btn.textContent = '📋 复制 JSON'; }, 2000);
+        setTimeout(function() { btn.textContent = '📋 复制 JSON'; }, 2000);
       });
     });
 
-    document.getElementById('download-json').addEventListener('click', () => {
-      const json = JSON.stringify(themeData, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+    document.getElementById('download-json').addEventListener('click', function() {
+      var json = JSON.stringify(theme, null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
       a.href = url;
-      a.download = `${themeSlug}.json`;
+      a.download = slug + '.json';
       a.click();
       URL.revokeObjectURL(url);
     });
   </script>
+
+  <style>
+    .detail-page {
+      padding: 24px 0 48px;
+    }
+
+    .detail-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .detail-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .detail-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 16px;
+    }
+
+    .detail-mode {
+      background: var(--green-pale);
+      color: var(--green-mid);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .detail-preview {
+      max-width: 480px;
+      margin: 0 auto 32px;
+    }
+
+    /* Theme Info */
+    .theme-info-section {
+      margin-top: 32px;
+    }
+
+    .theme-info-section h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .theme-info-grid {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .theme-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .theme-info-row:last-child {
+      border-bottom: none;
+    }
+
+    .theme-info-label {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .theme-info-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* CTA */
+    .detail-cta {
+      margin-top: 32px;
+      text-align: center;
+    }
+
+    .btn-lg {
+      padding: 14px 32px;
+      font-size: 16px;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .detail-page { padding: 16px 0 32px; }
+      .detail-header h1 { font-size: 20px; }
+      .detail-actions { flex-direction: column; gap: 8px; }
+      .detail-actions .btn { justify-content: center; }
+      .color-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .color-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </Layout>
