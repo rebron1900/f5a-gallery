@@ -7,9 +7,15 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  merge-theme:
+  merge-and-deploy:
     if: github.event.label.name == 'approved'
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +29,6 @@ jobs:
         run: npm ci
 
       - name: Extract and merge theme
-        id: merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx tsx scripts/merge-theme.ts --issue=${{ github.event.issue.number }}
@@ -38,17 +43,20 @@ jobs:
           git commit -m "theme: add ${THEME_NAME} (from #${{ github.event.issue.number }})"
           git push
 
-      - name: Trigger deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -X POST \
-            -H "Authorization: token ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches" \
-            -d '{"ref":"main"}'
+      - name: Build site
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Comment and close issue
+        if: success()
         uses: actions/github-script@v7
         with:
           script: |
@@ -56,7 +64,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `✅ 主题已合并并部署！\n\n查看: https://${context.repo.owner}.github.io/${context.repo.repo}/`
+              body: `✅ 主题已合并并上线！\n\n查看: https://${context.repo.owner}.github.io/${context.repo.repo}/`
             });
             await github.rest.issues.update({
               owner: context.repo.owner,
