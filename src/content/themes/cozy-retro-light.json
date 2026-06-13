@@ -1,0 +1,29 @@
+{
+  "name": "Cozy Retro Light",
+  "author": "rebron1900",
+  "isDark": false,
+  "builtin": false,
+  "colors": {
+    "backgroundColor": "#F6F6F6",
+    "barColor": "#EA85E3",
+    "keyboardColor": "#000000",
+    "keyBackgroundColor": "#F2EEFD",
+    "keyTextColor": "#3B292C",
+    "candidateTextColor": "#3B292C",
+    "candidateLabelColor": "#3B292C",
+    "candidateCommentColor": "#8F959E",
+    "altKeyBackgroundColor": "#AF8781",
+    "altKeyTextColor": "#FFFFFF",
+    "accentKeyBackgroundColor": "#E6D0A3",
+    "accentKeyTextColor": "#3B292C",
+    "keyPressHighlightColor": "#021EA3",
+    "keyShadowColor": "#DDDDDD",
+    "popupBackgroundColor": "#F2EEFD",
+    "popupTextColor": "#3B292C",
+    "spaceBarColor": "#EA85E3",
+    "dividerColor": "#000000",
+    "clipboardEntryColor": "#F2EEFD",
+    "genericActiveBackgroundColor": "#E6D0A3",
+    "genericActiveForegroundColor": "#3B292C"
+  }
+}
