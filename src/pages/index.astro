@@ -44,6 +44,25 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <div id="keyboard-container">
         <KeyboardPreview colors={defaultTheme.colors} />
       </div>
+      {/* Color legend — f5a-see-me style */}
+      <div class="color-legend" id="color-legend">
+        <div class="legend-item">
+          <span class="legend-swatch" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}></span>
+          <span class="legend-label">候选注释 Comment</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}></span>
+          <span class="legend-label">弹出文字 Popup</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}></span>
+          <span class="legend-label">剪贴板项 Clipboard</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}></span>
+          <span class="legend-label">激活态 Active</span>
+        </div>
+      </div>
     </div>
 
     {/* Theme card grid */}
@@ -77,6 +96,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
 
+    function updateLegend(colors) {
+      var map = {
+        'legend-comment': colors.candidateCommentColor,
+        'legend-popup': colors.popupTextColor,
+        'legend-clipboard': colors.clipboardEntryColor,
+        'legend-active': colors.genericActiveForegroundColor
+      };
+      Object.keys(map).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.background = map[id];
+      });
+    }
+
     function updateKeyboard(slug) {
       if (!themes[slug]) return;
       var theme = themes[slug];
@@ -85,6 +117,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       });
       document.getElementById('keyboard-container').innerHTML = html;
       document.getElementById('preview-theme-name').textContent = theme.name;
+      updateLegend(theme.colors);
 
       document.querySelectorAll('.theme-card').forEach(function (card) {
         card.classList.toggle('active', card.dataset.slug === slug);
@@ -108,6 +141,36 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       font-weight: 500;
     }
 
+    /* Color legend — below keyboard */
+    .color-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+
+    .legend-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      white-space: nowrap;
+    }
+
+    /* Card interaction */
     .theme-card {
       cursor: pointer;
     }
@@ -126,6 +189,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .theme-card-meta :global(.builtin-badge) {
       opacity: 1;
+    }
+
+    /* Mobile: stack legend vertically */
+    @media (max-width: 480px) {
+      .color-legend {
+        gap: 8px 16px;
+      }
     }
   </style>
 </Layout>

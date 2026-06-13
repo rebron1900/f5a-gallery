@@ -29,12 +29,6 @@
   height: var(--key-height, 42px);
   position: relative;
   user-select: none;
-  transition: transform 0.08s ease;
-}
-
-.keyboard-key:active {
-  transform: scale(0.95);
-  opacity: 0.85;
 }
 
 .keyboard-main {
@@ -71,4 +65,42 @@
 
 .keyboard-key.language-key .keyboard-main {
   font-size: clamp(12px, 3vw, 16px);
+}
+
+/* Mobile: scale keyboard to fit viewport */
+@media (max-width: 480px) {
+  .keyboard-preview {
+    max-width: 100%;
+    padding: 4px 2px;
+    border-radius: 8px;
+  }
+
+  .keyboard-row {
+    gap: 2px;
+  }
+
+  .keyboard-key {
+    height: var(--key-height, 36px);
+  }
+
+  .keyboard-main {
+    font-size: clamp(11px, 3vw, 16px);
+  }
+
+  .keyboard-alt {
+    font-size: clamp(8px, 1.8vw, 10px);
+  }
+
+  .keyboard-key.space-key .keyboard-main {
+    font-size: clamp(9px, 2.2vw, 12px);
+  }
+
+  .keyboard-key.accent-key .keyboard-main {
+    font-size: clamp(13px, 3.5vw, 18px);
+  }
+
+  .keyboard-key.alt-key .keyboard-main,
+  .keyboard-key.language-key .keyboard-main {
+    font-size: clamp(10px, 2.5vw, 13px);
+  }
 }
