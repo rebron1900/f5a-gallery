@@ -73,34 +73,38 @@ jobs:
               errors.push('缺少颜色定义');
             } else {
               for (const token of THEME_COLORS) {
-                if (colors[token] === undefined && colors[token] !== 0) errors.push(`缺少颜色: ${token}`);
+                if (colors[token] === undefined) errors.push(`缺少颜色: ${token}`);
               }
             }
 
+            // Fetch existing bot comments to avoid duplicates
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const botComments = comments.data.filter(c => c.user.type === 'Bot');
+
             if (errors.length > 0) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: `❌ 主题校验失败：\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n请修正后重新编辑 Issue。`
-              });
-            } else {
-              // Check for existing comment from this workflow to avoid duplicates
-              const comments = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                per_page: 100,
-              });
-              const existing = comments.data.find(c =>
-                c.user.type === 'Bot' && c.body.includes('✅ JSON 格式校验通过')
-              );
-              if (!existing) {
+              const failBody = `❌ 主题校验失败：\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n请修正后重新编辑 Issue。`;
+              const alreadyFailed = botComments.some(c => c.body.includes('主题校验失败'));
+              if (!alreadyFailed) {
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: context.issue.number,
-                  body: '✅ JSON 格式校验通过！等待管理员审核。'
+                  body: failBody,
+                });
+              }
+            } else {
+              const alreadyPassed = botComments.some(c => c.body.includes('✅ JSON 格式校验通过'));
+              if (!alreadyPassed) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: '✅ JSON 格式校验通过！等待管理员审核。',
                 });
               }
             }
