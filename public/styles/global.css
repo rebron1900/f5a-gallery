@@ -155,6 +155,37 @@ a:hover { opacity: 0.85; }
   letter-spacing: 0.04em;
 }
 
+/* Color legend */
+.color-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
 /* ===== Detail page ===== */
 .detail-page {
   padding: 20px 0 60px;

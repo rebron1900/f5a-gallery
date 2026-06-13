@@ -141,37 +141,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       font-weight: 500;
     }
 
-    /* Color legend — vertical stack below keyboard */
-    .color-legend {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 12px;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .legend-swatch {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      border: 1px solid rgba(255,255,255,0.1);
-      flex-shrink: 0;
-    }
-
-    .legend-label {
-      font-size: 11px;
-      color: var(--text-sub);
-      white-space: nowrap;
-    }
-
     /* Card interaction */
     .theme-card {
       cursor: pointer;
@@ -191,13 +160,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     .theme-card-meta :global(.builtin-badge) {
       opacity: 1;
-    }
-
-    /* Mobile: stack legend vertically */
-    @media (max-width: 480px) {
-      .color-legend {
-        gap: 8px 16px;
-      }
     }
   </style>
 </Layout>
