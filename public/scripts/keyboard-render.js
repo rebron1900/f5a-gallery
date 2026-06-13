@@ -1,6 +1,6 @@
 /**
  * Keyboard renderer — browser-side version.
- * Extracted from fxliang/f5a-see-me, plain JS (no TS/build needed).
+ * Matches f5a-see-me's CSS: flex 0 0 %, padding-based gaps.
  */
 (function (root) {
   "use strict";
@@ -30,14 +30,14 @@
     if (!key) return "?";
     if ((key.type === "AlphabetKey" || key.type === "MacroKey") && key.displayText) return key.displayText;
     switch (key.type) {
-      case "CapsKey": return "⇧";
+      case "CapsKey": return "\u21e7";
       case "LayoutSwitchKey": case "LayerSwitchKey": return key.label || "?123";
       case "CommaKey": return ",";
-      case "LanguageKey": return "🌐";
+      case "LanguageKey": return "\ud83c\udf10";
       case "SpaceKey": return "space";
       case "SymbolKey": return key.label || ".";
-      case "ReturnKey": return "↵";
-      case "BackspaceKey": return "⌫";
+      case "ReturnKey": return "\u21b5";
+      case "BackspaceKey": return "\u232b";
       case "AlphabetKey": return key.main || "?";
       case "MacroKey": return key.label || "M";
       default: return key.type;
@@ -69,12 +69,10 @@
       var w = Number.isFinite(raw) ? raw : dw;
       return { width: Math.max(0, w), auto: hasWeight ? w <= 0 : dw <= 0 };
     });
-    var fixedSum = 0;
-    var flexCount = 0;
+    var fixedSum = 0, flexCount = 0;
     entries.forEach(function (e) { if (!e.auto) fixedSum += e.width; else flexCount++; });
     var remaining = Math.max(0, 1 - fixedSum);
     var flexW = flexCount > 0 ? remaining / flexCount : 0;
-    // Return plain numbers (flex-grow weights), NOT percentages
     return entries.map(function (e) { return e.auto ? flexW : e.width; });
   }
 
@@ -105,35 +103,25 @@
     var radius = opts.keyRadius != null ? opts.keyRadius : 4;
     var border = opts.borderEnabled !== false;
 
-    var rows = layout;
-    var rowCount = rows.length;
-    var rowH = rowCount > 0 ? Math.max(34, Math.round(48 * (100 / rowCount) / 25)) : 42;
-    var keyH = Math.max(1, rowH - vGap * 2);
-
-    var html = rows.map(function (row) {
+    var html = layout.map(function (row) {
       var widths = resolveRowWidths(row);
       var keysHtml = row.map(function (key, i) {
-        var kw = widths[i];
+        var wp = (widths[i] * 100).toFixed(6) + "%";
         var c = resolveColors(key, colors);
         var vc = previewVariantClass(key);
         var bw = border ? 1 : 0;
         var bs = border ? "solid" : "none";
-        var main = previewTitle(key);
+        var main = escapeHtml(previewTitle(key));
         var sub = keySubText(key);
         var altHtml = sub ? '<span class="keyboard-alt" style="color:' + c.altText + '">' + escapeHtml(sub) + '</span>' : "";
 
-        return '<div class="keyboard-slot" style="--kw:' + kw + '">'
-          + '<div class="keyboard-key ' + vc + '"'
-          + ' style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border
-          + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">'
-          + '<span class="keyboard-main">' + escapeHtml(main) + '</span>' + altHtml
-          + '</div></div>';
+        return '<div class="keyboard-slot" style="--key-width:' + wp + ';--hgap:' + hGap + 'px"><div class="keyboard-key ' + vc + '" style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px"><span class="keyboard-main">' + main + '</span>' + altHtml + '</div></div>';
       }).join("");
 
-      return '<div class="keyboard-row" style="gap:' + hGap + 'px">' + keysHtml + '</div>';
+      return '<div class="keyboard-row"><div class="keyboard-keys">' + keysHtml + '</div></div>';
     }).join("");
 
-    return '<div class="keyboard-preview" style="background:' + colors.keyboardColor + ';gap:' + vGap + 'px">' + html + '</div>';
+    return '<div class="keyboard-preview" style="background:' + colors.keyboardColor + '">' + html + '</div>';
   }
 
   root.renderKeyboard = renderKeyboard;

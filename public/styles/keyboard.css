@@ -1,8 +1,6 @@
-/* Keyboard preview styles */
+/* Keyboard preview — matches f5a-see-me CSS approach */
 
 .keyboard-preview {
-  display: flex;
-  flex-direction: column;
   border-radius: 10px;
   overflow: hidden;
   padding: 6px 4px;
@@ -11,25 +9,39 @@
 }
 
 .keyboard-row {
+  margin-bottom: 6px;
   display: flex;
-  gap: 3px;
-  width: 100%;
+  justify-content: center;
+}
+
+.keyboard-row:last-child {
+  margin-bottom: 0;
+}
+
+.keyboard-keys {
+  display: flex;
+  gap: 0;
+  width: min(100%, 720px);
 }
 
 .keyboard-slot {
-  flex: var(--kw, 1) 1 0;
+  flex: 0 0 var(--key-width, 10%);
   min-width: 0;
+  padding: 0 var(--hgap, 3px);
+  display: flex;
 }
 
 .keyboard-key {
+  width: 100%;
+  height: 42px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 42px;
   position: relative;
   user-select: none;
   box-sizing: border-box;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .keyboard-main {
@@ -75,10 +87,6 @@
     border-radius: 8px;
   }
 
-  .keyboard-row {
-    gap: 2px;
-  }
-
   .keyboard-key {
     height: 36px;
   }
@@ -105,7 +113,6 @@
   }
 }
 
-/* Very small screens */
 @media (max-width: 360px) {
   .keyboard-key {
     height: 32px;
@@ -117,13 +124,5 @@
 
   .keyboard-alt {
     font-size: 8px;
-  }
-
-  .keyboard-row {
-    gap: 1px;
-  }
-
-  .keyboard-preview {
-    padding: 3px 1px;
   }
 }
