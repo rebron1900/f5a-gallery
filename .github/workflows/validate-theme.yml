@@ -31,8 +31,9 @@ jobs:
             let jsonStr = null;
             const codeBlockMatch = body.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
             if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+            // Fallback: match any JSON object with "name" field
             if (!jsonStr) {
-              const jsonMatch = body.match(/\{[\s\S]*"colors"[\s\S]*\}/);
+              const jsonMatch = body.match(/\{[\s\S]*"name"[\s\S]*\}/);
               if (jsonMatch) jsonStr = jsonMatch[0];
             }
 
@@ -59,16 +60,20 @@ jobs:
               return;
             }
 
+            // Support both formats:
+            //   - Native fcitx5-android: top-level color tokens as int32, no author/colors
+            //   - Gallery wrapper: { author, colors: { ...hex } }
             const errors = [];
             if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name 字段');
-            if (!data.author || typeof data.author !== 'string') errors.push('缺少或无效的 author 字段');
             if (typeof data.isDark !== 'boolean') errors.push('缺少或无效的 isDark 字段（需要 true 或 false）');
 
-            if (!data.colors || typeof data.colors !== 'object') {
-              errors.push('缺少 colors 对象');
+            // Colors can be in data.colors (wrapper) or directly in data (native)
+            const colors = data.colors || data;
+            if (typeof colors !== 'object') {
+              errors.push('缺少颜色定义');
             } else {
               for (const token of THEME_COLORS) {
-                if (!data.colors[token]) errors.push(`缺少颜色: ${token}`);
+                if (colors[token] === undefined && colors[token] !== 0) errors.push(`缺少颜色: ${token}`);
               }
             }
 
