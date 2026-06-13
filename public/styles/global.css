@@ -1,4 +1,4 @@
-/* Global styles for f5a-gallery — f5a-see-me style */
+/* Global styles for f5a-gallery */
 
 :root {
   --bg: #0f1115;
@@ -8,7 +8,7 @@
   --text-sub: #9aa4ba;
   --border: #2a3142;
   --accent: #4f8cff;
-  --radius: 10px;
+  --radius: 8px;
 }
 
 *,
@@ -36,14 +36,14 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { opacity: 0.85; }
 
 .container {
-  max-width: 1080px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* Header */
+/* ===== Header ===== */
 .site-header {
-  padding: 48px 0 12px;
+  padding: 40px 0 8px;
   text-align: center;
 }
 
@@ -59,12 +59,19 @@ a:hover { opacity: 0.85; }
   font-size: 14px;
 }
 
-/* ===== Theme card grid — f5a-see-me mini keyboard style ===== */
+/* ===== Top keyboard preview ===== */
+.preview-section {
+  padding: 20px 0 28px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== Theme card grid ===== */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  padding: 32px 0 60px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 0 0 8px;
 }
 
 .theme-card {
@@ -73,91 +80,61 @@ a:hover { opacity: 0.85; }
   border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  aspect-ratio: 1.65;
   display: flex;
   flex-direction: column;
+  padding: 14px 14px 12px;
 }
 
 .theme-card:hover {
   border-color: var(--accent);
   box-shadow: 0 0 8px 1px rgba(79, 140, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-/* Mini keyboard area inside card */
-.theme-card-keyboard {
-  border-radius: 8px 8px 0 0;
-  padding: 6px 4px 2px;
-  overflow: hidden;
-}
-
-/* Override keyboard preview inside cards to be compact */
-.theme-card-keyboard .keyboard-preview {
-  max-width: none;
-  border-radius: 6px;
-  padding: 3px 2px;
-}
-
-.theme-card-keyboard .keyboard-row {
-  gap: 1.5px !important;
-}
-
-.theme-card-keyboard .keyboard-slot {
-  min-width: 0;
-}
-
-.theme-card-keyboard .keyboard-key {
-  height: 26px !important;
-  border-width: 0.5px !important;
-}
-
-.theme-card-keyboard .keyboard-main {
-  font-size: 9px !important;
-}
-
-.theme-card-keyboard .keyboard-alt {
-  font-size: 6px !important;
-}
-
-.theme-card-keyboard .keyboard-key.space-key .keyboard-main {
-  font-size: 8px !important;
-}
-
-.theme-card-keyboard .keyboard-key.accent-key .keyboard-main {
-  font-size: 10px !important;
-}
-
-.theme-card-keyboard .keyboard-key.alt-key .keyboard-main {
-  font-size: 8px !important;
-}
-
-.theme-card-keyboard .keyboard-key.language-key .keyboard-main {
-  font-size: 8px !important;
-}
-
-/* Card footer: name + accent dot */
-.theme-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
 }
 
 .theme-card-name {
   font-size: 13px;
   font-weight: 600;
+  margin-bottom: auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--text);
+}
+
+.theme-card-bar {
+  width: 80%;
+  height: 14px;
+  border-radius: 4px;
+  margin: 8px auto 0;
+  opacity: 0.7;
 }
 
 .theme-card-dot {
-  width: 12px;
-  height: 12px;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ===== Theme meta grid ===== */
+.theme-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: -8px;
+  padding-bottom: 60px;
+}
+
+.theme-card-footer {
+  padding: 8px 2px 0;
+}
+
+.theme-card-meta {
+  font-size: 11px;
+  color: var(--text-sub);
 }
 
 .builtin-badge {
@@ -282,12 +259,15 @@ a:hover { opacity: 0.85; }
 .color-label { color: var(--text-sub); font-size: 11px; }
 .color-value { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px; }
 
-/* Responsive */
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .theme-grid,
+  .theme-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
 @media (max-width: 480px) {
-  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .theme-grid,
+  .theme-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .theme-card { padding: 10px 10px 8px; }
   .color-grid { grid-template-columns: 1fr; }
 }
