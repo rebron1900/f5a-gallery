@@ -1,14 +1,14 @@
 /* Global styles for f5a-gallery — f5a-see-me style */
 
 :root {
-  --bg: #1a1d28;
-  --bg-surface: #212430;
-  --bg-card: #2a2d3a;
+  --bg: #0f1115;
+  --bg-surface: #171a21;
+  --bg-card: #1d2230;
   --text: #e8ebf2;
-  --text-sub: #8a8fa4;
-  --border: #3a3d4a;
+  --text-sub: #9aa4ba;
+  --border: #2a3142;
   --accent: #4f8cff;
-  --radius: 8px;
+  --radius: 10px;
 }
 
 *,
@@ -36,14 +36,14 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { opacity: 0.85; }
 
 .container {
-  max-width: 960px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
 /* Header */
 .site-header {
-  padding: 40px 0 8px;
+  padding: 48px 0 12px;
   text-align: center;
 }
 
@@ -59,12 +59,12 @@ a:hover { opacity: 0.85; }
   font-size: 14px;
 }
 
-/* Theme card grid — f5a-see-me style */
+/* ===== Theme card grid — f5a-see-me mini keyboard style ===== */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  padding: 24px 0 60px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 32px 0 60px;
 }
 
 .theme-card {
@@ -73,63 +73,86 @@ a:hover { opacity: 0.85; }
   border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  position: relative;
-  aspect-ratio: 1.65;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
   display: flex;
   flex-direction: column;
-  padding: 14px 14px 12px;
 }
 
 .theme-card:hover {
   border-color: var(--accent);
+  box-shadow: 0 0 8px 1px rgba(79, 140, 255, 0.2);
+  transform: translateY(-2px);
 }
 
-.theme-card.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 4px 1px var(--accent);
-}
-
-/* Card top: theme name */
-.theme-card-name {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: auto;
-  white-space: nowrap;
+/* Mini keyboard area inside card */
+.theme-card-keyboard {
+  border-radius: 8px 8px 0 0;
+  padding: 4px 3px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  /* Scale down the keyboard to fit card */
+  transform: scale(0.72);
+  transform-origin: top center;
+  margin-bottom: -18px; /* compensate for scale empty space */
 }
 
-/* Card middle: accent bar (mini toolbar preview) */
-.theme-card-bar {
-  width: 80%;
-  height: 14px;
-  border-radius: 4px;
-  margin: 8px auto 0;
-  opacity: 0.7;
+/* Override keyboard preview inside cards to be compact */
+.theme-card-keyboard .keyboard-preview {
+  max-width: none;
+  border-radius: 6px;
 }
 
-/* Card bottom-right: accent dot */
-.theme-card-dot {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+.theme-card-keyboard .keyboard-key {
+  height: 28px !important;
+  border-width: 0.5px !important;
 }
 
-/* Card meta below */
+.theme-card-keyboard .keyboard-main {
+  font-size: 10px !important;
+}
+
+.theme-card-keyboard .keyboard-alt {
+  font-size: 7px !important;
+}
+
+.theme-card-keyboard .keyboard-key.space-key .keyboard-main {
+  font-size: 9px !important;
+}
+
+.theme-card-keyboard .keyboard-key.accent-key .keyboard-main {
+  font-size: 11px !important;
+}
+
+.theme-card-keyboard .keyboard-key.alt-key .keyboard-main {
+  font-size: 9px !important;
+}
+
+.theme-card-keyboard .keyboard-key.language-key .keyboard-main {
+  font-size: 9px !important;
+}
+
+/* Card footer: name + accent dot */
 .theme-card-footer {
-  padding: 8px 2px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 12px;
 }
 
-.theme-card-meta {
-  font-size: 11px;
-  color: var(--text-sub);
+.theme-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.theme-card-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .builtin-badge {
@@ -144,24 +167,7 @@ a:hover { opacity: 0.85; }
   letter-spacing: 0.04em;
 }
 
-/* Keyboard preview section */
-.preview-section {
-  padding: 24px 0;
-}
-
-.preview-section h2 {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-sub);
-}
-
-.keyboard-wrapper {
-  max-width: 420px;
-  margin: 0 auto;
-}
-
-/* Detail page */
+/* ===== Detail page ===== */
 .detail-page {
   padding: 20px 0 60px;
 }
@@ -273,11 +279,10 @@ a:hover { opacity: 0.85; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 
 @media (max-width: 480px) {
   .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .theme-card { padding: 10px 10px 8px; }
   .color-grid { grid-template-columns: 1fr; }
 }

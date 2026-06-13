@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import KeyboardPreview from '../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { renderKeyboard, type ThemeColors } from '../scripts/keyboard-renderer';
+import defaultLayout from '../data/default-layout.json';
 
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
@@ -12,13 +13,20 @@ interface Theme {
   author: string;
   isDark: boolean;
   builtin?: boolean;
-  colors: Record<string, string>;
+  colors: ThemeColors;
 }
 
-const themes: { slug: string; theme: Theme }[] = files.map(f => {
+const themes: { slug: string; theme: Theme; keyboardHtml: string }[] = files.map(f => {
   const slug = f.replace('.json', '');
   const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
-  return { slug, theme: data as Theme };
+  const theme = data as Theme;
+  const keyboardHtml = renderKeyboard(theme.colors, defaultLayout.default, {
+    keyHGap: 1.5,
+    keyVGap: 1.5,
+    keyRadius: 3,
+    borderEnabled: true,
+  });
+  return { slug, theme, keyboardHtml };
 });
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -32,33 +40,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </header>
 
     <div class="theme-grid">
-      {themes.map(({ slug, theme }) => {
-        // f5a-see-me style card: bg = keyboard color, accent bar = altKeyBg, dot = accentKeyBg
-        const cardBg = theme.colors.keyboardColor || theme.colors.backgroundColor;
-        const textColor = theme.isDark ? '#ffffff' : '#1a1a1a';
-        const barColor = theme.colors.altKeyBackgroundColor || theme.colors.barColor;
-        const dotColor = theme.colors.accentKeyBackgroundColor;
-
+      {themes.map(({ slug, theme, keyboardHtml }) => {
+        const accentColor = theme.colors.accentKeyBackgroundColor;
         return (
-          <a href={`${base}/theme/${slug}`} class="theme-card" style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}>
-            <div class="theme-card-name">{theme.name}</div>
-            <div class="theme-card-bar" style={`background:${barColor}`}></div>
-            <div class="theme-card-dot" style={`background:${dotColor}`}></div>
+          <a href={`${base}/theme/${slug}`} class="theme-card">
+            <div class="theme-card-keyboard" style={`background:${theme.colors.keyboardColor}`} set:html={keyboardHtml} />
+            <div class="theme-card-footer">
+              <span class="theme-card-name">{theme.name}</span>
+              <span class="theme-card-dot" style={`background:${accentColor}`}></span>
+            </div>
           </a>
         );
       })}
-    </div>
-
-    {/* Show theme meta below grid */}
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-12px">
-      {themes.map(({ slug, theme }) => (
-        <div class="theme-card-footer">
-          <span class="theme-card-meta">
-            @{theme.author}
-            {theme.builtin && <span class="builtin-badge">内置</span>}
-          </span>
-        </div>
-      ))}
     </div>
   </div>
 </Layout>
