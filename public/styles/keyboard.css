@@ -1,118 +1,106 @@
-/* Keyboard preview — faithful port from f5a-see-me */
+/* Keyboard preview styles — extracted from f5a-see-me/style.css */
 
 .keyboard-preview {
+  display: flex;
+  flex-direction: column;
   border-radius: 10px;
   overflow: hidden;
   padding: 6px 4px;
   width: 100%;
-  box-sizing: border-box;
+  max-width: 420px;
+  margin: 0 auto;
 }
 
-/* Row: flex center, 8px gap between rows */
-.layout-row {
-  margin-bottom: var(--preview-row-gap, 8px);
+.keyboard-row {
   display: flex;
-  justify-content: center;
-}
-.layout-row:last-child {
-  margin-bottom: 0;
+  gap: 3px;
 }
 
-/* Keys container: centered, max 720px */
-.layout-row .keys {
-  display: flex;
-  gap: 0;
-  min-height: var(--row-height, 42px);
-  width: min(100%, 720px);
-  justify-content: center;
-}
-
-/* Key slot: fixed percentage width, padding for horizontal gap */
-.layout-key-slot {
-  flex: 0 0 var(--key-width, 0%);
+.keyboard-slot {
+  flex: var(--key-width, 1);
   min-width: 0;
-  padding: 0 var(--preview-key-hgap, 0px);
-  display: flex;
 }
 
-/* Key: full-size fill, responsive font via container query */
-.layout-key {
-  height: var(--key-height, calc(var(--row-height, 42px) - var(--preview-key-vgap, 0px) * 2));
-  width: 100%;
+.keyboard-key {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: var(--key-height, 42px);
   position: relative;
   user-select: none;
-  box-sizing: border-box;
-  border-radius: var(--preview-key-radius, 4px);
-  overflow: hidden;
-  font-weight: 600;
-  padding: 0;
-  container-type: inline-size;
-  font-size: clamp(14px, 42cqw, 23px);
 }
 
-/* Main label */
-.layout-key-main {
+.keyboard-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: clamp(13px, 3.5vw, 20px);
   font-weight: 600;
   line-height: 1;
   text-align: center;
 }
 
-/* Lucide icon — same sizing as main text */
-.layout-key-icon {
-  width: 1em;
-  height: 1em;
-  stroke-width: 2.2;
-}
-
-/* Alt text (top-right, like f5a-see-me) */
-.layout-key-alt {
+.keyboard-alt {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: clamp(9px, 2vw, 12px);
   font-weight: 400;
   line-height: 1;
   text-align: center;
   opacity: 0.8;
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  max-width: calc(100% - 12px);
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: clamp(7px, 18cqw, 10px);
 }
 
-/* Variant: space key */
-.layout-key.space-key {
-  font-size: clamp(12px, 20cqw, 18px);
-}
-.layout-key.space-key .layout-key-main {
+/* Key variant styles */
+.keyboard-key.space-key .keyboard-main {
+  font-size: clamp(11px, 2.5vw, 14px);
   font-weight: 400;
   opacity: 0.7;
 }
 
-/* Variant: accent (return/enter) */
-.layout-key.accent-key {
-  font-size: clamp(13px, 38cqw, 20px);
+.keyboard-key.accent-key .keyboard-main {
+  font-size: clamp(16px, 4vw, 22px);
 }
 
-/* Variant: alt (shift, backspace, etc.) */
-.layout-key.alt-key {
-  font-size: clamp(12px, 34cqw, 16px);
-  font-weight: 700;
+.keyboard-key.alt-key .keyboard-main {
+  font-size: clamp(12px, 3vw, 16px);
 }
 
-/* Variant: language */
-.layout-key.language-key {
-  font-size: clamp(12px, 34cqw, 16px);
+.keyboard-key.language-key .keyboard-main {
+  font-size: clamp(12px, 3vw, 16px);
 }
 
-/* Mobile tweaks */
+/* Mobile: scale keyboard to fit viewport */
 @media (max-width: 480px) {
   .keyboard-preview {
+    max-width: 100%;
     padding: 4px 2px;
     border-radius: 8px;
+  }
+
+  .keyboard-row {
+    gap: 2px;
+  }
+
+  .keyboard-key {
+    height: var(--key-height, 36px);
+  }
+
+  .keyboard-main {
+    font-size: clamp(11px, 3vw, 16px);
+  }
+
+  .keyboard-alt {
+    font-size: clamp(8px, 1.8vw, 10px);
+  }
+
+  .keyboard-key.space-key .keyboard-main {
+    font-size: clamp(9px, 2.2vw, 12px);
+  }
+
+  .keyboard-key.accent-key .keyboard-main {
+    font-size: clamp(13px, 3.5vw, 18px);
+  }
+
+  .keyboard-key.alt-key .keyboard-main,
+  .keyboard-key.language-key .keyboard-main {
+    font-size: clamp(10px, 2.5vw, 13px);
   }
 }

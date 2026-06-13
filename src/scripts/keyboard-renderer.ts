@@ -1,11 +1,7 @@
 /**
- * Keyboard renderer — faithful port from fxliang/f5a-see-me
- * renderLayoutPreview() in js/app.js
- *
- * HTML: .layout-row > .keys > .layout-key-slot > .layout-key
- * CSS variables set on .keyboard-preview: --preview-key-hgap, --preview-key-vgap, --preview-key-radius, --preview-row-gap
- * CSS variables set on .layout-row: --row-height, --key-height
- * CSS variables set on .layout-key-slot: --key-width
+ * Keyboard renderer extracted from fxliang/f5a-see-me
+ * Pure display only — no editing, no state management.
+ * Colors use hex strings instead of ARGB int32.
  */
 
 export interface ThemeColors {
@@ -43,9 +39,10 @@ export interface KeyDef {
 
 export type Layout = KeyDef[][];
 
-/* --- helpers --- */
+// --- Key type → CSS class mapping (from f5a-see-me keyVariantClass) ---
 
 function keyVariantClass(key: KeyDef): string {
+  const classes: string[] = [];
   switch (key.type) {
     case "CapsKey":
     case "LayoutSwitchKey":
@@ -54,53 +51,58 @@ function keyVariantClass(key: KeyDef): string {
     case "SymbolKey":
     case "LanguageKey":
     case "BackspaceKey":
-      return "alt-key";
+      classes.push("alt-key");
+      break;
     case "SpaceKey":
-      return "space-key";
+      classes.push("space-key");
+      break;
     case "ReturnKey":
-      return "accent-key";
-    default:
-      return "";
+      classes.push("accent-key");
+      break;
   }
+  return classes.join(" ");
 }
 
 function previewVariantClass(key: KeyDef): string {
-  const cls = keyVariantClass(key);
-  if (key.type === "LanguageKey") return cls ? cls + " language-key" : "language-key";
-  return cls;
+  const classes = keyVariantClass(key)
+    .split(/\s+/)
+    .filter((cls) => cls && cls !== "macro-key" && cls !== "compose-key");
+  if (key.type === "LanguageKey") classes.push("language-key");
+  return classes.join(" ");
 }
 
-/** Lucide icon name for special keys */
-function lucideIcon(key: KeyDef): string | null {
-  switch (key.type) {
-    case "CapsKey": return "arrow-up";
-    case "BackspaceKey": return "delete";
-    case "ReturnKey": return "corner-down-left";
-    case "LanguageKey": return "globe";
-    default: return null;
-  }
-}
+// --- Key display text (from f5a-see-me previewTitleFromObj) ---
 
 function previewTitle(key: KeyDef): string {
   if (!key) return "?";
-  if ((key.type === "AlphabetKey" || key.type === "MacroKey") && key.displayText) return key.displayText;
+  if (key.type === "AlphabetKey" || key.type === "MacroKey") {
+    if (typeof key.displayText === "string" && key.displayText) return key.displayText;
+  }
   switch (key.type) {
+    case "CapsKey": return "⇧";
     case "LayoutSwitchKey":
     case "LayerSwitchKey": return key.label || "?123";
     case "CommaKey": return ",";
+    case "LanguageKey": return "🌐";
     case "SpaceKey": return "space";
     case "SymbolKey": return key.label || ".";
+    case "ReturnKey": return "↵";
+    case "BackspaceKey": return "⌫";
     case "AlphabetKey": return key.main || "?";
     case "MacroKey": return key.label || "M";
-    default: return "";
+    default: return key.type;
   }
 }
+
+// --- Key sub text (from f5a-see-me keySubText) ---
 
 function keySubText(key: KeyDef): string {
   if (!key) return "";
   if (key.type === "AlphabetKey") return key.alt || "";
   return "";
 }
+
+// --- Key width calculation (from f5a-see-me resolveRegularRowWidths) ---
 
 function defaultKeyWeight(key: KeyDef): number {
   switch (key.type) {
@@ -124,90 +126,131 @@ function resolveRowWidths(row: KeyDef[]): number[] {
   if (!row.length) return [];
   const entries = row.map((key) => {
     const hasWeight = key && "weight" in key;
-    const dw = defaultKeyWeight(key);
-    const raw = hasWeight ? Number(key.weight) : dw;
-    const w = Number.isFinite(raw) ? raw : dw;
-    return { width: Math.max(0, w), auto: hasWeight ? w <= 0 : dw <= 0 };
+    const defaultWidth = defaultKeyWeight(key);
+    const raw = hasWeight ? Number(key.weight) : defaultWidth;
+    const width = Number.isFinite(raw) ? raw : defaultWidth;
+    return {
+      width: Math.max(0, width),
+      auto: hasWeight ? width <= 0 : defaultWidth <= 0,
+    };
   });
-  const fixedSum = entries.reduce((s, e) => s + (e.auto ? 0 : e.width), 0);
-  const flexCount = entries.filter((e) => e.auto).length;
+  const fixedSum = entries.reduce((sum, item) => sum + (item.auto ? 0 : item.width), 0);
+  const flexCount = entries.filter((item) => item.auto).length;
   const remaining = Math.max(0, 1 - fixedSum);
-  const flexW = flexCount > 0 ? remaining / flexCount : 0;
-  return entries.map((e) => (e.auto ? flexW : e.width));
+  const flexWidth = flexCount > 0 ? remaining / flexCount : 0;
+  return entries.map((item) => (item.auto ? flexWidth : item.width));
 }
 
-function resolveColors(key: KeyDef, colors: ThemeColors) {
+// --- Color resolution (simplified from f5a-see-me) ---
+
+interface PreviewColors {
+  background: string;
+  text: string;
+  altText: string;
+  border: string;
+}
+
+function resolveColors(key: KeyDef, colors: ThemeColors): PreviewColors {
   const variant = keyVariantClass(key);
-  const isAlt = variant === "alt-key";
-  const isAccent = variant === "accent-key";
-  const isSpace = variant === "space-key";
+  const isAlt = variant.includes("alt-key");
+  const isAccent = variant.includes("accent-key");
+  const isSpace = variant.includes("space-key");
   const isReturn = key.type === "ReturnKey";
   const isLayoutSwitch = key.type === "LayoutSwitchKey" || key.type === "LayerSwitchKey";
 
-  const bg = isSpace ? colors.spaceBarColor
-    : (isReturn || isAccent) ? colors.accentKeyBackgroundColor
-    : (isAlt || isLayoutSwitch) ? colors.altKeyBackgroundColor
-    : colors.keyBackgroundColor;
+  // Background
+  let background: string;
+  if (isSpace) {
+    background = colors.spaceBarColor;
+  } else if (isReturn) {
+    background = colors.accentKeyBackgroundColor;
+  } else if (isLayoutSwitch) {
+    background = colors.altKeyBackgroundColor;
+  } else if (isAccent) {
+    background = colors.accentKeyBackgroundColor;
+  } else if (isAlt) {
+    background = colors.altKeyBackgroundColor;
+  } else {
+    background = colors.keyBackgroundColor;
+  }
 
-  const tx = isReturn || isAccent ? colors.accentKeyTextColor
-    : isAlt || isLayoutSwitch ? colors.altKeyTextColor
-    : colors.keyTextColor;
+  // Text
+  let text: string;
+  if (isReturn) {
+    text = colors.accentKeyTextColor;
+  } else if (isAccent) {
+    text = colors.accentKeyTextColor;
+  } else if (isAlt || isLayoutSwitch) {
+    text = colors.altKeyTextColor;
+  } else {
+    text = colors.keyTextColor;
+  }
 
-  return { bg, tx, altTx: colors.altKeyTextColor, border: colors.keyShadowColor };
+  // Alt text (for key sub labels)
+  const altText = colors.altKeyTextColor;
+
+  // Border
+  const border = colors.keyShadowColor;
+
+  return { background, text, altText, border };
 }
 
-function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// --- HTML escape ---
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-/**
- * Render keyboard HTML — matches f5a-see-me's renderLayoutPreview() exactly.
- *
- * Defaults match f5a-see-me's defaults:
- *   keyHGap=0, keyVGap=0, keyRadius=4, rowGap=8
- * These are set as CSS custom properties on .keyboard-preview.
- */
-export function renderKeyboard(
-  colors: ThemeColors,
-  layout: Layout,
-  options?: { keyHGap?: number; keyVGap?: number; keyRadius?: number; borderEnabled?: boolean }
-): string {
-  const hGap = options?.keyHGap ?? 0;
-  const vGap = options?.keyVGap ?? 0;
-  const radius = options?.keyRadius ?? 4;
-  const border = options?.borderEnabled !== false;
+// --- Main render function ---
 
-  const rowHeight = 42;
-  const keyHeight = rowHeight - vGap * 2;
-  const rowGap = 8;
+export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
+  keyHGap?: number;
+  keyVGap?: number;
+  keyRadius?: number;
+  borderEnabled?: boolean;
+}): string {
+  const {
+    keyHGap = 3,
+    keyVGap = 3,
+    keyRadius = 4,
+    borderEnabled = true,
+  } = options || {};
 
-  const html = layout.map((row) => {
+  const rows = layout;
+  const rowCount = rows.length;
+  const rowHeight = rowCount > 0 ? Math.max(34, Math.round(48 * (100 / rowCount) / 25)) : 42;
+  const keyHeight = Math.max(1, rowHeight - keyVGap * 2);
+
+  const html = rows.map((row) => {
     const widths = resolveRowWidths(row);
     const keysHtml = row.map((key, i) => {
-      const wp = `${(widths[i] * 100).toFixed(6)}%`;
+      const widthPercent = `${(widths[i] * 100).toFixed(6)}%`;
       const c = resolveColors(key, colors);
-      const vc = previewVariantClass(key);
-      const bw = border ? 1 : 0;
-      const bs = border ? "solid" : "none";
-      const icon = lucideIcon(key);
-      const title = previewTitle(key);
+      const variant = previewVariantClass(key);
+      const borderWidth = borderEnabled ? 1 : 0;
+      const borderStyle = borderEnabled ? "solid" : "none";
+
+      const mainText = previewTitle(key);
       const sub = keySubText(key);
 
-      const mainHtml = icon
-        ? `<i data-lucide="${icon}" class="layout-key-icon"></i>`
-        : `<span class="layout-key-main">${esc(title)}</span>`;
-
       const altHtml = sub
-        ? `<span class="layout-key-alt" style="color:${esc(c.altTx)}">${esc(sub)}</span>`
+        ? `<span class="keyboard-alt" style="color:${c.altText}">${escapeHtml(sub)}</span>`
         : "";
 
-      return `<div class="layout-key-slot" style="--key-width:${wp}">` +
-        `<div class="layout-key ${vc}" style="background:${esc(c.bg)};color:${esc(c.tx)};border-color:${esc(c.border)};border-width:${bw}px;border-style:${bs};border-radius:${radius}px">` +
-        `${mainHtml}${altHtml}</div></div>`;
+      return `<div class="keyboard-slot" style="--key-width:${widthPercent}">
+        <div class="keyboard-key ${variant}"
+             style="background:${c.background};color:${c.text};border-color:${c.border};border-width:${borderWidth}px;border-style:${borderStyle};border-radius:${keyRadius}px">
+          <span class="keyboard-main">${escapeHtml(mainText)}</span>${altHtml}
+        </div>
+      </div>`;
     }).join("");
 
-    return `<div class="layout-row" style="--row-height:${rowHeight}px;--key-height:${keyHeight}px"><div class="keys">${keysHtml}</div></div>`;
+    return `<div class="keyboard-row" style="--key-height:${keyHeight}px;gap:${keyHGap}px">${keysHtml}</div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" style="background:${esc(colors.keyboardColor)};--preview-key-hgap:${hGap}px;--preview-key-vgap:${vGap}px;--preview-key-radius:${radius}px;--preview-row-gap:${rowGap}px">${html}</div>`;
+  return `<div class="keyboard-preview" style="background:${colors.keyboardColor};gap:${keyVGap}px">${html}</div>`;
 }
