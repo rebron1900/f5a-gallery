@@ -1,0 +1,29 @@
+{
+  "name": "Braun Minimal Dark",
+  "author": "rebron1900",
+  "isDark": true,
+  "builtin": false,
+  "colors": {
+    "backgroundColor": "#2D2E42",
+    "barColor": "#2D2E42",
+    "keyboardColor": "#000000",
+    "keyBackgroundColor": "#454854",
+    "keyTextColor": "#ECECEC",
+    "candidateTextColor": "#ECECEC",
+    "candidateLabelColor": "#ECECEC",
+    "candidateCommentColor": "#A8ADB7",
+    "altKeyBackgroundColor": "#5A5E69",
+    "altKeyTextColor": "#ECECEC",
+    "accentKeyBackgroundColor": "#F98611",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyPressHighlightColor": "#088A11",
+    "keyShadowColor": "#1A1A1A",
+    "popupBackgroundColor": "#3A3C45",
+    "popupTextColor": "#ECECEC",
+    "spaceBarColor": "#3A3C45",
+    "dividerColor": "#000000",
+    "clipboardEntryColor": "#454854",
+    "genericActiveBackgroundColor": "#F98611",
+    "genericActiveForegroundColor": "#FFFFFF"
+  }
+}
