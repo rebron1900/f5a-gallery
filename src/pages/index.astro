@@ -29,54 +29,167 @@ const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.
 const layoutJson = JSON.stringify(layoutData.default);
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Palette swatches for cards
+const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
 ---
 
 <Layout title="f5a-gallery">
   <div class="container">
-    <header class="site-header">
-      <h1>f5a-gallery</h1>
-      <p>fcitx5-android 键盘主题画廊</p>
-    </header>
 
-    <div class="preview-section">
-      <div class="preview-label" id="preview-theme-name">{defaultTheme.name}</div>
-      <div class="preview-layout">
-        <div id="keyboard-container">
-          <KeyboardPreview colors={defaultTheme.colors} />
+    <!-- ===== Hero Section ===== -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1 class="hero-title-sm">探索键盘主题</h1>
+        <h2 class="hero-title">发现你的风格</h2>
+        <p class="hero-desc">
+          f5a-gallery 是 fcitx5-android 键盘主题画廊。<br/>
+          浏览主题，实时预览键盘效果，<br/>
+          找到最适合你的配色方案。
+        </p>
+        <div class="hero-actions">
+          <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            提交主题
+          </a>
+          <a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank" class="btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            查看指南
+          </a>
         </div>
-        <div class="color-legend" id="color-legend">
-          <span class="legend-chip" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}>候选注释</span>
-          <span class="legend-chip" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}>弹出文字</span>
-          <span class="legend-chip" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}>剪贴板项</span>
-          <span class="legend-chip" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}>激活态</span>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="stat-label">主题数量</div>
+            <div class="stat-value">{themes.length}</div>
+            <div class="stat-sub">个主题</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="stat-label">提交者</div>
+            <div class="stat-value">{new Set(themes.map(t => t.theme.author)).size}</div>
+            <div class="stat-sub">位贡献者</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="stat-label">点赞数</div>
+            <div class="stat-value">-</div>
+            <div class="stat-sub">待实现</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="theme-grid">
-      {themes.map(({ slug, theme }) => {
-        const cardBg = theme.colors.keyboardColor || theme.colors.backgroundColor;
-        const textColor = theme.isDark ? '#ffffff' : '#1a1a1a';
-        const barColor = theme.colors.altKeyBackgroundColor || theme.colors.barColor;
-        const dotColor = theme.colors.accentKeyBackgroundColor;
-
-        return (
-          <div
-            class={`theme-card${slug === defaultSlug ? ' active' : ''}`}
-            data-slug={slug}
-            style={`background:${cardBg};color:${textColor};border-color:${theme.isDark ? '#3a3d4a' : '#d0d0d0'}`}
-          >
-            <div class="theme-card-name">{theme.name}</div>
-            <div class="theme-card-bar" style={`background:${barColor}`}></div>
-            <div class="theme-card-meta">
-              @{theme.author}
-              {theme.builtin && <span class="builtin-badge">内置</span>}
-            </div>
-            <div class="theme-card-dot" style={`background:${dotColor}`}></div>
+      <div class="hero-preview">
+        <div class="preview-card">
+          <div class="preview-tabs">
+            <button class="preview-tab active" data-device="desktop">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              桌面
+            </button>
+            <button class="preview-tab" data-device="mobile">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+              手机
+            </button>
           </div>
-        );
-      })}
-    </div>
+          <div class="preview-title" id="preview-theme-name">{defaultTheme.name}</div>
+          <div id="keyboard-container">
+            <KeyboardPreview colors={defaultTheme.colors} />
+          </div>
+          <div class="color-legend" id="color-legend">
+            <span class="legend-chip">
+              <span class="legend-dot" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}></span>
+              Popup
+            </span>
+            <span class="legend-chip">
+              <span class="legend-dot" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}></span>
+              Clipboard
+            </span>
+            <span class="legend-chip">
+              <span class="legend-dot" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}></span>
+              Active
+            </span>
+            <span class="legend-chip">
+              <span class="legend-dot" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}></span>
+              Comment
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Theme Grid Section ===== -->
+    <section class="themes-section">
+      <div class="themes-header">
+        <h2 class="section-title">主题色卡</h2>
+        <div class="themes-sort">
+          排序方式：最新提交
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <div class="theme-grid">
+        {themes.map(({ slug, theme }, i) => {
+          const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
+          return (
+            <div
+              class={`theme-card${slug === defaultSlug ? ' active' : ''}`}
+              data-slug={slug}
+            >
+              <div class="theme-card-name">{theme.name}</div>
+              <div class="theme-card-meta">#{i + 1} · @{theme.author}</div>
+              <div class="theme-card-palette">
+                {palette.map(c => <div class="theme-card-swatch" style={`background:${c}`}></div>)}
+              </div>
+              <div class="theme-card-footer">
+                <div class="theme-card-likes">
+                  <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                  0
+                </div>
+                {theme.builtin && <span class="builtin-badge">内置</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>关于 f5a-gallery</h3>
+          <p>开源的 fcitx5-android 键盘主题画廊，由社区驱动，自动化部署。</p>
+          <a href="https://github.com/rebron1900/f5a-gallery" target="_blank">GitHub 仓库 →</a>
+        </div>
+        <div class="footer-col">
+          <h3>快速链接</h3>
+          <ul>
+            <li><a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank">主题提交指南</a></li>
+            <li><a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank">JSON 格式说明</a></li>
+            <li><a href="https://github.com/rebron1900/f5a-gallery/blob/main/README.md" target="_blank">贡献指南</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>技术栈</h3>
+          <ul>
+            <li>Astro SSG</li>
+            <li>GitHub Actions</li>
+            <li>GitHub Pages</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-logo">f5a</span>
+        © 2024 f5a-gallery · MIT License
+      </div>
+    </footer>
+
   </div>
 
   <script define:vars={{ themesJson, layoutJson, defaultSlug }}>
@@ -85,10 +198,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     function updateLegend(colors) {
       var map = {
-        'legend-comment': colors.candidateCommentColor,
         'legend-popup': colors.popupTextColor,
         'legend-clipboard': colors.clipboardEntryColor,
-        'legend-active': colors.genericActiveForegroundColor
+        'legend-active': colors.genericActiveForegroundColor,
+        'legend-comment': colors.candidateCommentColor
       };
       Object.keys(map).forEach(function (id) {
         var el = document.getElementById(id);
@@ -114,88 +227,357 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     document.querySelectorAll('.theme-card').forEach(function (card) {
       card.addEventListener('click', function () {
         updateKeyboard(card.dataset.slug);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll keyboard preview into view on mobile
+        var preview = document.querySelector('.hero-preview');
+        if (preview && window.innerWidth <= 768) {
+          preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       });
     });
   </script>
 
   <style>
-    .preview-label {
+    /* ===== Hero ===== */
+    .hero {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      padding: 40px 0 48px;
+    }
+
+    .hero-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hero-title-sm {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .hero-title {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-desc {
+      font-size: 15px;
+      color: var(--text-sub);
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    /* Stats */
+    .hero-stats {
+      display: flex;
+      gap: 12px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
       text-align: center;
+    }
+
+    .stat-icon {
+      color: var(--green-mid);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    /* Preview Card */
+    .hero-preview {
+      flex: 1.1;
+      min-width: 0;
+    }
+
+    .preview-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .preview-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .preview-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: var(--bg-white);
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preview-tab.active {
+      background: var(--green-mid);
+      border-color: var(--green-mid);
+      color: #fff;
+    }
+
+    .preview-tab:hover:not(.active) {
+      border-color: var(--green-accent);
+      color: var(--green-dark);
+    }
+
+    .preview-title {
       font-size: 13px;
       color: var(--text-sub);
       margin-bottom: 8px;
       font-weight: 500;
     }
 
-    .preview-layout {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    #keyboard-container {
-      flex: 1;
-      max-width: 640px;
-      min-width: 0;
-    }
-
-    /* Legend: colored chip badges */
+    /* Legend */
     .color-legend {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      flex-shrink: 0;
-      padding-top: 4px;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
     }
 
     .legend-chip {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-sub);
       font-weight: 500;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-      white-space: nowrap;
-      line-height: 1.3;
     }
 
-    /* Card interaction */
-    .theme-card {
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ===== Themes Section ===== */
+    .themes-section {
+      padding-bottom: 48px;
+    }
+
+    .themes-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .themes-sort {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--text-sub);
       cursor: pointer;
     }
 
-    .theme-card.active {
-      border-color: var(--accent) !important;
-      box-shadow: 0 0 8px 1px rgba(79, 140, 255, 0.3);
+    /* Card palette & likes */
+    .theme-card-palette {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
     }
 
-    .theme-card-meta {
-      font-size: 11px;
-      opacity: 0.65;
+    .theme-card-swatch {
+      flex: 1;
+      height: 28px;
+      border-radius: 4px;
+    }
+
+    .theme-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-top: auto;
-      padding-top: 4px;
     }
 
-    .theme-card-meta :global(.builtin-badge) {
-      opacity: 1;
+    .theme-card-likes {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-sub);
     }
 
-    /* Mobile: legend below keyboard, horizontal wrap */
-    @media (max-width: 640px) {
-      .preview-layout {
+    .theme-card-likes svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-sub);
+      fill: none;
+    }
+
+    .builtin-badge {
+      display: inline-block;
+      background: rgba(90, 126, 99, 0.1);
+      color: var(--green-mid);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    /* ===== Footer ===== */
+    .site-footer {
+      background: var(--bg-footer);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 40px 0 24px;
+      margin-top: 40px;
+    }
+
+    .footer-grid {
+      display: flex;
+      gap: 48px;
+      margin-bottom: 32px;
+    }
+
+    .footer-col h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .footer-col p {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .footer-col a {
+      font-size: 13px;
+      color: var(--green-mid);
+    }
+
+    .footer-col ul {
+      list-style: none;
+    }
+
+    .footer-col li {
+      font-size: 13px;
+      color: var(--text-body);
+      padding: 3px 0;
+    }
+
+    .footer-col li a {
+      color: var(--text-body);
+    }
+
+    .footer-col li a:hover {
+      color: var(--green-mid);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-sub);
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-sub);
+      opacity: 0.5;
+    }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 768px) {
+      .hero {
         flex-direction: column;
-        align-items: center;
+        gap: 32px;
+        padding: 24px 0 32px;
       }
 
-      .color-legend {
+      .hero-title { font-size: 28px; }
+
+      .hero-stats {
         flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
-        justify-content: center;
+        gap: 8px;
       }
+
+      .stat-card { padding: 10px 8px; }
+      .stat-value { font-size: 22px; }
+
+      .hero-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .hero-actions .btn { justify-content: center; }
+
+      .preview-card { padding: 12px; }
+
+      .themes-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .footer-grid {
+        flex-direction: column;
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: 24px; }
+      .hero-title-sm { font-size: 17px; }
+
+      .hero-stats { flex-direction: column; gap: 8px; }
+
+      .color-legend { gap: 8px; }
+      .legend-chip { font-size: 11px; }
     }
   </style>
 </Layout>
