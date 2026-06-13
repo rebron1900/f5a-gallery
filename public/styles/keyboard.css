@@ -1,4 +1,4 @@
-/* Keyboard preview styles — extracted from f5a-see-me/style.css */
+/* Keyboard preview styles */
 
 .keyboard-preview {
   display: flex;
@@ -7,17 +7,17 @@
   overflow: hidden;
   padding: 6px 4px;
   width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .keyboard-row {
   display: flex;
   gap: 3px;
+  width: 100%;
 }
 
 .keyboard-slot {
-  flex: var(--key-width, 1);
+  flex: var(--kw, 1) 1 0;
   min-width: 0;
 }
 
@@ -29,11 +29,12 @@
   height: var(--key-height, 42px);
   position: relative;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .keyboard-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: clamp(13px, 3.5vw, 20px);
+  font-size: clamp(13px, 3.2vw, 20px);
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -41,7 +42,7 @@
 
 .keyboard-alt {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: clamp(9px, 2vw, 12px);
+  font-size: clamp(9px, 1.8vw, 12px);
   font-weight: 400;
   line-height: 1;
   text-align: center;
@@ -50,27 +51,26 @@
 
 /* Key variant styles */
 .keyboard-key.space-key .keyboard-main {
-  font-size: clamp(11px, 2.5vw, 14px);
+  font-size: clamp(11px, 2.2vw, 14px);
   font-weight: 400;
   opacity: 0.7;
 }
 
 .keyboard-key.accent-key .keyboard-main {
-  font-size: clamp(16px, 4vw, 22px);
+  font-size: clamp(16px, 3.5vw, 22px);
 }
 
 .keyboard-key.alt-key .keyboard-main {
-  font-size: clamp(12px, 3vw, 16px);
+  font-size: clamp(12px, 2.5vw, 16px);
 }
 
 .keyboard-key.language-key .keyboard-main {
-  font-size: clamp(12px, 3vw, 16px);
+  font-size: clamp(12px, 2.5vw, 16px);
 }
 
-/* Mobile: scale keyboard to fit viewport */
+/* Mobile */
 @media (max-width: 480px) {
   .keyboard-preview {
-    max-width: 100%;
     padding: 4px 2px;
     border-radius: 8px;
   }
@@ -79,28 +79,23 @@
     gap: 2px;
   }
 
+  .keyboard-main {
+    font-size: clamp(10px, 3vw, 15px);
+  }
+
+  .keyboard-alt {
+    font-size: clamp(7px, 1.6vw, 9px);
+  }
+
   .keyboard-key {
     height: var(--key-height, 36px);
   }
 
-  .keyboard-main {
-    font-size: clamp(11px, 3vw, 16px);
-  }
-
-  .keyboard-alt {
-    font-size: clamp(8px, 1.8vw, 10px);
+  .keyboard-key.accent-key .keyboard-main {
+    font-size: clamp(13px, 3vw, 18px);
   }
 
   .keyboard-key.space-key .keyboard-main {
-    font-size: clamp(9px, 2.2vw, 12px);
-  }
-
-  .keyboard-key.accent-key .keyboard-main {
-    font-size: clamp(13px, 3.5vw, 18px);
-  }
-
-  .keyboard-key.alt-key .keyboard-main,
-  .keyboard-key.language-key .keyboard-main {
-    font-size: clamp(10px, 2.5vw, 13px);
+    font-size: clamp(9px, 2vw, 12px);
   }
 }

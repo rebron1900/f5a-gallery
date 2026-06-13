@@ -74,6 +74,7 @@
     entries.forEach(function (e) { if (!e.auto) fixedSum += e.width; else flexCount++; });
     var remaining = Math.max(0, 1 - fixedSum);
     var flexW = flexCount > 0 ? remaining / flexCount : 0;
+    // Return plain numbers (flex-grow weights), NOT percentages
     return entries.map(function (e) { return e.auto ? flexW : e.width; });
   }
 
@@ -112,7 +113,7 @@
     var html = rows.map(function (row) {
       var widths = resolveRowWidths(row);
       var keysHtml = row.map(function (key, i) {
-        var wp = (widths[i] * 100).toFixed(6) + "%";
+        var kw = widths[i];
         var c = resolveColors(key, colors);
         var vc = previewVariantClass(key);
         var bw = border ? 1 : 0;
@@ -121,7 +122,7 @@
         var sub = keySubText(key);
         var altHtml = sub ? '<span class="keyboard-alt" style="color:' + c.altText + '">' + escapeHtml(sub) + '</span>' : "";
 
-        return '<div class="keyboard-slot" style="--key-width:' + wp + '">'
+        return '<div class="keyboard-slot" style="--kw:' + kw + '">'
           + '<div class="keyboard-key ' + vc + '"'
           + ' style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border
           + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">'

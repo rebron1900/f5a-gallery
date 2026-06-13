@@ -228,7 +228,7 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   const html = rows.map((row) => {
     const widths = resolveRowWidths(row);
     const keysHtml = row.map((key, i) => {
-      const widthPercent = `${(widths[i] * 100).toFixed(6)}%`;
+      const flexGrow = widths[i];
       const c = resolveColors(key, colors);
       const variant = previewVariantClass(key);
       const borderWidth = borderEnabled ? 1 : 0;
@@ -241,7 +241,7 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
         ? `<span class="keyboard-alt" style="color:${c.altText}">${escapeHtml(sub)}</span>`
         : "";
 
-      return `<div class="keyboard-slot" style="--key-width:${widthPercent}">
+      return `<div class="keyboard-slot" style="--kw:${flexGrow}">
         <div class="keyboard-key ${variant}"
              style="background:${c.background};color:${c.text};border-color:${c.border};border-width:${borderWidth}px;border-style:${borderStyle};border-radius:${keyRadius}px">
           <span class="keyboard-main">${escapeHtml(mainText)}</span>${altHtml}
