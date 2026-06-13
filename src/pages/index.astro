@@ -118,6 +118,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       document.getElementById('keyboard-container').innerHTML = html;
       document.getElementById('preview-theme-name').textContent = theme.name;
       updateLegend(theme.colors);
+      if (typeof initLucideIcons === 'function') initLucideIcons();
 
       document.querySelectorAll('.theme-card').forEach(function (card) {
         card.classList.toggle('active', card.dataset.slug === slug);

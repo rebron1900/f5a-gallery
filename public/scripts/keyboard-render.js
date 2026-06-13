@@ -1,6 +1,7 @@
 /**
  * Keyboard renderer — browser-side version.
  * Matches f5a-see-me's CSS: flex 0 0 %, padding-based gaps.
+ * Uses Lucide icons for special keys.
  */
 (function (root) {
   "use strict";
@@ -26,21 +27,27 @@
     return cls;
   }
 
+  function lucideIcon(key) {
+    switch (key.type) {
+      case "CapsKey": return "arrow-up";
+      case "BackspaceKey": return "delete";
+      case "ReturnKey": return "corner-down-left";
+      case "LanguageKey": return "globe";
+      default: return null;
+    }
+  }
+
   function previewTitle(key) {
     if (!key) return "?";
     if ((key.type === "AlphabetKey" || key.type === "MacroKey") && key.displayText) return key.displayText;
     switch (key.type) {
-      case "CapsKey": return "\u21e7";
       case "LayoutSwitchKey": case "LayerSwitchKey": return key.label || "?123";
       case "CommaKey": return ",";
-      case "LanguageKey": return "\ud83c\udf10";
       case "SpaceKey": return "space";
       case "SymbolKey": return key.label || ".";
-      case "ReturnKey": return "\u21b5";
-      case "BackspaceKey": return "\u232b";
       case "AlphabetKey": return key.main || "?";
       case "MacroKey": return key.label || "M";
-      default: return key.type;
+      default: return "";
     }
   }
 
@@ -111,11 +118,17 @@
         var vc = previewVariantClass(key);
         var bw = border ? 1 : 0;
         var bs = border ? "solid" : "none";
-        var main = escapeHtml(previewTitle(key));
+        var title = previewTitle(key);
+        var icon = lucideIcon(key);
         var sub = keySubText(key);
+
+        var mainHtml = icon
+          ? '<i data-lucide="' + icon + '" class="keyboard-icon"></i>'
+          : '<span class="keyboard-main">' + escapeHtml(title) + '</span>';
+
         var altHtml = sub ? '<span class="keyboard-alt" style="color:' + c.altText + '">' + escapeHtml(sub) + '</span>' : "";
 
-        return '<div class="keyboard-slot" style="--key-width:' + wp + ';--hgap:' + hGap + 'px"><div class="keyboard-key ' + vc + '" style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px"><span class="keyboard-main">' + main + '</span>' + altHtml + '</div></div>';
+        return '<div class="keyboard-slot" style="--key-width:' + wp + ';--hgap:' + hGap + 'px"><div class="keyboard-key ' + vc + '" style="background:' + c.background + ';color:' + c.text + ';border-color:' + c.border + ';border-width:' + bw + 'px;border-style:' + bs + ';border-radius:' + radius + 'px">' + mainHtml + altHtml + '</div></div>';
       }).join("");
 
       return '<div class="keyboard-row"><div class="keyboard-keys">' + keysHtml + '</div></div>';

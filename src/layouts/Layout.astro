@@ -17,6 +17,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   </head>
   <body>
     <slot />
+    <script is:inline src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
     <script is:inline src={`${base}/scripts/keyboard-render.js`}></script>
+    <script is:inline>
+      /* Initialize Lucide icons — runs once on load and after any dynamic re-render */
+      function initLucideIcons() {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
+        }
+      }
+      document.addEventListener('DOMContentLoaded', initLucideIcons);
+    </script>
   </body>
 </html>

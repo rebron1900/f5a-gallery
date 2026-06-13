@@ -2,6 +2,8 @@
  * Keyboard renderer extracted from fxliang/f5a-see-me
  * Pure display only — no editing, no state management.
  * Colors use hex strings instead of ARGB int32.
+ *
+ * Icons use Lucide SVG (via CDN) instead of emoji characters.
  */
 
 export interface ThemeColors {
@@ -64,22 +66,29 @@ function previewVariantClass(key: KeyDef): string {
   return cls;
 }
 
+/** Lucide icon names for special keys */
+function lucideIcon(key: KeyDef): string | null {
+  switch (key.type) {
+    case "CapsKey": return "arrow-up";
+    case "BackspaceKey": return "delete";
+    case "ReturnKey": return "corner-down-left";
+    case "LanguageKey": return "globe";
+    default: return null;
+  }
+}
+
 function previewTitle(key: KeyDef): string {
   if (!key) return "?";
   if ((key.type === "AlphabetKey" || key.type === "MacroKey") && key.displayText) return key.displayText;
   switch (key.type) {
-    case "CapsKey": return "⇧";
     case "LayoutSwitchKey":
     case "LayerSwitchKey": return key.label || "?123";
     case "CommaKey": return ",";
-    case "LanguageKey": return "🌐";
     case "SpaceKey": return "space";
     case "SymbolKey": return key.label || ".";
-    case "ReturnKey": return "↵";
-    case "BackspaceKey": return "⌫";
     case "AlphabetKey": return key.main || "?";
     case "MacroKey": return key.label || "M";
-    default: return key.type;
+    default: return "";
   }
 }
 
@@ -160,6 +169,7 @@ function escapeHtml(s: string): string {
  * - padding on slots for horizontal gaps (NOT gap on row)
  * - .keyboard-keys wrapper per row
  * - CSS variables for hgap/vgap/radius (set by caller or CSS)
+ * - Lucide icons for special keys (data-lucide attribute)
  */
 export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   keyHGap?: number;
@@ -182,13 +192,19 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
       const variant = previewVariantClass(key);
       const bw = borderEnabled ? 1 : 0;
       const bs = borderEnabled ? "solid" : "none";
-      const main = escapeHtml(previewTitle(key));
+      const title = previewTitle(key);
+      const icon = lucideIcon(key);
       const sub = keySubText(key);
+
+      const mainHtml = icon
+        ? `<i data-lucide="${icon}" class="keyboard-icon"></i>`
+        : `<span class="keyboard-main">${escapeHtml(title)}</span>`;
+
       const altHtml = sub
         ? `<span class="keyboard-alt" style="color:${c.altText}">${escapeHtml(sub)}</span>`
         : "";
 
-      return `<div class="keyboard-slot" style="--key-width:${widthPercent};--hgap:${keyHGap}px"><div class="keyboard-key ${variant}" style="background:${c.background};color:${c.text};border-color:${c.border};border-width:${bw}px;border-style:${bs};border-radius:${keyRadius}px"><span class="keyboard-main">${main}</span>${altHtml}</div></div>`;
+      return `<div class="keyboard-slot" style="--key-width:${widthPercent};--hgap:${keyHGap}px"><div class="keyboard-key ${variant}" style="background:${c.background};color:${c.text};border-color:${c.border};border-width:${bw}px;border-style:${bs};border-radius:${keyRadius}px">${mainHtml}${altHtml}</div></div>`;
     }).join("");
 
     return `<div class="keyboard-row"><div class="keyboard-keys">${keysHtml}</div></div>`;
