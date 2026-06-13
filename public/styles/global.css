@@ -110,6 +110,8 @@ img { max-width: 100%; display: block; }
   align-items: center;
   gap: 24px;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-links a {
