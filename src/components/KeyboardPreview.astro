@@ -10,4 +10,4 @@ const { colors } = Astro.props;
 const layout = defaultLayout.default;
 const html = renderKeyboard(colors, layout);
 ---
-<div class="keyboard-preview-wrapper" set:html={html} />
+<Fragment set:html={html} />

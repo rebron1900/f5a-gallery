@@ -9,7 +9,7 @@ interface Props {
 const { title } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-// Inline keyboard CSS to avoid FOUC on mobile (external CSS loading delay)
+// Inline keyboard CSS to avoid FOUC on mobile
 const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css'), 'utf-8');
 ---
 <!doctype html>
@@ -23,16 +23,6 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
   </head>
   <body>
     <slot />
-    <script is:inline src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
     <script is:inline src={`${base}/scripts/keyboard-render.js`}></script>
-    <script is:inline>
-      /* Initialize Lucide icons — runs once on load and after any dynamic re-render */
-      function initLucideIcons() {
-        if (typeof lucide !== 'undefined' && lucide.createIcons) {
-          lucide.createIcons();
-        }
-      }
-      document.addEventListener('DOMContentLoaded', initLucideIcons);
-    </script>
   </body>
 </html>

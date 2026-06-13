@@ -117,24 +117,6 @@ a:hover { opacity: 0.85; }
   border-radius: 50%;
 }
 
-/* ===== Theme meta grid ===== */
-.theme-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: -8px;
-  padding-bottom: 60px;
-}
-
-.theme-card-footer {
-  padding: 8px 2px 0;
-}
-
-.theme-card-meta {
-  font-size: 11px;
-  color: var(--text-sub);
-}
-
 .builtin-badge {
   display: inline-block;
   background: rgba(79, 140, 255, 0.12);
@@ -259,13 +241,11 @@ a:hover { opacity: 0.85; }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .theme-grid,
-  .theme-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
 @media (max-width: 480px) {
-  .theme-grid,
-  .theme-meta-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .theme-card { padding: 10px 10px 8px; }
   .color-grid { grid-template-columns: 1fr; }
 }

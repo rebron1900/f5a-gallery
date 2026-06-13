@@ -19,7 +19,7 @@ fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-androi
 - 功能键（Shift / Backspace / Return / 切换键）
 - 空格键
 
-特殊键使用 [Lucide](https://lucide.dev/) 图标显示。
+特殊键使用 Unicode 符号显示。
 
 ## 主题 JSON 格式
 
@@ -125,7 +125,6 @@ npm run build
 ## 技术栈
 
 - [Astro](https://astro.build/) — 静态站点生成器
-- [Lucide](https://lucide.dev/) — 图标库
 - 键盘渲染器移植自 [f5a-see-me](https://github.com/fxliang/f5a-see-me)
 
 ## License
