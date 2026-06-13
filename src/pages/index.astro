@@ -21,6 +21,8 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
   const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
   return { slug, theme: data as Theme };
 });
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <Layout title="fcitx5-android 主题画廊">
   <div class="container">
@@ -31,7 +33,7 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
 
     <div class="theme-grid">
       {themes.map(({ slug, theme }) => (
-        <a href={`/theme/${slug}`} class="theme-card">
+        <a href={`${base}/theme/${slug}`} class="theme-card">
           <div class="theme-card-preview">
             <KeyboardPreview colors={theme.colors} />
           </div>
