@@ -34,11 +34,18 @@ def make_qr_string(theme_json_str):
 themes_dir = os.path.join(os.path.dirname(__file__), '..', 'src', 'content', 'themes')
 out_path = os.path.join(os.path.dirname(__file__), '..', 'public', 'qr-data.json')
 
+# Gallery-only fields — strip before QR encoding
+STRIP_KEYS = {'builtin', 'author'}
+
 qr_data = {}
 for f in sorted(glob.glob(os.path.join(themes_dir, '*.json'))):
     slug = os.path.basename(f).replace('.json', '')
     with open(f) as fh:
-        theme_json = fh.read().strip()
+        theme = json.load(fh)
+    # Remove gallery-specific fields not in native format
+    for k in STRIP_KEYS:
+        theme.pop(k, None)
+    theme_json = json.dumps(theme, separators=(',', ':'), ensure_ascii=False)
     qr_data[slug] = make_qr_string(theme_json)
     print(f"  {slug}")
 
