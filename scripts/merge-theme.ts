@@ -111,12 +111,18 @@ async function main() {
     author: issueAuthor,
     isDark: data.isDark,
     builtin: false,
+    backgroundImage: null,
+    version: "2.1",
   };
 
   // Copy all 21 color tokens as-is (native int32 values)
   for (const token of THEME_COLORS) {
     theme[token] = data[token];
   }
+
+  // If submitter included backgroundImage or version, use their values
+  if (data.backgroundImage !== undefined) theme.backgroundImage = data.backgroundImage;
+  if (data.version !== undefined) theme.version = data.version;
 
   const slug = slugify(theme.name);
   const themesDir = join(process.cwd(), "src", "content", "themes");

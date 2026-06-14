@@ -67,6 +67,15 @@ jobs:
             if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name 字段');
             if (typeof data.isDark !== 'boolean') errors.push('缺少或无效的 isDark 字段（需要 true 或 false）');
 
+            // backgroundImage must be null or absent (no background) or an object (with background)
+            if (data.backgroundImage !== undefined && data.backgroundImage !== null && typeof data.backgroundImage !== 'object') {
+              errors.push('backgroundImage 应为 null 或对象，不能是字符串');
+            }
+            // version should be "2.1" if present
+            if (data.version !== undefined && data.version !== '2.1') {
+              errors.push(`version 应为 "2.1"，当前为 "${data.version}"`);
+            }
+
             // Colors can be in data.colors (wrapper) or directly in data (native)
             const colors = data.colors || data;
             if (typeof colors !== 'object') {

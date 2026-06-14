@@ -10,11 +10,15 @@ body:
         粘贴完整的主题 JSON，使用 fcitx5-android-fx（靓企鹅版）原生格式：
         - 颜色为 signed int32（如 -16777216、-1）
         - 颜色字段直接在顶层，不需要 colors 包装
-        - 必须包含 name 和 isDark 字段，以及全部 21 个颜色 token
+        - 必须包含 name、isDark、backgroundImage 字段，以及全部 21 个颜色 token
+        - backgroundImage 没有背景图时填 null
+        - version 固定为 "2.1"
       placeholder: |
         {
           "name": "我的主题",
           "isDark": true,
+          "backgroundImage": null,
+          "version": "2.1",
           "backgroundColor": -16777216,
           "barColor": -16777216,
           "keyboardColor": -16777216,
