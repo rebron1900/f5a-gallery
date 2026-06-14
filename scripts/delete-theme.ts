@@ -3,20 +3,32 @@
  * delete-theme.ts
  * Removes a theme by issue number — deletes theme JSON file and meta entry.
  *
- * Usage: npx tsx scripts/delete-theme.ts --issue=<number>
+ * Primary: match by issue number in theme-meta.json
+ * Fallback: match by theme name from --name flag (slugified)
+ *
+ * Usage: npx tsx scripts/delete-theme.ts --issue=<number> [--name=<theme-name>]
  */
 
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from "fs";
 import { join } from "path";
 
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function main() {
   const issueArg = process.argv.find((a) => a.startsWith("--issue="));
+  const nameArg = process.argv.find((a) => a.startsWith("--name="));
   if (!issueArg) {
-    console.error("Usage: npx tsx scripts/delete-theme.ts --issue=<number>");
+    console.error("Usage: npx tsx scripts/delete-theme.ts --issue=<number> [--name=<theme-name>]");
     process.exit(1);
   }
 
   const issueNumber = parseInt(issueArg.split("=")[1], 10);
+  const fallbackName = nameArg ? nameArg.split("=").slice(1).join("=") : null;
   const metaPath = join(process.cwd(), "src", "data", "theme-meta.json");
 
   if (!existsSync(metaPath)) {
@@ -27,10 +39,19 @@ function main() {
   const meta: Record<string, { author: string; builtin: boolean; issue?: number }> =
     JSON.parse(readFileSync(metaPath, "utf-8"));
 
-  // Find slug by issue number
-  const slug = Object.entries(meta).find(
+  // Primary: find by issue number
+  let slug = Object.entries(meta).find(
     ([, entry]) => (entry as any).issue === issueNumber
   )?.[0];
+
+  // Fallback: find by theme name (slugified)
+  if (!slug && fallbackName) {
+    const expectedSlug = slugify(fallbackName);
+    if (meta[expectedSlug]) {
+      slug = expectedSlug;
+      console.log(`Found by name fallback: ${slug}`);
+    }
+  }
 
   if (!slug) {
     console.error(`No theme found for issue #${issueNumber}`);

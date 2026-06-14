@@ -5,11 +5,13 @@
   },
   "braun-minimal-dark": {
     "author": "rebron1900",
-    "builtin": false
+    "builtin": false,
+    "issue": 2
   },
   "braun-minimal-light": {
     "author": "rebron1900",
-    "builtin": false
+    "builtin": false,
+    "issue": 1
   },
   "cozy-retro-light": {
     "author": "rebron1900",
@@ -21,7 +23,8 @@
   },
   "github-dark-dim": {
     "author": "rebron1900",
-    "builtin": false
+    "builtin": false,
+    "issue": 6
   },
   "material-dark": {
     "author": "fxliang",
@@ -43,6 +46,14 @@
     "author": "fxliang",
     "builtin": true
   },
+  "pastel-retro-light": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "pink-panther-light": {
+    "author": "rebron1900",
+    "builtin": false
+  },
   "pixel-dark": {
     "author": "fxliang",
     "builtin": true
@@ -51,24 +62,19 @@
     "author": "fxliang",
     "builtin": true
   },
+  "sage-journey": {
+    "author": "rebron1900",
+    "builtin": false,
+    "issue": 7
+  },
   "wechat-dark": {
     "author": "rebron1900",
-    "builtin": false
+    "builtin": false,
+    "issue": 5
   },
   "wechat-light": {
     "author": "rebron1900",
-    "builtin": false
-  },
-  "sage-journey": {
-    "author": "rebron1900",
-    "builtin": false
-  },
-  "pastel-retro-light": {
-    "author": "rebron1900",
-    "builtin": false
-  },
-  "pink-panther-light": {
-    "author": "rebron1900",
-    "builtin": false
+    "builtin": false,
+    "issue": 4
   }
 }
