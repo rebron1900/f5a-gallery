@@ -1,0 +1,212 @@
+name: Manage Theme
+
+on:
+  issues:
+    types: [edited, deleted, labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # ── Issue edited: re-validate and update theme ──
+  update-theme:
+    if: github.event.action == 'edited'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check if issue has approved label
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.issue.labels.map(l => l.name);
+            const hasApproved = labels.includes('approved');
+            core.setOutput('approved', hasApproved);
+
+      - name: Validate theme JSON
+        if: steps.check.outputs.approved == 'true'
+        id: validate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const THEME_COLORS = [
+              "backgroundColor", "barColor", "keyboardColor", "keyBackgroundColor",
+              "keyTextColor", "candidateTextColor", "candidateLabelColor",
+              "candidateCommentColor", "altKeyBackgroundColor", "altKeyTextColor",
+              "accentKeyBackgroundColor", "accentKeyTextColor", "keyPressHighlightColor",
+              "keyShadowColor", "popupBackgroundColor", "popupTextColor",
+              "spaceBarColor", "dividerColor", "clipboardEntryColor",
+              "genericActiveBackgroundColor", "genericActiveForegroundColor",
+            ];
+
+            const body = context.payload.issue.body || '';
+            let jsonStr = null;
+            const codeBlockMatch = body.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
+            if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+            if (!jsonStr) {
+              const jsonMatch = body.match(/\{[\s\S]*"name"[\s\S]*\}/);
+              if (jsonMatch) jsonStr = jsonMatch[0];
+            }
+
+            if (!jsonStr) {
+              core.setOutput('valid', 'false');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: '❌ 更新失败：未找到有效的 JSON。',
+              });
+              return;
+            }
+
+            let data;
+            try { data = JSON.parse(jsonStr); } catch (e) {
+              core.setOutput('valid', 'false');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ 更新失败：JSON 解析错误：\n\`\`\`\n${e.message}\n\`\`\``,
+              });
+              return;
+            }
+
+            const errors = [];
+            if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name');
+            if (typeof data.isDark !== 'boolean') errors.push('缺少或无效的 isDark');
+            if (data.author !== undefined) errors.push('请不要包含 author 字段');
+            if (data.builtin !== undefined) errors.push('请不要包含 builtin 字段');
+            if (data.backgroundImage !== undefined && data.backgroundImage !== null && typeof data.backgroundImage !== 'object')
+              errors.push('backgroundImage 应为 null 或对象');
+            if (data.version !== undefined && data.version !== '2.1') errors.push('version 应为 "2.1"');
+            const colors = data.colors || data;
+            for (const token of THEME_COLORS) {
+              if (colors[token] === undefined) errors.push(`缺少颜色: ${token}`);
+            }
+
+            if (errors.length > 0) {
+              core.setOutput('valid', 'false');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `❌ 更新校验失败：\n\n${errors.map(e => `- ${e}`).join('\n')}\n\n请修正后重新编辑。`,
+              });
+              return;
+            }
+
+            core.setOutput('valid', 'true');
+
+      - name: Update theme
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx tsx scripts/merge-theme.ts --issue=${{ github.event.issue.number }} --update
+
+      - name: Commit and redeploy
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/themes/ src/data/theme-meta.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          THEME_FILE=$(git diff --cached --name-only | grep '\.json$' | grep themes/ | head -1)
+          THEME_NAME=$(basename "$THEME_FILE" .json)
+          git commit -m "theme: update ${THEME_NAME} (from #${{ github.event.issue.number }})"
+          git push
+
+      - name: Build site
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        run: npm run build
+
+      - name: Upload Pages artifact
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        uses: actions/deploy-pages@v4
+
+      - name: Comment success
+        if: steps.check.outputs.approved == 'true' && steps.validate.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `✅ 主题已更新！\n\n查看: https://${context.repo.owner}.github.io/${context.repo.repo}/`,
+            });
+
+  # ── Issue deleted or labeled 'rejected': remove theme ──
+  delete-theme:
+    if: >
+      github.event.action == 'deleted' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'rejected')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Delete theme
+        id: delete
+        continue-on-error: true
+        run: |
+          OUTPUT=$(npx tsx scripts/delete-theme.ts --issue=${{ github.event.issue.number }} 2>&1)
+          echo "$OUTPUT"
+          SLUG=$(echo "$OUTPUT" | grep '^SLUG=' | cut -d= -f2)
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and redeploy
+        if: steps.delete.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/themes/ src/data/theme-meta.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "theme: remove ${{ steps.delete.outputs.slug }} (issue #${{ github.event.issue.number }})"
+          git push
+
+      - name: Build site
+        if: steps.delete.outcome == 'success'
+        run: npm run build
+
+      - name: Upload Pages artifact
+        if: steps.delete.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        if: steps.delete.outcome == 'success'
+        uses: actions/deploy-pages@v4

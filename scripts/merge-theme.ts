@@ -11,7 +11,7 @@
  * Usage: node merge-theme.ts --issue=<number>
  */
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from "fs";
 import { join } from "path";
 
 const THEME_COLORS = [
@@ -43,6 +43,16 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
+/**
+ * Find existing slug for an issue number by scanning theme-meta.json
+ */
+function findSlugByIssue(meta: Record<string, any>, issueNumber: number): string | null {
+  for (const [slug, entry] of Object.entries(meta)) {
+    if ((entry as any).issue === issueNumber) return slug;
+  }
+  return null;
+}
+
 function validateTheme(data: any): string[] {
   const errors: string[] = [];
   if (!data.name || typeof data.name !== "string") errors.push("Missing 'name'");
@@ -57,6 +67,7 @@ function validateTheme(data: any): string[] {
 
 async function main() {
   const issueArg = process.argv.find((a) => a.startsWith("--issue="));
+  const updateMode = process.argv.includes("--update");
   if (!issueArg) {
     console.error("Usage: node merge-theme.ts --issue=<number>");
     process.exit(1);
@@ -125,8 +136,25 @@ async function main() {
   const slug = slugify(theme.name);
   const themesDir = join(process.cwd(), "src", "content", "themes");
   const filePath = join(themesDir, `${slug}.json`);
+  const metaPath = join(process.cwd(), "src", "data", "theme-meta.json");
+  const meta: Record<string, { author: string; builtin: boolean; issue?: number }> = existsSync(metaPath)
+    ? JSON.parse(readFileSync(metaPath, "utf-8"))
+    : {};
 
-  if (existsSync(filePath)) {
+  // In update mode, find and clean up the old theme if slug changed
+  if (updateMode) {
+    const oldSlug = findSlugByIssue(meta, issueNumber);
+    if (oldSlug && oldSlug !== slug) {
+      const oldFile = join(themesDir, `${oldSlug}.json`);
+      if (existsSync(oldFile)) {
+        unlinkSync(oldFile);
+        console.log(`🗑️  Removed old theme file: ${oldSlug}.json (slug changed to ${slug})`);
+      }
+      delete meta[oldSlug];
+    }
+  }
+
+  if (existsSync(filePath) && !updateMode) {
     console.error(`Theme file already exists: ${slug}.json`);
     process.exit(1);
   }
@@ -134,17 +162,14 @@ async function main() {
   // Write theme JSON (pure native format)
   writeFileSync(filePath, JSON.stringify(theme, null, 2) + "\n");
 
-  // Update theme-meta.json with author info
-  const metaPath = join(process.cwd(), "src", "data", "theme-meta.json");
-  const meta: Record<string, { author: string; builtin: boolean }> = existsSync(metaPath)
-    ? JSON.parse(readFileSync(metaPath, "utf-8"))
-    : {};
-  meta[slug] = { author: issueAuthor, builtin: false };
+  // Update theme-meta.json with author info and issue number
+  meta[slug] = { author: issueAuthor, builtin: false, issue: issueNumber };
   writeFileSync(metaPath, JSON.stringify(meta, null, 2) + "\n");
 
-  console.log(`✅ Theme written: src/content/themes/${slug}.json`);
+  console.log(`✅ Theme ${updateMode ? "updated" : "written"}: src/content/themes/${slug}.json`);
   console.log(`   Name: ${theme.name}`);
   console.log(`   Author: ${issueAuthor} (saved to theme-meta.json)`);
+  console.log(`   Issue: #${issueNumber}`);
   console.log(`   Format: native fcitx5-android-fx（靓企鹅版）(signed int32 colors, flat structure)`);
 }
 
