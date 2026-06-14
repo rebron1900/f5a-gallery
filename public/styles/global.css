@@ -263,6 +263,7 @@ img { max-width: 100%; display: block; }
   flex: 1;
   height: 28px;
   border-radius: 4px;
+  outline: 1px solid var(--border);
 }
 
 .theme-card-footer {
