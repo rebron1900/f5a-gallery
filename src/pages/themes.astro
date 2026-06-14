@@ -169,17 +169,15 @@ const layoutJson = JSON.stringify(layoutData.default);
       <button class="btn" id="clear-filters">清除筛选</button>
     </div>
 
-    <!-- Theme Preview Popup -->
-    <div class="theme-popup-overlay" id="theme-popup-overlay">
-      <div class="theme-popup" id="theme-popup">
-        <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
-        <div class="theme-popup-name" id="theme-popup-name"></div>
-        <div class="theme-popup-kb" id="theme-popup-kb"></div>
-        <div class="theme-popup-actions">
-          <button class="btn btn-sm" id="popup-download">💾 下载</button>
-          <button class="btn btn-sm" id="popup-copy">📋 复制 JSON</button>
-          <a class="btn btn-primary btn-sm" id="popup-detail" href="#">详情 →</a>
-        </div>
+    <!-- Theme Preview Popup (positioned by JS) -->
+    <div class="theme-popup" id="theme-popup">
+      <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
+      <div class="theme-popup-name" id="theme-popup-name"></div>
+      <div class="theme-popup-kb" id="theme-popup-kb"></div>
+      <div class="theme-popup-actions">
+        <button class="btn btn-sm" id="popup-download">下载</button>
+        <button class="btn btn-sm" id="popup-copy">复制 JSON</button>
+        <a class="btn btn-primary btn-sm" id="popup-detail" href="#">详情 →</a>
       </div>
     </div>
 
@@ -249,7 +247,7 @@ const layoutJson = JSON.stringify(layoutData.default);
     }
 
     // --- Theme Popup ---
-    var popupOverlay = document.getElementById('theme-popup-overlay');
+    var popup = document.getElementById('theme-popup');
     var popupKb = document.getElementById('theme-popup-kb');
     var popupName = document.getElementById('theme-popup-name');
     var popupDetail = document.getElementById('popup-detail');
@@ -258,7 +256,7 @@ const layoutJson = JSON.stringify(layoutData.default);
     var popupClose = document.getElementById('theme-popup-close');
     var currentPopupSlug = '';
 
-    function showPopup(slug) {
+    function showPopup(slug, cardEl) {
       if (!themes[slug]) return;
       currentPopupSlug = slug;
       var theme = themes[slug];
@@ -268,24 +266,35 @@ const layoutJson = JSON.stringify(layoutData.default);
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;
       popupDetail.href = base + '/theme/' + slug;
-      popupOverlay.classList.add('open');
+      // Position above the card
+      var rect = cardEl.getBoundingClientRect();
+      popup.style.display = 'block';
+      var popupRect = popup.getBoundingClientRect();
+      var top = rect.top - popupRect.height - 12;
+      if (top < 8) top = 8;
+      var left = rect.left + (rect.width - popupRect.width) / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
+      popup.style.top = top + 'px';
+      popup.style.left = left + 'px';
     }
 
     function closePopup() {
-      popupOverlay.classList.remove('open');
+      popup.style.display = 'none';
       currentPopupSlug = '';
     }
 
     // Card click → show popup
     cards.forEach(function (card) {
       card.addEventListener('click', function () {
-        showPopup(card.dataset.slug);
+        showPopup(card.dataset.slug, card);
       });
     });
 
     popupClose.addEventListener('click', closePopup);
-    popupOverlay.addEventListener('click', function(e) {
-      if (e.target === popupOverlay) closePopup();
+    document.addEventListener('click', function(e) {
+      if (currentPopupSlug && !popup.contains(e.target) && !e.target.closest('.theme-card')) {
+        closePopup();
+      }
     });
 
     popupDownload.addEventListener('click', function() {
@@ -304,8 +313,8 @@ const layoutJson = JSON.stringify(layoutData.default);
       if (!themes[currentPopupSlug]) return;
       var json = JSON.stringify(themes[currentPopupSlug], null, 2);
       navigator.clipboard.writeText(json).then(function() {
-        popupCopy.textContent = '✅ 已复制';
-        setTimeout(function() { popupCopy.textContent = '📋 复制 JSON'; }, 2000);
+        popupCopy.textContent = '已复制';
+        setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       });
     });
   </script>
@@ -314,7 +323,6 @@ const layoutJson = JSON.stringify(layoutData.default);
     /* Page header */
     .themes-page {
       padding: 24px 0 48px;
-      margin: 0 32px;
     }
 
     .themes-page-header {
@@ -494,43 +502,35 @@ const layoutJson = JSON.stringify(layoutData.default);
     }
 
     /* Popup */
-    .theme-popup-overlay {
+    .theme-popup {
       display: none;
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .theme-popup-overlay.open { display: flex; }
-    .theme-popup {
       background: var(--bg-white);
       border-radius: var(--radius-lg);
       padding: 20px;
-      max-width: 520px;
-      width: 100%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      position: relative;
+      max-width: 480px;
+      width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      z-index: 2000;
+      border: 1px solid var(--border);
     }
     .theme-popup-close {
       position: absolute;
-      top: 12px; right: 12px;
-      width: 28px; height: 28px;
+      top: 10px; right: 12px;
+      width: 26px; height: 26px;
       display: flex; align-items: center; justify-content: center;
       border: none; background: none;
-      font-size: 16px; color: var(--text-sub);
+      font-size: 15px; color: var(--text-sub);
       cursor: pointer; border-radius: var(--radius-sm);
     }
     .theme-popup-close:hover { background: var(--green-pale); }
     .theme-popup-name {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .theme-popup-kb { margin-bottom: 16px; }
+    .theme-popup-kb { margin-bottom: 14px; }
     .theme-popup-actions {
       display: flex;
       gap: 8px;
@@ -554,7 +554,6 @@ const layoutJson = JSON.stringify(layoutData.default);
     @media (max-width: 768px) {
       .themes-page {
         padding: 16px 0 32px;
-        margin: 0 16px;
       }
 
       .themes-page-header h1 {

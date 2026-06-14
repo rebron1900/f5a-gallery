@@ -54,8 +54,8 @@ const colorLabels: Record<string, string> = {
         <span class="detail-mode">{theme.isDark ? '暗色' : '亮色'}</span>
       </div>
       <div class="detail-actions">
-        <button class="btn" id="copy-json">📋 复制 JSON</button>
-        <button class="btn btn-primary" id="download-json">💾 下载主题</button>
+        <button class="btn" id="copy-json">复制 JSON</button>
+        <button class="btn btn-primary" id="download-json">下载主题</button>
       </div>
     </div>
 
@@ -113,8 +113,8 @@ const colorLabels: Record<string, string> = {
       var json = JSON.stringify(theme, null, 2);
       navigator.clipboard.writeText(json).then(function() {
         var btn = document.getElementById('copy-json');
-        btn.textContent = '✅ 已复制';
-        setTimeout(function() { btn.textContent = '📋 复制 JSON'; }, 2000);
+        btn.textContent = '已复制';
+        setTimeout(function() { btn.textContent = '复制 JSON'; }, 2000);
       });
     });
 
@@ -133,7 +133,6 @@ const colorLabels: Record<string, string> = {
   <style>
     .detail-page {
       padding: 24px 0 48px;
-      margin: 0 32px;
     }
 
     .detail-header {
@@ -233,7 +232,7 @@ const colorLabels: Record<string, string> = {
 
     /* Mobile */
     @media (max-width: 768px) {
-      .detail-page { padding: 16px 0 32px; margin: 0 16px; }
+      .detail-page { padding: 16px 0 32px; }
       .detail-header h1 { font-size: 20px; }
       .detail-actions { flex-direction: column; gap: 8px; }
       .detail-actions .btn { justify-content: center; }
