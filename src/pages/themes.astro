@@ -77,6 +77,10 @@ const COLOR_FAMILIES = [
   { key: 'blue', label: '蓝紫系', dot: '#2980b9' },
   { key: 'purple', label: '紫色系', dot: '#8e44ad' },
 ];
+
+const layoutData = JSON.parse(readFileSync(join(process.cwd(), 'src/data/default-layout.json'), 'utf-8'));
+const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.theme])));
+const layoutJson = JSON.stringify(layoutData.default);
 ---
 
 <Layout title="主题列表">
@@ -129,8 +133,7 @@ const COLOR_FAMILIES = [
       {themeFamilies.map(({ slug, theme, family }, i) => {
         const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
         return (
-          <a
-            href={`${base}/theme/${slug}`}
+          <div
             class="theme-card"
             data-slug={slug}
             data-dark={theme.isDark ? '1' : '0'}
@@ -154,7 +157,7 @@ const COLOR_FAMILIES = [
               </div>
               {theme.builtin && <span class="builtin-badge">内置</span>}
             </div>
-          </a>
+          </div>
         );
       })}
     </div>
@@ -166,70 +169,145 @@ const COLOR_FAMILIES = [
       <button class="btn" id="clear-filters">清除筛选</button>
     </div>
 
+    <!-- Theme Preview Popup -->
+    <div class="theme-popup-overlay" id="theme-popup-overlay">
+      <div class="theme-popup" id="theme-popup">
+        <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
+        <div class="theme-popup-name" id="theme-popup-name"></div>
+        <div class="theme-popup-kb" id="theme-popup-kb"></div>
+        <div class="theme-popup-actions">
+          <button class="btn btn-sm" id="popup-download">💾 下载</button>
+          <button class="btn btn-sm" id="popup-copy">📋 复制 JSON</button>
+          <a class="btn btn-primary btn-sm" id="popup-detail" href="#">详情 →</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <script>
-    (function () {
-      var currentMode = 'all';
-      var currentColor = 'all';
-      var cards = document.querySelectorAll('.theme-card[data-slug]');
-      var visibleCountEl = document.getElementById('visible-count');
-      var emptyState = document.getElementById('empty-state');
+  <script define:vars={{ themesJson, layoutJson, base }}>
+    var themes = JSON.parse(themesJson);
+    var layout = JSON.parse(layoutJson);
+    var currentMode = 'all';
+    var currentColor = 'all';
+    var cards = document.querySelectorAll('.theme-card[data-slug]');
+    var visibleCountEl = document.getElementById('visible-count');
+    var emptyState = document.getElementById('empty-state');
 
-      function applyFilters() {
-        var visible = 0;
-        cards.forEach(function (card) {
-          var modeMatch = currentMode === 'all' ||
-            (currentMode === 'dark' && card.dataset.dark === '1') ||
-            (currentMode === 'light' && card.dataset.dark === '0');
-          var colorMatch = currentColor === 'all' || card.dataset.family === currentColor;
-          var show = modeMatch && colorMatch;
-          card.style.display = show ? '' : 'none';
-          if (show) visible++;
-        });
-        if (visibleCountEl) visibleCountEl.textContent = visible;
-        if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
-      }
-
-      // Mode toggle buttons
-      document.querySelectorAll('[data-filter-type="mode"]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          document.querySelectorAll('[data-filter-type="mode"]').forEach(function (b) {
-            b.classList.remove('active');
-          });
-          btn.classList.add('active');
-          currentMode = btn.dataset.filterValue;
-          applyFilters();
-        });
+    function applyFilters() {
+      var visible = 0;
+      cards.forEach(function (card) {
+        var modeMatch = currentMode === 'all' ||
+          (currentMode === 'dark' && card.dataset.dark === '1') ||
+          (currentMode === 'light' && card.dataset.dark === '0');
+        var colorMatch = currentColor === 'all' || card.dataset.family === currentColor;
+        var show = modeMatch && colorMatch;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
       });
+      if (visibleCountEl) visibleCountEl.textContent = visible;
+      if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
+    }
 
-      // Color dot buttons
-      document.querySelectorAll('[data-filter-type="color"]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          document.querySelectorAll('[data-filter-type="color"]').forEach(function (b) {
-            b.classList.remove('active');
-          });
-          btn.classList.add('active');
-          currentColor = btn.dataset.filterValue;
-          applyFilters();
+    // Mode toggle buttons
+    document.querySelectorAll('[data-filter-type="mode"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('[data-filter-type="mode"]').forEach(function (b) {
+          b.classList.remove('active');
         });
+        btn.classList.add('active');
+        currentMode = btn.dataset.filterValue;
+        applyFilters();
       });
+    });
 
-      // Clear filters
-      var clearBtn = document.getElementById('clear-filters');
-      if (clearBtn) {
-        clearBtn.addEventListener('click', function () {
-          currentMode = 'all';
-          currentColor = 'all';
-          document.querySelectorAll('.filter-btn, .color-dot').forEach(function (b) {
-            b.classList.remove('active');
-          });
-          document.querySelector('[data-filter-value="all"][data-filter-type="mode"]').classList.add('active');
-          document.querySelector('[data-filter-value="all"][data-filter-type="color"]').classList.add('active');
-          applyFilters();
+    // Color dot buttons
+    document.querySelectorAll('[data-filter-type="color"]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('[data-filter-type="color"]').forEach(function (b) {
+          b.classList.remove('active');
         });
-      }
-    })();
+        btn.classList.add('active');
+        currentColor = btn.dataset.filterValue;
+        applyFilters();
+      });
+    });
+
+    // Clear filters
+    var clearBtn = document.getElementById('clear-filters');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        currentMode = 'all';
+        currentColor = 'all';
+        document.querySelectorAll('.filter-btn, .color-dot').forEach(function (b) {
+          b.classList.remove('active');
+        });
+        document.querySelector('[data-filter-value="all"][data-filter-type="mode"]').classList.add('active');
+        document.querySelector('[data-filter-value="all"][data-filter-type="color"]').classList.add('active');
+        applyFilters();
+      });
+    }
+
+    // --- Theme Popup ---
+    var popupOverlay = document.getElementById('theme-popup-overlay');
+    var popupKb = document.getElementById('theme-popup-kb');
+    var popupName = document.getElementById('theme-popup-name');
+    var popupDetail = document.getElementById('popup-detail');
+    var popupDownload = document.getElementById('popup-download');
+    var popupCopy = document.getElementById('popup-copy');
+    var popupClose = document.getElementById('theme-popup-close');
+    var currentPopupSlug = '';
+
+    function showPopup(slug) {
+      if (!themes[slug]) return;
+      currentPopupSlug = slug;
+      var theme = themes[slug];
+      var html = window.renderKeyboard(theme.colors, layout, {
+        keyHGap: 2, keyVGap: 2, keyRadius: 3, borderEnabled: true
+      });
+      popupKb.innerHTML = html;
+      popupName.textContent = theme.name;
+      popupDetail.href = base + '/theme/' + slug;
+      popupOverlay.classList.add('open');
+    }
+
+    function closePopup() {
+      popupOverlay.classList.remove('open');
+      currentPopupSlug = '';
+    }
+
+    // Card click → show popup
+    cards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        showPopup(card.dataset.slug);
+      });
+    });
+
+    popupClose.addEventListener('click', closePopup);
+    popupOverlay.addEventListener('click', function(e) {
+      if (e.target === popupOverlay) closePopup();
+    });
+
+    popupDownload.addEventListener('click', function() {
+      if (!themes[currentPopupSlug]) return;
+      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = currentPopupSlug + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    popupCopy.addEventListener('click', function() {
+      if (!themes[currentPopupSlug]) return;
+      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
+      navigator.clipboard.writeText(json).then(function() {
+        popupCopy.textContent = '✅ 已复制';
+        setTimeout(function() { popupCopy.textContent = '📋 复制 JSON'; }, 2000);
+      });
+    });
   </script>
 
   <style>
@@ -410,11 +488,55 @@ const COLOR_FAMILIES = [
       border-radius: 3px;
     }
 
-    /* Theme cards as links */
+    /* Theme cards */
     .theme-card {
-      text-decoration: none;
-      color: inherit;
+      cursor: pointer;
     }
+
+    /* Popup */
+    .theme-popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .theme-popup-overlay.open { display: flex; }
+    .theme-popup {
+      background: var(--bg-white);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .theme-popup-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none;
+      font-size: 16px; color: var(--text-sub);
+      cursor: pointer; border-radius: var(--radius-sm);
+    }
+    .theme-popup-close:hover { background: var(--green-pale); }
+    .theme-popup-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .theme-popup-kb { margin-bottom: 16px; }
+    .theme-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
 
     /* Empty state */
     .empty-state {
@@ -467,6 +589,9 @@ const COLOR_FAMILIES = [
         padding: 4px;
         border-radius: 50%;
       }
+
+      .theme-popup { padding: 16px; max-width: 100%; }
+      .theme-popup-actions { flex-wrap: wrap; }
     }
 
     @media (max-width: 480px) {
