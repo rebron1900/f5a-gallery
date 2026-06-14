@@ -68,6 +68,7 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
     <slot />
 
     <script is:inline src={`${base}/scripts/keyboard-render.js`}></script>
+    <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
     <script is:inline>
       (function() {
         var hamburger = document.getElementById('nav-hamburger');
