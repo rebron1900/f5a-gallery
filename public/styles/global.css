@@ -486,10 +486,17 @@ img { max-width: 100%; display: block; }
 /* ===== Site Footer ===== */
 .site-footer {
   max-width: 1080px;
-  margin: 40px auto 0;
+  margin: 0 auto;
+  padding: 40px 32px 24px;
   background: var(--bg-footer);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: 40px 32px 24px;
+}
+
+/* Footer needs top spacing when it's the first element after container */
+.container + .site-footer,
+.container ~ .site-footer {
+  margin-top: 0;
+  padding-top: 40px;
 }
 
 .footer-grid {
