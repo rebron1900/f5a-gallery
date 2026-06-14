@@ -224,9 +224,21 @@ const themesBase = base + '/themes';
       <div class="theme-popup-name" id="theme-popup-name"></div>
       <div class="theme-popup-kb" id="theme-popup-kb"></div>
       <div class="theme-popup-actions">
-        <button class="btn btn-sm" id="popup-download">下载</button>
+        <button class="btn btn-sm" id="popup-download">下载 ZIP</button>
         <button class="btn btn-sm" id="popup-copy">复制 JSON</button>
+        <button class="btn btn-sm" id="popup-qr">扫码</button>
         <a class="btn btn-primary btn-sm" id="popup-detail" href="#">详情</a>
+      </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div class="qr-modal" id="qr-modal" style="display:none;">
+      <div class="qr-modal-content">
+        <button class="qr-modal-close" id="qr-modal-close" aria-label="关闭">✕</button>
+        <h3>扫码导入主题</h3>
+        <p>使用靓企鹅扫描下方二维码</p>
+        <div class="qr-code" id="qr-code"></div>
+        <p class="qr-filename" id="qr-filename"></p>
       </div>
     </div>
 
@@ -376,6 +388,58 @@ const themesBase = base + '/themes';
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       });
+    });
+
+    // QR code for 靓企鹅 import
+    var qrModal = document.getElementById('qr-modal');
+    var qrClose = document.getElementById('qr-modal-close');
+    var qrCodeEl = document.getElementById('qr-code');
+    var qrFilename = document.getElementById('qr-filename');
+    var popupQr = document.getElementById('popup-qr');
+    var qrDataCache = null;
+
+    function showQrModal(slug) {
+      qrModal.style.display = 'flex';
+      qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">加载中…</p>';
+      qrFilename.textContent = '';
+
+      function renderQr(data) {
+        var qrStr = data[slug];
+        if (!qrStr) {
+          qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">该主题暂无二维码</p>';
+          return;
+        }
+        if (typeof qrcode !== 'undefined') {
+          var qr = qrcode(0, 'M');
+          qr.addData(qrStr);
+          qr.make();
+          qrCodeEl.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4 });
+        } else {
+          qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">QR 库加载失败</p>';
+        }
+        qrFilename.textContent = slug + '.json';
+      }
+
+      if (qrDataCache) {
+        renderQr(qrDataCache);
+      } else {
+        fetch(base + '/qr-data.json')
+          .then(function(r) { return r.json(); })
+          .then(function(data) { qrDataCache = data; renderQr(data); })
+          .catch(function() { qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">加载失败</p>'; });
+      }
+    }
+
+    popupQr.addEventListener('click', function() {
+      if (!currentPopupSlug) return;
+      showQrModal(currentPopupSlug);
+    });
+
+    qrClose.addEventListener('click', function() {
+      qrModal.style.display = 'none';
+    });
+    qrModal.addEventListener('click', function(e) {
+      if (e.target === qrModal) qrModal.style.display = 'none';
     });
   </script>
 

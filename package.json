@@ -10,12 +10,17 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "validate": "npx tsx scripts/validate-theme.ts"
+    "validate": "npx tsx scripts/validate-theme.ts",
+    "generate-zips": "node scripts/generate-zips.mjs",
+    "prebuild": "node scripts/generate-zips.mjs && python3 scripts/generate-qr-data.py",
+    "generate-qr": "python3 scripts/generate-qr-data.py"
   },
   "dependencies": {
     "astro": "^6.4.6"
   },
   "devDependencies": {
+    "jszip": "^3.10.1",
+    "lzma": "^2.3.2",
     "tsx": "^4.22.4"
   }
 }
