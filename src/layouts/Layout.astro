@@ -18,6 +18,7 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} | 靓企鹅主题商店</title>
+    <link rel="icon" type="image/png" href={`${base}/logo.png`} />
     <link rel="stylesheet" href={`${base}/styles/global.css`} />
     <style set:html={keyboardCss}></style>
   </head>
@@ -25,7 +26,7 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
     <div class="container">
       <nav class="site-nav">
         <a href={base + '/'} class="nav-logo">
-          <span class="nav-logo-icon">⌨</span>
+          <img src={`${base}/logo.png`} alt="靓企鹅主题商店" class="nav-logo-img" />
           靓企鹅主题商店
         </a>
         <ul class="nav-links" id="nav-links">
