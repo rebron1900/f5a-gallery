@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   # ── Issue edited: re-validate and update theme ──
@@ -123,6 +123,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add src/content/themes/ src/data/theme-meta.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
@@ -177,18 +178,25 @@ jobs:
 
       - name: Delete theme
         id: delete
-        continue-on-error: true
         run: |
-          OUTPUT=$(npx tsx scripts/delete-theme.ts --issue=${{ github.event.issue.number }} 2>&1)
+          OUTPUT=$(npx tsx scripts/delete-theme.ts --issue=${{ github.event.issue.number }} 2>&1) || true
           echo "$OUTPUT"
           SLUG=$(echo "$OUTPUT" | grep '^SLUG=' | cut -d= -f2)
-          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          if [ -z "$SLUG" ]; then
+            echo "No theme found for this issue, skipping."
+            echo "slug=" >> "$GITHUB_OUTPUT"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Commit and redeploy
-        if: steps.delete.outcome == 'success'
+        if: steps.delete.outputs.found == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add src/content/themes/ src/data/theme-meta.json
           if git diff --cached --quiet; then
             echo "No changes to commit"
@@ -198,15 +206,15 @@ jobs:
           git push
 
       - name: Build site
-        if: steps.delete.outcome == 'success'
+        if: steps.delete.outputs.found == 'true'
         run: npm run build
 
       - name: Upload Pages artifact
-        if: steps.delete.outcome == 'success'
+        if: steps.delete.outputs.found == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
 
       - name: Deploy to GitHub Pages
-        if: steps.delete.outcome == 'success'
+        if: steps.delete.outputs.found == 'true'
         uses: actions/deploy-pages@v4
