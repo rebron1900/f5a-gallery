@@ -185,6 +185,8 @@ const colorLabels: Record<string, string> = {
           qr.addData(qrStr);
           qr.make();
           qrCodeEl.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4 });
+          var svg = qrCodeEl.querySelector('svg');
+          if (svg) { svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%'); }
         } else {
           qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">QR 库加载失败</p>';
         }
