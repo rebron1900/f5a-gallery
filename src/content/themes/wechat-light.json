@@ -1,9 +1,7 @@
 {
   "name": "WeChat Light",
-  "author": "rebron1900",
   "isDark": false,
   "version": "2.1",
-  "builtin": false,
   "backgroundColor": -526345,
   "backgroundImage": null,
   "barColor": -1184275,

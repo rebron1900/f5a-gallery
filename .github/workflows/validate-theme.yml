@@ -60,12 +60,15 @@ jobs:
               return;
             }
 
-            // Support both formats:
-            //   - Native fcitx5-android-fx（靓企鹅版）: top-level color tokens as int32, no author/colors
-            //   - Gallery wrapper: { author, colors: { ...hex } }
+            // Support native fcitx5-android-fx（靓企鹅版）format only
+            // Gallery extension fields (author, builtin) should NOT be in the JSON
             const errors = [];
             if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name 字段');
             if (typeof data.isDark !== 'boolean') errors.push('缺少或无效的 isDark 字段（需要 true 或 false）');
+
+            // Warn about gallery extension fields (not fatal, will be stripped on merge)
+            if (data.author !== undefined) errors.push('请不要包含 author 字段（作者信息由系统自动记录）');
+            if (data.builtin !== undefined) errors.push('请不要包含 builtin 字段');
 
             // backgroundImage must be null or absent (no background) or an object (with background)
             if (data.backgroundImage !== undefined && data.backgroundImage !== null && typeof data.backgroundImage !== 'object') {

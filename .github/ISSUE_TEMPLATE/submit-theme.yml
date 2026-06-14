@@ -13,6 +13,7 @@ body:
         - 必须包含 name、isDark、backgroundImage 字段，以及全部 21 个颜色 token
         - backgroundImage 没有背景图时填 null
         - version 固定为 "2.1"
+        - ⚠️ 请勿包含 author 或 builtin 字段（作者信息由系统自动记录）
       placeholder: |
         {
           "name": "我的主题",

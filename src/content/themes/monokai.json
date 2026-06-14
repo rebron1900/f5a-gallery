@@ -1,8 +1,6 @@
 {
   "name": "Monokai",
   "isDark": true,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -14211038,
   "backgroundImage": null,
   "barColor": -12698318,

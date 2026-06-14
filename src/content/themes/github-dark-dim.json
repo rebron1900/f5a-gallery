@@ -1,9 +1,7 @@
 {
   "name": "GitHub Dark Dim",
-  "author": "rebron1900",
   "isDark": true,
   "version": "2.1",
-  "builtin": false,
   "backgroundColor": -14538962,
   "backgroundImage": null,
   "barColor": -13814981,

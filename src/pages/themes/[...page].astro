@@ -9,9 +9,7 @@ export function getStaticPaths({ paginate }) {
 
   interface Theme {
     name: string;
-    author: string;
     isDark: boolean;
-    builtin?: boolean;
     [key: string]: any;
   }
 
@@ -30,6 +28,10 @@ export function getStaticPaths({ paginate }) {
 const { page } = Astro.props;
 const themes = page.data;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Load gallery metadata (author, builtin)
+const themeMeta: Record<string, { author: string; builtin: boolean }> =
+  JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
 
 // Palette swatches for cards
 const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
@@ -157,7 +159,7 @@ const themesBase = base + '/themes';
           >
             <div class="theme-card-name">{theme.name}</div>
             <div class="theme-card-meta">
-              @{theme.author}
+              @{themeMeta[slug]?.author || 'unknown'}
               {theme.isDark
                 ? <span class="dark-badge">暗色</span>
                 : <span class="light-badge">亮色</span>
@@ -171,7 +173,7 @@ const themesBase = base + '/themes';
                 <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                 0
               </div>
-              {theme.builtin && <span class="builtin-badge">内置</span>}
+              {themeMeta[slug]?.builtin && <span class="builtin-badge">内置</span>}
             </div>
           </div>
         );

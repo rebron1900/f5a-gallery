@@ -18,6 +18,9 @@ REQUIRED_DEFAULTS = {
     "version": "2.1",
 }
 
+# Gallery extension fields that must NOT appear in native theme JSONs
+GALLERY_FIELDS = {"author", "builtin"}
+
 def main():
     apply = "--apply" in sys.argv
     themes_dir = os.path.join(os.path.dirname(__file__), "..", "src", "content", "themes")
@@ -38,19 +41,26 @@ def main():
             if key not in data:
                 missing[key] = default
 
-        if not missing:
+        # Check for gallery extension fields that should not be in native JSON
+        gallery_found = GALLERY_FIELDS & set(data.keys())
+
+        if not missing and not gallery_found:
             print(f"  ✅ {filename}")
             continue
 
         fixed_count += 1
         details = ", ".join(f"{k}={json.dumps(v)}" for k, v in missing.items())
-        print(f"  🔧 {filename}: missing {details}")
+        extra = f", strip: {', '.join(gallery_found)}" if gallery_found else ""
+        print(f"  🔧 {filename}: missing {details}{extra}")
 
         if apply:
             # Insert fields in logical positions
             new_data = {}
             inserted = set()
             for key in data:
+                # Skip gallery extension fields
+                if key in GALLERY_FIELDS:
+                    continue
                 new_data[key] = data[key]
                 # Insert backgroundImage right after backgroundColor
                 if key == "backgroundColor" and "backgroundImage" in missing:

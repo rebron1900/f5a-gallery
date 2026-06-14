@@ -1,9 +1,7 @@
 {
   "name": "WeChat Dark",
-  "author": "rebron1900",
   "isDark": true,
   "version": "2.1",
-  "builtin": false,
   "backgroundColor": -15132391,
   "backgroundImage": null,
   "barColor": -14474461,

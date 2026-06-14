@@ -18,6 +18,11 @@ export async function getStaticPaths() {
 const { theme, slug } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// Load gallery metadata (author, builtin)
+const themeMeta: Record<string, { author: string; builtin: boolean }> =
+  JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
+const meta = themeMeta[slug] || { author: 'unknown', builtin: false };
+
 function int32ToCSS(n: number): string {
   const u = n >= 0 ? n : n + 0x100000000;
   return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
@@ -54,8 +59,8 @@ const colorLabels: Record<string, string> = {
     <div class="detail-header">
       <h1>{theme.name}</h1>
       <div class="detail-meta">
-        <span>@{theme.author}</span>
-        {theme.builtin && <span class="builtin-badge">内置</span>}
+        <span>@{meta.author}</span>
+        {meta.builtin && <span class="builtin-badge">内置</span>}
         <span class="detail-mode">{theme.isDark ? '暗色' : '亮色'}</span>
       </div>
       <div class="detail-actions">

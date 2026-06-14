@@ -1,8 +1,6 @@
 {
   "name": "Pixel Light",
   "isDark": false,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -328966,
   "backgroundImage": null,
   "barColor": -986896,

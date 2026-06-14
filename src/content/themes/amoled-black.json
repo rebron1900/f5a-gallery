@@ -1,8 +1,6 @@
 {
   "name": "AMOLED Black",
   "isDark": true,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -16777216,
   "backgroundImage": null,
   "barColor": -16119286,

@@ -37,8 +37,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/content/themes/
-          THEME_FILE=$(git diff --cached --name-only | head -1)
+          git add src/content/themes/ src/data/theme-meta.json
+          THEME_FILE=$(git diff --cached --name-only | grep '\.json$' | grep themes/ | head -1)
           THEME_NAME=$(basename "$THEME_FILE" .json)
           git commit -m "theme: add ${THEME_NAME} (from #${{ github.event.issue.number }})"
           git push

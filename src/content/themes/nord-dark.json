@@ -1,8 +1,6 @@
 {
   "name": "Nord Dark",
   "isDark": true,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -13749184,
   "backgroundImage": null,
   "barColor": -12893614,

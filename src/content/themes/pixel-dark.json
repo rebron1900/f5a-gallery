@@ -1,8 +1,6 @@
 {
   "name": "Pixel Dark",
   "isDark": true,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -15066578,
   "backgroundImage": null,
   "barColor": -15326914,

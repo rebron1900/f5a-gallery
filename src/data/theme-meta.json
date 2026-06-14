@@ -1,0 +1,62 @@
+{
+  "amoled-black": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "braun-minimal-dark": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "braun-minimal-light": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "cozy-retro-light": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "deep-blue": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "github-dark-dim": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "material-dark": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "material-light": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "monokai": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "nord-dark": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "nord-light": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "pixel-dark": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "pixel-light": {
+    "author": "fxliang",
+    "builtin": true
+  },
+  "wechat-dark": {
+    "author": "rebron1900",
+    "builtin": false
+  },
+  "wechat-light": {
+    "author": "rebron1900",
+    "builtin": false
+  }
+}

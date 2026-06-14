@@ -1,8 +1,6 @@
 {
   "name": "Material Dark",
   "isDark": true,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -15592942,
   "backgroundImage": null,
   "barColor": -14803426,

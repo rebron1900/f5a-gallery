@@ -7,11 +7,13 @@ import { join } from 'path';
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 
+// Load gallery metadata (author, builtin) — stored separately to keep theme JSON native-compatible
+const themeMeta: Record<string, { author: string; builtin: boolean }> =
+  JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
+
 interface Theme {
   name: string;
-  author: string;
   isDark: boolean;
-  builtin?: boolean;
   [key: string]: any;
 }
 
@@ -77,7 +79,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
             </div>
             <div class="stat-text">
-              <div class="stat-value">{new Set(themes.map(t => t.theme.author)).size}</div>
+              <div class="stat-value">{new Set(themes.map(t => themeMeta[t.slug]?.author)).size}</div>
               <div class="stat-label">贡献者</div>
             </div>
           </div>
@@ -128,7 +130,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
               data-slug={slug}
             >
               <div class="theme-card-name">{theme.name}</div>
-              <div class="theme-card-meta">#{i + 1} · @{theme.author}</div>
+              <div class="theme-card-meta">#{i + 1} · @{themeMeta[slug]?.author || 'unknown'}</div>
               <div class="theme-card-palette">
                 {palette.map(c => <div class="theme-card-swatch" style={`background:${c}`}></div>)}
               </div>
@@ -137,7 +139,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
                   <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                   0
                 </div>
-                {theme.builtin && <span class="builtin-badge">内置</span>}
+                {themeMeta[slug]?.builtin && <span class="builtin-badge">内置</span>}
               </div>
             </div>
           );

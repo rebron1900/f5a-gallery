@@ -1,8 +1,6 @@
 {
   "name": "Braun Minimal Light",
   "isDark": false,
-  "builtin": false,
-  "author": "rebron1900",
   "backgroundColor": -526345,
   "backgroundImage": null,
   "barColor": -526345,

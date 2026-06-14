@@ -5,8 +5,8 @@
  *
  * Input and output are native fcitx5-android-fx（靓企鹅版）format:
  *   - Colors as signed 32-bit integers (ARGB), flat top-level structure
- *   - builtin is always set to false
- *   - author is injected from the issue submitter
+ *   - No gallery extension fields (author, builtin) in theme JSON
+ *   - Author info is stored separately in src/data/theme-meta.json
  *
  * Usage: node merge-theme.ts --issue=<number>
  */
@@ -104,13 +104,11 @@ async function main() {
     process.exit(1);
   }
 
-  // Build output in native format: inject author from issue submitter, set builtin=false
+  // Build output in native format (no gallery extension fields)
   const issueAuthor = issue.user?.login || "unknown";
   const theme: any = {
     name: data.name,
-    author: issueAuthor,
     isDark: data.isDark,
-    builtin: false,
     backgroundImage: null,
     version: "2.1",
   };
@@ -133,10 +131,20 @@ async function main() {
     process.exit(1);
   }
 
+  // Write theme JSON (pure native format)
   writeFileSync(filePath, JSON.stringify(theme, null, 2) + "\n");
+
+  // Update theme-meta.json with author info
+  const metaPath = join(process.cwd(), "src", "data", "theme-meta.json");
+  const meta: Record<string, { author: string; builtin: boolean }> = existsSync(metaPath)
+    ? JSON.parse(readFileSync(metaPath, "utf-8"))
+    : {};
+  meta[slug] = { author: issueAuthor, builtin: false };
+  writeFileSync(metaPath, JSON.stringify(meta, null, 2) + "\n");
+
   console.log(`✅ Theme written: src/content/themes/${slug}.json`);
   console.log(`   Name: ${theme.name}`);
-  console.log(`   Author: ${theme.author}`);
+  console.log(`   Author: ${issueAuthor} (saved to theme-meta.json)`);
   console.log(`   Format: native fcitx5-android-fx（靓企鹅版）(signed int32 colors, flat structure)`);
 }
 

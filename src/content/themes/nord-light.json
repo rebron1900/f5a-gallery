@@ -1,8 +1,6 @@
 {
   "name": "Nord Light",
   "isDark": false,
-  "builtin": true,
-  "author": "fxliang",
   "backgroundColor": -1249292,
   "backgroundImage": null,
   "barColor": -1709584,
