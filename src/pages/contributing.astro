@@ -8,7 +8,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <section class="page">
       <div class="page-header">
         <h1 class="page-title">贡献指南</h1>
-        <p class="page-desc">欢迎为 f5a-gallery 提交主题或改进代码。以下是参与方式。</p>
+        <p class="page-desc">欢迎为靓企鹅主题商店提交主题或改进代码。以下是参与方式。</p>
       </div>
 
       <!-- ===== 1. 提交主题 ===== -->
@@ -18,7 +18,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           提交主题
         </h2>
         <div class="section-body">
-          <p>通过 GitHub Issue 提交 fcitx5-android 配色方案，审核通过后自动部署到画廊。</p>
+          <p>通过 GitHub Issue 提交 fcitx5-android-fx（靓企鹅版）配色方案，审核通过后自动部署到画廊。</p>
           <ol class="steps">
             <li>前往 <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank">GitHub Issues 选择模板</a> 页面</li>
             <li>选择 <strong>「提交主题」</strong>（submit-theme）模板</li>
@@ -50,29 +50,27 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   "name": "My Theme",
   "author": "yourname",
   "isDark": false,
-  "colors": {
-    "backgroundColor": "#F5F5F5",
-    "barColor": "#E8E8E8",
-    "keyboardColor": "#F0F0F0",
-    "keyBackgroundColor": "#FFFFFF",
-    "keyTextColor": "#333333",
-    "candidateTextColor": "#333333",
-    "candidateLabelColor": "#999999",
-    "candidateCommentColor": "#AAAAAA",
-    "altKeyBackgroundColor": "#E0E0E0",
-    "altKeyTextColor": "#666666",
-    "accentKeyBackgroundColor": "#4CAF50",
-    "accentKeyTextColor": "#FFFFFF",
-    "keyPressHighlightColor": "#FFFFFF40",
-    "keyShadowColor": "#00000010",
-    "popupBackgroundColor": "#FFFFFF",
-    "popupTextColor": "#333333",
-    "spaceBarColor": "#E8E8E8",
-    "dividerColor": "#E0E0E0",
-    "clipboardEntryColor": "#2196F3",
-    "genericActiveBackgroundColor": "#4CAF5020",
-    "genericActiveForegroundColor": "#4CAF50"
-  }
+  "backgroundColor": -657931,
+  "barColor": -1513240,
+  "keyboardColor": -1052689,
+  "keyBackgroundColor": -1,
+  "keyTextColor": -1250068,
+  "candidateTextColor": -1250068,
+  "candidateLabelColor": -6710887,
+  "candidateCommentColor": -5592406,
+  "altKeyBackgroundColor": -2039584,
+  "altKeyTextColor": -6710887,
+  "accentKeyBackgroundColor": -11751600,
+  "accentKeyTextColor": -1,
+  "keyPressHighlightColor": 1090519039,
+  "keyShadowColor": 268435455,
+  "popupBackgroundColor": -1,
+  "popupTextColor": -1250068,
+  "spaceBarColor": -1513240,
+  "dividerColor": -2039584,
+  "clipboardEntryColor": -1513240,
+  "genericActiveBackgroundColor": -11751600,
+  "genericActiveForegroundColor": -1
 }`}</code></pre>
           </div>
 
@@ -116,7 +114,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           <div class="callout">
             <div class="callout-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg></div>
             <div class="callout-text">
-              <strong>关于颜色格式</strong> — 画廊中使用十六进制（如 <code>#4CAF50</code>），fcitx5-android 原生格式使用 int32 ARGB 值。提交 Issue 时使用十六进制即可，转换由 CI 自动完成。
+              <strong>关于颜色格式</strong> — 主题使用 fcitx5-android-fx（靓企鹅版）原生格式，颜色值为 signed int32（如 <code>-16777216</code> 为黑色，<code>-1</code> 为白色）。提交 Issue 时请直接使用 int32 值，无需转换。
             </div>
           </div>
         </div>
@@ -176,7 +174,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             <div class="code-header">Terminal</div>
             <pre><code>{`# 1. Fork 并克隆仓库
 git clone https://github.com/<your-user>/f5a-gallery.git
-cd f5a-gallery
+cd f5a-gallery  # 仓库名不变
 
 # 2. 安装依赖
 npm install

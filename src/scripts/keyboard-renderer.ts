@@ -1,31 +1,31 @@
 /**
  * Keyboard renderer extracted from fxliang/f5a-see-me
  * Pure display only — no editing, no state management.
- * Colors use hex strings instead of ARGB int32.
+ * Colors use signed int32 ARGB values (converted to CSS hex at render time).
  */
 
 export interface ThemeColors {
-  backgroundColor: string;
-  barColor: string;
-  keyboardColor: string;
-  keyBackgroundColor: string;
-  keyTextColor: string;
-  candidateTextColor: string;
-  candidateLabelColor: string;
-  candidateCommentColor: string;
-  altKeyBackgroundColor: string;
-  altKeyTextColor: string;
-  accentKeyBackgroundColor: string;
-  accentKeyTextColor: string;
-  keyPressHighlightColor: string;
-  keyShadowColor: string;
-  popupBackgroundColor: string;
-  popupTextColor: string;
-  spaceBarColor: string;
-  dividerColor: string;
-  clipboardEntryColor: string;
-  genericActiveBackgroundColor: string;
-  genericActiveForegroundColor: string;
+  backgroundColor: number;
+  barColor: number;
+  keyboardColor: number;
+  keyBackgroundColor: number;
+  keyTextColor: number;
+  candidateTextColor: number;
+  candidateLabelColor: number;
+  candidateCommentColor: number;
+  altKeyBackgroundColor: number;
+  altKeyTextColor: number;
+  accentKeyBackgroundColor: number;
+  accentKeyTextColor: number;
+  keyPressHighlightColor: number;
+  keyShadowColor: number;
+  popupBackgroundColor: number;
+  popupTextColor: number;
+  spaceBarColor: number;
+  dividerColor: number;
+  clipboardEntryColor: number;
+  genericActiveBackgroundColor: number;
+  genericActiveForegroundColor: number;
 }
 
 export interface KeyDef {
@@ -38,6 +38,18 @@ export interface KeyDef {
 }
 
 export type Layout = KeyDef[][];
+
+// --- int32 → CSS hex color ---
+
+export function int32ToCSS(n: number): string {
+  const u = n >= 0 ? n : n + 0x100000000;
+  return (
+    '#' +
+    ((u >> 16) & 0xff).toString(16).padStart(2, '0') +
+    ((u >> 8) & 0xff).toString(16).padStart(2, '0') +
+    (u & 0xff).toString(16).padStart(2, '0')
+  );
+}
 
 // --- Key type → CSS class mapping (from f5a-see-me keyVariantClass) ---
 
@@ -161,36 +173,36 @@ function resolveColors(key: KeyDef, colors: ThemeColors): PreviewColors {
   // Background
   let background: string;
   if (isSpace) {
-    background = colors.spaceBarColor;
+    background = int32ToCSS(colors.spaceBarColor);
   } else if (isReturn) {
-    background = colors.accentKeyBackgroundColor;
+    background = int32ToCSS(colors.accentKeyBackgroundColor);
   } else if (isLayoutSwitch) {
-    background = colors.altKeyBackgroundColor;
+    background = int32ToCSS(colors.altKeyBackgroundColor);
   } else if (isAccent) {
-    background = colors.accentKeyBackgroundColor;
+    background = int32ToCSS(colors.accentKeyBackgroundColor);
   } else if (isAlt) {
-    background = colors.altKeyBackgroundColor;
+    background = int32ToCSS(colors.altKeyBackgroundColor);
   } else {
-    background = colors.keyBackgroundColor;
+    background = int32ToCSS(colors.keyBackgroundColor);
   }
 
   // Text
   let text: string;
   if (isReturn) {
-    text = colors.accentKeyTextColor;
+    text = int32ToCSS(colors.accentKeyTextColor);
   } else if (isAccent) {
-    text = colors.accentKeyTextColor;
+    text = int32ToCSS(colors.accentKeyTextColor);
   } else if (isAlt || isLayoutSwitch) {
-    text = colors.altKeyTextColor;
+    text = int32ToCSS(colors.altKeyTextColor);
   } else {
-    text = colors.keyTextColor;
+    text = int32ToCSS(colors.keyTextColor);
   }
 
   // Alt text (for key sub labels)
-  const altText = colors.altKeyTextColor;
+  const altText = int32ToCSS(colors.altKeyTextColor);
 
   // Border
-  const border = colors.keyShadowColor;
+  const border = int32ToCSS(colors.keyShadowColor);
 
   return { background, text, altText, border };
 }
@@ -252,5 +264,5 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
     return `<div class="keyboard-row" style="--key-height:${keyHeight}px;gap:${keyHGap}px">${keysHtml}</div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" style="background:${colors.keyboardColor};gap:${keyVGap}px">${html}</div>`;
+  return `<div class="keyboard-preview" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${html}</div>`;
 }

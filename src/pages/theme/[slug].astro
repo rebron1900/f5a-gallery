@@ -18,6 +18,11 @@ export async function getStaticPaths() {
 const { theme, slug } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+function int32ToCSS(n: number): string {
+  const u = n >= 0 ? n : n + 0x100000000;
+  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
+}
+
 const colorLabels: Record<string, string> = {
   backgroundColor: '背景',
   barColor: '工具栏',
@@ -61,19 +66,19 @@ const colorLabels: Record<string, string> = {
 
     <!-- Keyboard Preview -->
     <div class="detail-preview">
-      <KeyboardPreview colors={theme.colors} />
+      <KeyboardPreview colors={theme} />
     </div>
 
     <!-- Color Preview Grid -->
     <div class="color-section">
       <h2>颜色预览</h2>
       <div class="color-grid">
-        {Object.entries(theme.colors).map(([key, value]) => (
+        {Object.keys(colorLabels).filter(key => theme[key] !== undefined).map(key => (
           <div class="color-item">
-            <div class="color-swatch" style={`background:${value}`}></div>
+            <div class="color-swatch" style={`background:${int32ToCSS(theme[key])}`}></div>
             <div>
-              <div class="color-label">{colorLabels[key] || key}</div>
-              <div class="color-value">{value}</div>
+              <div class="color-label">{colorLabels[key]}</div>
+              <div class="color-value">{int32ToCSS(theme[key])}</div>
             </div>
           </div>
         ))}
@@ -94,7 +99,7 @@ const colorLabels: Record<string, string> = {
         </div>
         <div class="theme-info-row">
           <span class="theme-info-label">颜色数量</span>
-          <span class="theme-info-value">{Object.keys(theme.colors).length} 个 token</span>
+          <span class="theme-info-value">{Object.keys(colorLabels).length} 个 token</span>
         </div>
       </div>
     </div>
@@ -102,7 +107,7 @@ const colorLabels: Record<string, string> = {
     <!-- CTA -->
     <div class="detail-cta">
       <a href={`https://github.com/rebron1900/f5a-gallery/blob/main/src/content/themes/${slug}.json`} target="_blank" class="btn btn-primary btn-lg">
-        在 fcitx5-android 中使用
+        在 fcitx5-android-fx（靓企鹅版）中使用
       </a>
     </div>
 

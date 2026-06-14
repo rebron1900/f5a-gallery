@@ -1,6 +1,6 @@
-# f5a-gallery
+# 靓企鹅主题商店
 
-fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android) 键盘主题的网站。
+fcitx5-android-fx (靓企鹅版) 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android) 键盘主题的网站。
 
 🔗 **在线访问**：[https://rebron1900.github.io/f5a-gallery/](https://rebron1900.github.io/f5a-gallery/)
 
@@ -13,7 +13,7 @@ fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-androi
 
 ## 键盘预览
 
-每个主题详情页都有一个键盘模拟器，展示该主题在 fcitx5-android 上的实际效果。模拟器使用 QWERTY 标准布局，包含：
+每个主题详情页都有一个键盘模拟器，展示该主题在 fcitx5-android-fx（靓企鹅版）上的实际效果。模拟器使用 QWERTY 标准布局，包含：
 
 - 字母键（带 alt 符号预览）
 - 功能键（Shift / Backspace / Return / 切换键）
@@ -23,7 +23,7 @@ fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-androi
 
 ## 主题 JSON 格式
 
-每个主题是一个 JSON 文件，包含以下字段：
+每个主题是一个 JSON 文件，使用 fcitx5-android-fx（靓企鹅版）原生格式（signed int32 颜色，平铺结构）：
 
 ```json
 {
@@ -31,31 +31,32 @@ fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-androi
   "author": "作者名",
   "isDark": true,
   "builtin": true,
-  "colors": {
-    "backgroundColor": "#000000",
-    "barColor": "#1a1a1a",
-    "keyboardColor": "#000000",
-    "keyBackgroundColor": "#1a1a1a",
-    "keyTextColor": "#ffffff",
-    "candidateTextColor": "#ffffff",
-    "candidateLabelColor": "#aaaaaa",
-    "candidateCommentColor": "#888888",
-    "altKeyBackgroundColor": "#2a2a2a",
-    "altKeyTextColor": "#cccccc",
-    "accentKeyBackgroundColor": "#4f8cff",
-    "accentKeyTextColor": "#ffffff",
-    "keyPressHighlightColor": "#333333",
-    "keyShadowColor": "#333333",
-    "popupBackgroundColor": "#1a1a1a",
-    "popupTextColor": "#ffffff",
-    "spaceBarColor": "#1a1a1a",
-    "dividerColor": "#333333",
-    "clipboardEntryColor": "#1a1a1a",
-    "genericActiveBackgroundColor": "#4f8cff",
-    "genericActiveForegroundColor": "#ffffff"
-  }
+  "backgroundColor": -15592942,
+  "barColor": -14803426,
+  "keyboardColor": -13882324,
+  "keyBackgroundColor": -1,
+  "keyTextColor": -16777216,
+  "candidateTextColor": -16777216,
+  "candidateLabelColor": -8355712,
+  "candidateCommentColor": -6710887,
+  "altKeyBackgroundColor": -14474461,
+  "altKeyTextColor": -3355444,
+  "accentKeyBackgroundColor": -14922241,
+  "accentKeyTextColor": -1,
+  "keyPressHighlightColor": 436207615,
+  "keyShadowColor": -16777216,
+  "popupBackgroundColor": -1,
+  "popupTextColor": -16777216,
+  "spaceBarColor": -14803426,
+  "dividerColor": -14474461,
+  "clipboardEntryColor": -1,
+  "genericActiveBackgroundColor": -14922241,
+  "genericActiveForegroundColor": -1,
+  "version": "2.1"
 }
 ```
+
+> 颜色值为 signed 32-bit ARGB 整数，如 `-16777216`（黑色）、`-1`（白色）。fcitx5-android-fx（靓企鹅版）直接读取此格式，无需转换。
 
 ### 21 种颜色 Token 说明
 
@@ -89,7 +90,7 @@ fcitx5-android 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-androi
 
 1. 前往 [GitHub Issues](https://github.com/rebron1900/f5a-gallery/issues/new)
 2. 使用主题提交模板
-3. 填写主题名称、作者、颜色 JSON
+3. 填写主题名称、作者、颜色 JSON（signed int32 格式）
 4. 提交后等待管理员审核
 5. 审核通过后自动合并到画廊
 

@@ -1,9 +1,17 @@
 /**
  * Keyboard renderer — browser-side version.
  * Extracted from fxliang/f5a-see-me, plain JS (no TS/build needed).
+ * Colors use signed int32 ARGB values (converted to CSS hex at render time).
  */
 (function (root) {
   "use strict";
+
+  function int32ToCSS(n) {
+    var u = n >= 0 ? n : n + 0x100000000;
+    return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0')
+               + ((u >> 8) & 0xff).toString(16).padStart(2, '0')
+               + (u & 0xff).toString(16).padStart(2, '0');
+  }
 
   function escapeHtml(s) {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -87,31 +95,31 @@
 
     var bg;
     if (isSpace) {
-      bg = colors.spaceBarColor;
+      bg = int32ToCSS(colors.spaceBarColor);
     } else if (isReturn) {
-      bg = colors.accentKeyBackgroundColor;
+      bg = int32ToCSS(colors.accentKeyBackgroundColor);
     } else if (isLayoutSwitch) {
-      bg = colors.altKeyBackgroundColor;
+      bg = int32ToCSS(colors.altKeyBackgroundColor);
     } else if (isAccent) {
-      bg = colors.accentKeyBackgroundColor;
+      bg = int32ToCSS(colors.accentKeyBackgroundColor);
     } else if (isAlt) {
-      bg = colors.altKeyBackgroundColor;
+      bg = int32ToCSS(colors.altKeyBackgroundColor);
     } else {
-      bg = colors.keyBackgroundColor;
+      bg = int32ToCSS(colors.keyBackgroundColor);
     }
 
     var tx;
     if (isReturn) {
-      tx = colors.accentKeyTextColor;
+      tx = int32ToCSS(colors.accentKeyTextColor);
     } else if (isAccent) {
-      tx = colors.accentKeyTextColor;
+      tx = int32ToCSS(colors.accentKeyTextColor);
     } else if (isAlt || isLayoutSwitch) {
-      tx = colors.altKeyTextColor;
+      tx = int32ToCSS(colors.altKeyTextColor);
     } else {
-      tx = colors.keyTextColor;
+      tx = int32ToCSS(colors.keyTextColor);
     }
 
-    return { background: bg, text: tx, altText: colors.altKeyTextColor, border: colors.keyShadowColor };
+    return { background: bg, text: tx, altText: int32ToCSS(colors.altKeyTextColor), border: int32ToCSS(colors.keyShadowColor) };
   }
 
   function renderKeyboard(colors, layout, opts) {
@@ -149,8 +157,9 @@
       return '<div class="keyboard-row" style="--key-height:' + keyH + 'px;gap:' + hGap + 'px">' + keysHtml + '</div>';
     }).join("");
 
-    return '<div class="keyboard-preview" style="background:' + colors.keyboardColor + ';gap:' + vGap + 'px">' + html + '</div>';
+    return '<div class="keyboard-preview" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + html + '</div>';
   }
 
+  root.int32ToCSS = int32ToCSS;
   root.renderKeyboard = renderKeyboard;
 })(window);

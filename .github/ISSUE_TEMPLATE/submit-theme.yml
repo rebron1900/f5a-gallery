@@ -1,5 +1,5 @@
 name: 提交主题
-description: 提交一个新的 fcitx5-android 键盘主题
+description: 提交一个新的 fcitx5-android-fx（靓企鹅版）键盘主题
 labels: ["theme-submission"]
 body:
   - type: textarea
@@ -7,11 +7,10 @@ body:
     attributes:
       label: 主题 JSON
       description: |
-        粘贴完整的主题 JSON。支持两种格式：
-        1. fcitx5-android 原生格式（颜色为整数，如 -526345）
-        2. 本站格式（颜色为 hex 字符串，如 #F7F7F7）
-
-        必须包含 name 和 isDark 字段，以及全部 21 个颜色 token。
+        粘贴完整的主题 JSON，使用 fcitx5-android-fx（靓企鹅版）原生格式：
+        - 颜色为 signed int32（如 -16777216、-1）
+        - 颜色字段直接在顶层，不需要 colors 包装
+        - 必须包含 name 和 isDark 字段，以及全部 21 个颜色 token
       placeholder: |
         {
           "name": "我的主题",

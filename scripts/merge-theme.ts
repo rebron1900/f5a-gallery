@@ -3,11 +3,10 @@
  * merge-theme.ts
  * Extracts theme JSON from a GitHub Issue body and writes it to src/content/themes/
  *
- * Supports two input formats:
- *   - Native fcitx5-android: colors as signed 32-bit integers (ARGB), top-level
- *   - Gallery format: colors as hex strings inside a colors object
- *
- * Output is always gallery format with hex strings.
+ * Input and output are native fcitx5-android-fx（靓企鹅版）format:
+ *   - Colors as signed 32-bit integers (ARGB), flat top-level structure
+ *   - builtin is always set to false
+ *   - author is injected from the issue submitter
  *
  * Usage: node merge-theme.ts --issue=<number>
  */
@@ -24,44 +23,6 @@ const THEME_COLORS = [
   "spaceBarColor", "dividerColor", "clipboardEntryColor",
   "genericActiveBackgroundColor", "genericActiveForegroundColor",
 ];
-
-/** Convert signed 32-bit ARGB integer to #RRGGBB hex string */
-function intToHex(argb: number): string {
-  // Mask to unsigned 32-bit, extract RGB (drop alpha)
-  const unsigned = argb >>> 0;
-  const r = (unsigned >> 16) & 0xff;
-  const g = (unsigned >> 8) & 0xff;
-  const b = unsigned & 0xff;
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-}
-
-/** Detect if a color value is a signed 32-bit integer (not a hex string) */
-function isIntColor(v: unknown): v is number {
-  return typeof v === "number";
-}
-
-/** Normalize theme data to gallery format (hex strings, colors wrapper) */
-function normalizeTheme(data: any, author?: string): any {
-  const result: any = {
-    name: data.name,
-    author: author || data.author || "unknown",
-    isDark: data.isDark,
-    builtin: false,
-  };
-
-  // Detect format: if colors exist at top level as integers, convert
-  const rawColors = data.colors || data;
-  const colors: Record<string, string> = {};
-
-  for (const token of THEME_COLORS) {
-    const v = rawColors[token];
-    if (v === undefined) continue;
-    colors[token] = isIntColor(v) ? intToHex(v) : v;
-  }
-
-  result.colors = colors;
-  return result;
-}
 
 function extractJsonFromIssueBody(body: string): string | null {
   // Match JSON inside ```json ... ``` code block
@@ -87,10 +48,9 @@ function validateTheme(data: any): string[] {
   if (!data.name || typeof data.name !== "string") errors.push("Missing 'name'");
   if (typeof data.isDark !== "boolean") errors.push("Missing 'isDark'");
 
-  // Check colors exist (either in wrapper or top-level)
-  const rawColors = data.colors || data;
   for (const token of THEME_COLORS) {
-    if (rawColors[token] === undefined) errors.push(`Missing color: ${token}`);
+    if (data[token] === undefined) errors.push(`Missing color: ${token}`);
+    else if (typeof data[token] !== "number") errors.push(`Color '${token}' must be a number (int32), got ${typeof data[token]}`);
   }
   return errors;
 }
@@ -144,9 +104,20 @@ async function main() {
     process.exit(1);
   }
 
-  // Normalize to gallery format, use issue author as theme author
+  // Build output in native format: inject author from issue submitter, set builtin=false
   const issueAuthor = issue.user?.login || "unknown";
-  const theme = normalizeTheme(data, issueAuthor);
+  const theme: any = {
+    name: data.name,
+    author: issueAuthor,
+    isDark: data.isDark,
+    builtin: false,
+  };
+
+  // Copy all 21 color tokens as-is (native int32 values)
+  for (const token of THEME_COLORS) {
+    theme[token] = data[token];
+  }
+
   const slug = slugify(theme.name);
   const themesDir = join(process.cwd(), "src", "content", "themes");
   const filePath = join(themesDir, `${slug}.json`);
@@ -160,7 +131,7 @@ async function main() {
   console.log(`✅ Theme written: src/content/themes/${slug}.json`);
   console.log(`   Name: ${theme.name}`);
   console.log(`   Author: ${theme.author}`);
-  console.log(`   Format: normalized to hex strings`);
+  console.log(`   Format: native fcitx5-android-fx（靓企鹅版）(signed int32 colors, flat structure)`);
 }
 
 main().catch((e) => {

@@ -12,7 +12,12 @@ interface Theme {
   author: string;
   isDark: boolean;
   builtin?: boolean;
-  colors: Record<string, string>;
+  [key: string]: any;
+}
+
+function int32ToCSS(n: number): string {
+  const u = n >= 0 ? n : n + 0x100000000;
+  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
 }
 
 const themes: { slug: string; theme: Theme }[] = files.map(f => {
@@ -34,7 +39,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
 ---
 
-<Layout title="f5a-gallery">
+<Layout title="靓企鹅主题商店">
   <div class="container">
 
     <!-- ===== Hero Section ===== -->
@@ -43,7 +48,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <h1 class="hero-title-sm">探索键盘主题</h1>
         <h2 class="hero-title">发现你的风格</h2>
         <p class="hero-desc">
-          f5a-gallery 是 fcitx5-android 键盘主题画廊。<br/>
+          靓企鹅主题商店是 fcitx5-android-fx（靓企鹅版）键盘主题商店。<br/>
           浏览主题，实时预览键盘效果，<br/>
           找到最适合你的配色方案。
         </p>
@@ -83,23 +88,23 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <div class="preview-card">
           <div class="preview-title" id="preview-theme-name">{defaultTheme.name}</div>
           <div id="keyboard-container">
-            <KeyboardPreview colors={defaultTheme.colors} />
+            <KeyboardPreview colors={defaultTheme} />
           </div>
           <div class="color-legend" id="color-legend">
             <span class="legend-chip">
-              <span class="legend-dot" id="legend-popup" style={`background:${defaultTheme.colors.popupTextColor}`}></span>
+              <span class="legend-dot" id="legend-popup" style={`background:${int32ToCSS(defaultTheme.popupTextColor)}`}></span>
               Popup
             </span>
             <span class="legend-chip">
-              <span class="legend-dot" id="legend-clipboard" style={`background:${defaultTheme.colors.clipboardEntryColor}`}></span>
+              <span class="legend-dot" id="legend-clipboard" style={`background:${int32ToCSS(defaultTheme.clipboardEntryColor)}`}></span>
               Clipboard
             </span>
             <span class="legend-chip">
-              <span class="legend-dot" id="legend-active" style={`background:${defaultTheme.colors.genericActiveForegroundColor}`}></span>
+              <span class="legend-dot" id="legend-active" style={`background:${int32ToCSS(defaultTheme.genericActiveForegroundColor)}`}></span>
               Active
             </span>
             <span class="legend-chip">
-              <span class="legend-dot" id="legend-comment" style={`background:${defaultTheme.colors.candidateCommentColor}`}></span>
+              <span class="legend-dot" id="legend-comment" style={`background:${int32ToCSS(defaultTheme.candidateCommentColor)}`}></span>
               Comment
             </span>
           </div>
@@ -116,7 +121,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
       <div class="theme-grid">
         {themes.slice(0, 20).map(({ slug, theme }, i) => {
-          const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
+          const palette = PALETTE_KEYS.map(k => int32ToCSS(theme[k]));
           return (
             <div
               class={`theme-card${slug === defaultSlug ? ' active' : ''}`}
@@ -174,8 +179,8 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     <footer class="site-footer">
       <div class="footer-grid">
         <div class="footer-col">
-          <h3>关于 f5a-gallery</h3>
-          <p>开源的 fcitx5-android 键盘主题画廊，由社区驱动，自动化部署。</p>
+          <h3>关于 靓企鹅主题商店</h3>
+          <p>开源的 fcitx5-android-fx（靓企鹅版）键盘主题商店，由社区驱动，自动化部署。</p>
           <a href="https://github.com/rebron1900/f5a-gallery" target="_blank">GitHub 仓库 →</a>
         </div>
         <div class="footer-col">
@@ -196,7 +201,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         </div>
       </div>
       <div class="footer-bottom">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> f5a-gallery.rebron.me
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 靓企鹅主题商店
       </div>
     </footer>
 
@@ -206,12 +211,12 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
 
-    function updateLegend(colors) {
+    function updateLegend(theme) {
       var map = {
-        'legend-popup': colors.popupTextColor,
-        'legend-clipboard': colors.clipboardEntryColor,
-        'legend-active': colors.genericActiveForegroundColor,
-        'legend-comment': colors.candidateCommentColor
+        'legend-popup': int32ToCSS(theme.popupTextColor),
+        'legend-clipboard': int32ToCSS(theme.clipboardEntryColor),
+        'legend-active': int32ToCSS(theme.genericActiveForegroundColor),
+        'legend-comment': int32ToCSS(theme.candidateCommentColor)
       };
       Object.keys(map).forEach(function (id) {
         var el = document.getElementById(id);
@@ -223,12 +228,12 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (typeof window.renderKeyboard !== 'function') return;
       if (!themes[slug]) return;
       var theme = themes[slug];
-      var html = window.renderKeyboard(theme.colors, layout, {
+      var html = window.renderKeyboard(theme, layout, {
         keyHGap: 3, keyVGap: 3, keyRadius: 4, borderEnabled: true
       });
       document.getElementById('keyboard-container').innerHTML = html;
       document.getElementById('preview-theme-name').textContent = theme.name;
-      updateLegend(theme.colors);
+      updateLegend(theme);
 
       document.querySelectorAll('.theme-card').forEach(function (card) {
         card.classList.toggle('active', card.dataset.slug === slug);
@@ -250,7 +255,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (!themes[slug]) return;
       currentPopupSlug = slug;
       var theme = themes[slug];
-      var html = window.renderKeyboard(theme.colors, layout, {
+      var html = window.renderKeyboard(theme, layout, {
         keyHGap: 2, keyVGap: 2, keyRadius: 3, borderEnabled: true
       });
       popupKb.innerHTML = html;

@@ -61,7 +61,7 @@ jobs:
             }
 
             // Support both formats:
-            //   - Native fcitx5-android: top-level color tokens as int32, no author/colors
+            //   - Native fcitx5-android-fx（靓企鹅版）: top-level color tokens as int32, no author/colors
             //   - Gallery wrapper: { author, colors: { ...hex } }
             const errors = [];
             if (!data.name || typeof data.name !== 'string') errors.push('缺少或无效的 name 字段');

@@ -2,9 +2,11 @@
 /**
  * validate-theme.ts
  * Validates theme JSON files in src/content/themes/
- * Supports both formats:
- *   - Native fcitx5-android: colors as signed 32-bit integers, no colors wrapper
- *   - Gallery format: colors as hex strings inside a colors object
+ *
+ * Expected format: native fcitx5-android-fx（靓企鹅版）format
+ *   - Flat structure (no colors wrapper)
+ *   - Colors as signed 32-bit integers
+ *   - 21 color token fields at top level
  */
 
 import { readdirSync, readFileSync } from "fs";
@@ -30,17 +32,16 @@ for (const file of files) {
   const data = JSON.parse(readFileSync(join(themesDir, file), "utf-8"));
   const errors: string[] = [];
 
-  if (!data.name || typeof data.name !== "string") errors.push("missing name");
-  if (typeof data.isDark !== "boolean") errors.push("missing isDark");
+  if (!data.name || typeof data.name !== "string") errors.push("missing or invalid 'name'");
+  if (typeof data.isDark !== "boolean") errors.push("missing or invalid 'isDark'");
 
-  // Support both formats: colors wrapper or top-level tokens
-  const colors = data.colors || data;
-  const hasColors = typeof colors === "object";
-  if (!hasColors) {
-    errors.push("missing color tokens");
-  } else {
-    for (const token of THEME_COLORS) {
-      if (colors[token] === undefined) errors.push(`missing ${token}`);
+  // Validate all 21 color tokens exist as numbers (int32) at top level
+  for (const token of THEME_COLORS) {
+    const value = data[token];
+    if (value === undefined) {
+      errors.push(`missing ${token}`);
+    } else if (typeof value !== "number" || !Number.isInteger(value)) {
+      errors.push(`${token} must be a signed int32 number, got ${typeof value}`);
     }
   }
 
