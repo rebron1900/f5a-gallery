@@ -62,5 +62,9 @@
   "sage-journey": {
     "author": "rebron1900",
     "builtin": false
+  },
+  "pastel-retro-light": {
+    "author": "rebron1900",
+    "builtin": false
   }
 }
