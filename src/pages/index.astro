@@ -292,7 +292,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
     document.querySelectorAll('.theme-card').forEach(function (card) {
       card.addEventListener('click', function () {
-        showPopup(card.dataset.slug, card);
+        var slug = card.dataset.slug;
+        updateKeyboard(slug);
+        showPopup(slug, card);
       });
     });
 
