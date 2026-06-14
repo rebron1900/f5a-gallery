@@ -1,0 +1,476 @@
+---
+import Layout from '../layouts/Layout.astro';
+import KeyboardPreview from '../components/KeyboardPreview.astro';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+const themesDir = join(process.cwd(), 'src/content/themes');
+const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
+
+interface Theme {
+  name: string;
+  author: string;
+  isDark: boolean;
+  builtin?: boolean;
+  colors: Record<string, string>;
+}
+
+const themes: { slug: string; theme: Theme }[] = files.map(f => {
+  const slug = f.replace('.json', '');
+  const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
+  return { slug, theme: data as Theme };
+});
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Palette swatches for cards
+const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
+
+// Extract hue from hex color
+function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l };
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return { h: h * 360, s, l };
+}
+
+function getColorFamily(hex: string): string {
+  const hsl = hexToHsl(hex);
+  if (!hsl) return 'other';
+  const { h, s, l } = hsl;
+  if (l < 0.2) return 'dark';
+  if (l > 0.8) return 'light';
+  if (s < 0.1) return 'gray';
+  if (h < 30 || h >= 330) return 'warm';
+  if (h < 90) return 'yellow';
+  if (h < 150) return 'green';
+  if (h < 210) return 'cyan';
+  if (h < 270) return 'blue';
+  return 'purple';
+}
+
+// Pre-compute color families for each theme
+const themeFamilies = themes.map(({ slug, theme }) => {
+  const bg = theme.colors.backgroundColor || '#cccccc';
+  return { slug, theme, family: getColorFamily(bg) };
+});
+
+const COLOR_FAMILIES = [
+  { key: 'dark', label: '暗色系', dot: '#1a1a2e' },
+  { key: 'light', label: '浅色系', dot: '#f0f0f0' },
+  { key: 'gray', label: '灰色系', dot: '#888888' },
+  { key: 'warm', label: '暖色系', dot: '#c0392b' },
+  { key: 'yellow', label: '黄橙系', dot: '#f39c12' },
+  { key: 'green', label: '绿色系', dot: '#27ae60' },
+  { key: 'cyan', label: '青色系', dot: '#00838f' },
+  { key: 'blue', label: '蓝紫系', dot: '#2980b9' },
+  { key: 'purple', label: '紫色系', dot: '#8e44ad' },
+];
+---
+
+<Layout title="主题列表">
+  <div class="container themes-page">
+
+    <!-- Header -->
+    <div class="themes-page-header">
+      <div class="themes-page-title-row">
+        <a href={base + '/'} class="back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          返回首页
+        </a>
+      </div>
+      <h1>主题列表</h1>
+      <p class="themes-page-sub">共 <strong>{themes.length}</strong> 个主题</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">模式</span>
+        <div class="filter-toggles">
+          <button class="filter-btn active" data-filter-type="mode" data-filter-value="all">全部</button>
+          <button class="filter-btn" data-filter-type="mode" data-filter-value="light">亮色</button>
+          <button class="filter-btn" data-filter-type="mode" data-filter-value="dark">暗色</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">色调</span>
+        <div class="color-dots">
+          <button class="color-dot active" data-filter-type="color" data-filter-value="all" title="全部">
+            <span class="dot" style="background: conic-gradient(#c0392b, #f39c12, #27ae60, #2980b9, #8e44ad, #c0392b);"></span>
+            <span class="dot-label">全部</span>
+          </button>
+          {COLOR_FAMILIES.map(f => (
+            <button class="color-dot" data-filter-type="color" data-filter-value={f.key} title={f.label}>
+              <span class="dot" style={`background:${f.dot}`}></span>
+              <span class="dot-label">{f.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div class="filter-count">
+        显示 <span id="visible-count">{themes.length}</span> / {themes.length}
+      </div>
+    </div>
+
+    <!-- Theme Grid -->
+    <div class="theme-grid" id="theme-grid">
+      {themeFamilies.map(({ slug, theme, family }, i) => {
+        const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
+        return (
+          <a
+            href={`${base}/theme/${slug}`}
+            class="theme-card"
+            data-slug={slug}
+            data-dark={theme.isDark ? '1' : '0'}
+            data-family={family}
+          >
+            <div class="theme-card-name">{theme.name}</div>
+            <div class="theme-card-meta">
+              @{theme.author}
+              {theme.isDark
+                ? <span class="dark-badge">暗色</span>
+                : <span class="light-badge">亮色</span>
+              }
+            </div>
+            <div class="theme-card-palette">
+              {palette.map(c => <div class="theme-card-swatch" style={`background:${c}`}></div>)}
+            </div>
+            <div class="theme-card-footer">
+              <div class="theme-card-likes">
+                <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                0
+              </div>
+              {theme.builtin && <span class="builtin-badge">内置</span>}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>没有匹配的主题</p>
+      <button class="btn" id="clear-filters">清除筛选</button>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      var currentMode = 'all';
+      var currentColor = 'all';
+      var cards = document.querySelectorAll('.theme-card[data-slug]');
+      var visibleCountEl = document.getElementById('visible-count');
+      var emptyState = document.getElementById('empty-state');
+
+      function applyFilters() {
+        var visible = 0;
+        cards.forEach(function (card) {
+          var modeMatch = currentMode === 'all' ||
+            (currentMode === 'dark' && card.dataset.dark === '1') ||
+            (currentMode === 'light' && card.dataset.dark === '0');
+          var colorMatch = currentColor === 'all' || card.dataset.family === currentColor;
+          var show = modeMatch && colorMatch;
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        if (visibleCountEl) visibleCountEl.textContent = visible;
+        if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
+      }
+
+      // Mode toggle buttons
+      document.querySelectorAll('[data-filter-type="mode"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('[data-filter-type="mode"]').forEach(function (b) {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+          currentMode = btn.dataset.filterValue;
+          applyFilters();
+        });
+      });
+
+      // Color dot buttons
+      document.querySelectorAll('[data-filter-type="color"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('[data-filter-type="color"]').forEach(function (b) {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+          currentColor = btn.dataset.filterValue;
+          applyFilters();
+        });
+      });
+
+      // Clear filters
+      var clearBtn = document.getElementById('clear-filters');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          currentMode = 'all';
+          currentColor = 'all';
+          document.querySelectorAll('.filter-btn, .color-dot').forEach(function (b) {
+            b.classList.remove('active');
+          });
+          document.querySelector('[data-filter-value="all"][data-filter-type="mode"]').classList.add('active');
+          document.querySelector('[data-filter-value="all"][data-filter-type="color"]').classList.add('active');
+          applyFilters();
+        });
+      }
+    })();
+  </script>
+
+  <style>
+    /* Page header */
+    .themes-page {
+      padding: 24px 0 48px;
+      margin: 0 32px;
+    }
+
+    .themes-page-header {
+      margin-bottom: 24px;
+    }
+
+    .themes-page-title-row {
+      margin-bottom: 8px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+    .back-link:hover { color: var(--text-body); opacity: 1; }
+
+    .themes-page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .themes-page-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .themes-page-sub strong {
+      color: var(--text-primary);
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-label {
+      font-size: 13px;
+      color: var(--text-sub);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .filter-toggles {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: var(--text-sub);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-body);
+    }
+
+    .filter-btn.active {
+      background: var(--bg-white);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .color-dot {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px 4px 4px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg-white);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .color-dot:hover {
+      border-color: var(--green-accent);
+    }
+
+    .color-dot.active {
+      border-color: var(--green-mid);
+      background: var(--green-pale);
+      color: var(--text-primary);
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .dot-label {
+      font-weight: 500;
+    }
+
+    .filter-count {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* Badge variants */
+    .dark-badge,
+    .light-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .dark-badge {
+      background: rgba(60, 84, 64, 0.1);
+      color: var(--green-mid);
+    }
+
+    .light-badge {
+      background: rgba(243, 218, 156, 0.25);
+      color: #a08030;
+    }
+
+    .builtin-badge {
+      display: inline-block;
+      background: rgba(90, 126, 99, 0.1);
+      color: var(--green-mid);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    /* Theme cards as links */
+    .theme-card {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 64px 0;
+    }
+
+    .empty-state p {
+      font-size: 15px;
+      color: var(--text-sub);
+      margin: 12px 0 16px;
+    }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 768px) {
+      .themes-page {
+        padding: 16px 0 32px;
+        margin: 0 16px;
+      }
+
+      .themes-page-header h1 {
+        font-size: 22px;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        gap: 14px;
+        padding: 12px 14px;
+      }
+
+      .filter-group {
+        flex-wrap: wrap;
+      }
+
+      .filter-count {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      .color-dots {
+        gap: 4px;
+      }
+
+      .color-dot .dot-label {
+        display: none;
+      }
+
+      .color-dot {
+        padding: 4px;
+        border-radius: 50%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .themes-page-header h1 { font-size: 20px; }
+    }
+  </style>
+</Layout>

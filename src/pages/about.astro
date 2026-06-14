@@ -1,0 +1,414 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout title="关于项目">
+  <div class="container about-page">
+
+    <div class="about-header">
+      <h1>关于 f5a-gallery</h1>
+      <p class="about-subtitle">fcitx5-android 键盘主题画廊</p>
+    </div>
+
+    <!-- What -->
+    <section class="about-section">
+      <h2>🎨 项目简介</h2>
+      <p>
+        <strong>f5a-gallery</strong> 是一个在线浏览和预览
+        <a href="https://github.com/fcitx5-android/fcitx5-android" target="_blank">fcitx5-android</a>
+        键盘主题的网站。这是一个<strong>社区驱动、开源</strong>的项目，旨在帮助用户发现和选择最适合自己的键盘配色方案。
+      </p>
+      <p>
+        所有主题均以 JSON 格式存储，你可以一键复制或下载主题文件，直接导入 fcitx5-android 使用。
+      </p>
+    </section>
+
+    <!-- Features -->
+    <section class="about-section">
+      <h2>✨ 功能特性</h2>
+      <ul class="feature-list">
+        <li>
+          <span class="feature-icon">🎨</span>
+          <div>
+            <strong>浏览主题</strong>
+            <p>浏览内置和社区提交的键盘主题，支持亮色/暗色分类</p>
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">⌨️</span>
+          <div>
+            <strong>实时键盘预览</strong>
+            <p>内置键盘模拟器，QWERTY 标准布局，所见即所得地预览主题效果</p>
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">📋</span>
+          <div>
+            <strong>下载主题 JSON</strong>
+            <p>一键复制或下载主题 JSON 文件，直接导入 fcitx5-android</p>
+          </div>
+        </li>
+        <li>
+          <span class="feature-icon">🎯</span>
+          <div>
+            <strong>21 种颜色 Token</strong>
+            <p>每个主题包含 21 种颜色 token，逐一展示色值，覆盖键盘所有视觉元素</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Keyboard Preview -->
+    <section class="about-section">
+      <h2>⌨️ 键盘预览说明</h2>
+      <p>
+        每个主题详情页都包含一个键盘模拟器，展示该主题在 fcitx5-android 上的实际渲染效果。
+        模拟器使用 <strong>QWERTY</strong> 标准布局，包含：
+      </p>
+      <ul class="detail-list">
+        <li>字母键（带 alt 符号预览）</li>
+        <li>功能键 — 使用 Unicode 符号：<code>⇧</code> Shift · <code>⌫</code> Backspace · <code>↵</code> Return · <code>🌐</code> 切换键</li>
+        <li>空格键</li>
+      </ul>
+      <p>键盘渲染器移植自 <a href="https://github.com/fxliang/f5a-see-me" target="_blank">f5a-see-me</a> 项目。</p>
+    </section>
+
+    <!-- How it works -->
+    <section class="about-section">
+      <h2>🔄 工作流程</h2>
+      <div class="workflow-steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>内置主题</strong>
+            <p>画廊预置了多款经典主题，如 AMOLED Black、Nord Dark/Light、Monokai 等</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>社区提交</strong>
+            <p>任何人都可以通过 GitHub Issues 提交自己的主题 JSON</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>自动化审核</strong>
+            <p>提交后进入自动化审核流水线，通过后自动合并到画廊</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>自动部署</strong>
+            <p>GitHub Actions 自动构建并部署到 GitHub Pages</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="about-section">
+      <h2>🛠 技术栈</h2>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="tech-name">Astro SSG</div>
+          <div class="tech-desc">静态站点生成器，构建高性能网站</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">GitHub Actions</div>
+          <div class="tech-desc">CI/CD 自动化构建与部署</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">GitHub Pages</div>
+          <div class="tech-desc">免费静态站点托管</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">f5a-see-me</div>
+          <div class="tech-desc">键盘渲染器，可视化主题效果</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contribute -->
+    <section class="about-section">
+      <h2>🤝 参与贡献</h2>
+      <p>
+        欢迎提交你的键盘主题！前往
+        <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank">GitHub Issues</a>
+        使用主题提交模板，填写主题名称、作者和颜色 JSON 即可。
+      </p>
+      <p>
+        项目源码托管在
+        <a href="https://github.com/rebron1900/f5a-gallery" target="_blank">GitHub</a>，
+        欢迎 Star、Fork 和提交 PR。
+      </p>
+      <div class="about-actions">
+        <a href="https://github.com/rebron1900/f5a-gallery" target="_blank" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          查看 GitHub 仓库
+        </a>
+        <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank" class="btn">
+          提交主题
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <style>
+    .about-page {
+      margin: 0 32px;
+      padding: 24px 0 64px;
+      max-width: 720px;
+    }
+
+    .about-header {
+      margin-bottom: 36px;
+    }
+
+    .about-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .about-subtitle {
+      font-size: 15px;
+      color: var(--text-sub);
+    }
+
+    .about-section {
+      margin-bottom: 36px;
+    }
+
+    .about-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .about-section p {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    .about-section a {
+      color: var(--green-mid);
+      font-weight: 500;
+      text-decoration: underline;
+      text-decoration-color: rgba(90, 126, 99, 0.3);
+      text-underline-offset: 2px;
+    }
+
+    .about-section a:hover {
+      text-decoration-color: var(--green-mid);
+    }
+
+    .about-section code {
+      background: var(--green-pale);
+      color: var(--text-primary);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    }
+
+    /* Feature list */
+    .feature-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .feature-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .feature-list strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .feature-list p {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Detail list */
+    .detail-list {
+      margin: 8px 0 12px 20px;
+      padding: 0;
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.8;
+    }
+
+    .detail-list li {
+      margin-bottom: 4px;
+    }
+
+    /* Workflow */
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--green-mid);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-content strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Tech grid */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tech-item {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .tech-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .tech-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    /* Actions */
+    .about-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-white);
+      color: var(--text-body);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn:hover {
+      border-color: var(--green-mid);
+      color: var(--green-mid);
+    }
+
+    .btn-primary {
+      background: var(--green-mid);
+      color: #fff;
+      border-color: var(--green-mid);
+    }
+
+    .btn-primary:hover {
+      background: #4d6d55;
+      color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about-page {
+        margin: 0 16px;
+        padding: 16px 0 48px;
+      }
+
+      .about-header h1 {
+        font-size: 26px;
+      }
+
+      .about-section h2 {
+        font-size: 18px;
+      }
+
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-actions {
+        flex-direction: column;
+      }
+
+      .about-actions .btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</Layout>

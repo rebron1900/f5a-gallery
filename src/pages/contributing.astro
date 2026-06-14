@@ -1,0 +1,490 @@
+---
+import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout title="贡献指南">
+  <div class="container">
+    <section class="page">
+      <div class="page-header">
+        <h1 class="page-title">贡献指南</h1>
+        <p class="page-desc">欢迎为 f5a-gallery 提交主题或改进代码。以下是参与方式。</p>
+      </div>
+
+      <!-- ===== 1. 提交主题 ===== -->
+      <article class="section">
+        <h2 class="section-title">
+          <span class="section-number">1</span>
+          提交主题
+        </h2>
+        <div class="section-body">
+          <p>通过 GitHub Issue 提交 fcitx5-android 配色方案，审核通过后自动部署到画廊。</p>
+          <ol class="steps">
+            <li>前往 <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank">GitHub Issues 选择模板</a> 页面</li>
+            <li>选择 <strong>「提交主题」</strong>（submit-theme）模板</li>
+            <li>填写主题名称、作者、配色 JSON</li>
+            <li>提交 Issue，等待自动验证与人工审核</li>
+            <li>审核通过后自动合并，主题出现在画廊</li>
+          </ol>
+          <div class="callout">
+            <div class="callout-icon">💡</div>
+            <div class="callout-text">
+              <strong>零代码参与</strong> — 无需 Fork / PR，只需填写 Issue 模板。适合只想分享配色的用户。
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== 2. 主题 JSON 格式规范 ===== -->
+      <article class="section">
+        <h2 class="section-title">
+          <span class="section-number">2</span>
+          主题 JSON 格式规范
+        </h2>
+        <div class="section-body">
+          <p>主题使用 JSON 文件描述，包含元数据和 21 个颜色 token。以下是完整示例：</p>
+
+          <div class="code-block">
+            <div class="code-header">theme-example.json</div>
+            <pre><code>{`{
+  "name": "My Theme",
+  "author": "yourname",
+  "isDark": false,
+  "colors": {
+    "backgroundColor": "#F5F5F5",
+    "keyBackgroundColor": "#FFFFFF",
+    "altKeyBackgroundColor": "#E0E0E0",
+    "accentKeyBackgroundColor": "#4CAF50",
+    "keyTextColor": "#333333",
+    "altKeyTextColor": "#666666",
+    "accentKeyTextColor": "#FFFFFF",
+    "keyBorderColor": "#CCCCCC",
+    "keyShadowColor": "#00000010",
+    "keyPressHighlightColor": "#FFFFFF40",
+    "popupBackgroundColor": "#FFFFFF",
+    "popupTextColor": "#333333",
+    "popupBorderColor": "#DDDDDD",
+    "candidateTextColor": "#333333",
+    "candidateCommentColor": "#999999",
+    "candidateActiveBackgroundColor": "#4CAF5030",
+    "candidateActiveForegroundColor": "#4CAF50",
+    "genericActiveForegroundColor": "#4CAF50",
+    "genericActiveBackgroundColor": "#4CAF5020",
+    "clipboardEntryColor": "#2196F3",
+    "dividerColor": "#E0E0E0"
+  }
+}`}</code></pre>
+          </div>
+
+          <h3 class="sub-title">颜色 Token 说明</h3>
+          <p>共 21 个颜色字段，涵盖键盘各个视觉区域：</p>
+
+          <div class="table-wrap">
+            <table class="token-table">
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>backgroundColor</code></td><td>键盘整体背景色</td></tr>
+                <tr><td><code>keyBackgroundColor</code></td><td>普通按键背景色</td></tr>
+                <tr><td><code>altKeyBackgroundColor</code></td><td>功能键（Shift、回退等）背景色</td></tr>
+                <tr><td><code>accentKeyBackgroundColor</code></td><td>强调键（空格、发送等）背景色</td></tr>
+                <tr><td><code>keyTextColor</code></td><td>普通按键文字颜色</td></tr>
+                <tr><td><code>altKeyTextColor</code></td><td>功能键文字颜色</td></tr>
+                <tr><td><code>accentKeyTextColor</code></td><td>强调键文字颜色</td></tr>
+                <tr><td><code>keyBorderColor</code></td><td>按键边框颜色</td></tr>
+                <tr><td><code>keyShadowColor</code></td><td>按键阴影颜色</td></tr>
+                <tr><td><code>keyPressHighlightColor</code></td><td>按键按下时的高亮颜色</td></tr>
+                <tr><td><code>popupBackgroundColor</code></td><td>候选词弹出框背景色</td></tr>
+                <tr><td><code>popupTextColor</code></td><td>候选词弹出框文字颜色</td></tr>
+                <tr><td><code>popupBorderColor</code></td><td>候选词弹出框边框颜色</td></tr>
+                <tr><td><code>candidateTextColor</code></td><td>候选词文字颜色</td></tr>
+                <tr><td><code>candidateCommentColor</code></td><td>候选词注释/拼音颜色</td></tr>
+                <tr><td><code>candidateActiveBackgroundColor</code></td><td>当前选中候选词背景色</td></tr>
+                <tr><td><code>candidateActiveForegroundColor</code></td><td>当前选中候选词文字颜色</td></tr>
+                <tr><td><code>genericActiveForegroundColor</code></td><td>通用活跃状态前景色（如指示器）</td></tr>
+                <tr><td><code>genericActiveBackgroundColor</code></td><td>通用活跃状态背景色</td></tr>
+                <tr><td><code>clipboardEntryColor</code></td><td>剪贴板条目强调色</td></tr>
+                <tr><td><code>dividerColor</code></td><td>分隔线颜色</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <div class="callout-icon">📝</div>
+            <div class="callout-text">
+              <strong>关于颜色格式</strong> — 画廊中使用十六进制（如 <code>#4CAF50</code>），fcitx5-android 原生格式使用 int32 ARGB 值。提交 Issue 时使用十六进制即可，转换由 CI 自动完成。
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== 3. 审核流程 ===== -->
+      <article class="section">
+        <h2 class="section-title">
+          <span class="section-number">3</span>
+          审核流程
+        </h2>
+        <div class="section-body">
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="flow-step-num">①</div>
+              <div class="flow-step-content">
+                <strong>自动验证</strong>
+                <p>提交 Issue 后，GitHub Actions 自动检查 JSON 结构是否合法（字段完整、颜色格式正确）。</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">②</div>
+              <div class="flow-step-content">
+                <strong>人工审核</strong>
+                <p>管理员审核配色质量，通过后为 Issue 添加 <code>approved</code> 标签。</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">③</div>
+              <div class="flow-step-content">
+                <strong>自动合并</strong>
+                <p>检测到 <code>approved</code> 标签后，主题 JSON 自动入库并触发构建。</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <div class="flow-step-num">④</div>
+              <div class="flow-step-content">
+                <strong>部署上线</strong>
+                <p>GitHub Pages 自动部署新版本。Issue 自动关闭，附带成功提示评论。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== 4. 开发贡献 ===== -->
+      <article class="section">
+        <h2 class="section-title">
+          <span class="section-number">4</span>
+          开发贡献
+        </h2>
+        <div class="section-body">
+          <p>如果你想改进代码、修复 Bug 或添加功能，欢迎提交 Pull Request。</p>
+
+          <h3 class="sub-title">环境搭建</h3>
+          <div class="code-block">
+            <div class="code-header">Terminal</div>
+            <pre><code>{`# 1. Fork 并克隆仓库
+git clone https://github.com/<your-user>/f5a-gallery.git
+cd f5a-gallery
+
+# 2. 安装依赖
+npm install
+
+# 3. 启动开发服务器
+npm run dev
+
+# 4. 构建生产版本
+npm run build`}</code></pre>
+          </div>
+
+          <h3 class="sub-title">提交 PR</h3>
+          <ol class="steps">
+            <li>从 <code>main</code> 创建功能分支：<code>git checkout -b feat/your-feature</code></li>
+            <li>提交变更，写清 commit message</li>
+            <li>推送分支并创建 Pull Request</li>
+            <li>等待 CI 检查通过与代码审核</li>
+          </ol>
+
+          <div class="callout">
+            <div class="callout-icon">🤝</div>
+            <div class="callout-text">
+              <strong>有疑问？</strong> 在 GitHub Discussions 或 Issue 中提问，维护者会尽快回复。
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== Footer Link ===== -->
+      <div class="page-footer">
+        <a href={base + '/'} class="back-link">← 返回首页</a>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    /* ===== Page Layout ===== */
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    .page-header {
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .page-desc {
+      font-size: 15px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    /* ===== Sections ===== */
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--green-mid);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-body {
+      font-size: 14.5px;
+      color: var(--text-body);
+      line-height: 1.75;
+    }
+
+    .section-body p {
+      margin-bottom: 12px;
+    }
+
+    .sub-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 20px 0 10px;
+    }
+
+    /* ===== Steps ===== */
+    .steps {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+
+    .steps li {
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .steps li::marker {
+      color: var(--green-mid);
+      font-weight: 600;
+    }
+
+    /* ===== Callout ===== */
+    .callout {
+      display: flex;
+      gap: 10px;
+      background: var(--green-pale);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin: 16px 0;
+    }
+
+    .callout-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      line-height: 1.6;
+    }
+
+    .callout-text {
+      font-size: 13.5px;
+      color: var(--text-body);
+      line-height: 1.65;
+    }
+
+    .callout-text code {
+      background: rgba(90, 126, 99, 0.12);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12.5px;
+    }
+
+    /* ===== Code Block ===== */
+    .code-block {
+      background: #2b2b2b;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 12px 0 16px;
+    }
+
+    .code-header {
+      background: #3a3a3a;
+      color: #aaa;
+      font-size: 12px;
+      padding: 6px 14px;
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 14px;
+      overflow-x: auto;
+    }
+
+    .code-block code {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+
+    /* ===== Token Table ===== */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 12px 0 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .token-table th {
+      background: var(--green-pale);
+      color: var(--text-primary);
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .token-table td {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-body);
+    }
+
+    .token-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .token-table tr:hover td {
+      background: rgba(90, 126, 99, 0.04);
+    }
+
+    .token-table code {
+      background: rgba(90, 126, 99, 0.1);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12.5px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: var(--green-dark);
+    }
+
+    /* ===== Flow Steps ===== */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .flow-step-num {
+      font-size: 18px;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .flow-step-content strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .flow-step-content p {
+      font-size: 13.5px;
+      color: var(--text-body);
+      margin: 0;
+    }
+
+    .flow-step-content code {
+      background: rgba(90, 126, 99, 0.1);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12.5px;
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+
+    /* ===== Footer ===== */
+    .page-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .back-link {
+      font-size: 14px;
+      color: var(--green-mid);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .page {
+        padding: 20px 16px 48px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .section-title {
+        font-size: 18px;
+      }
+
+      .token-table th,
+      .token-table td {
+        padding: 7px 10px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</Layout>

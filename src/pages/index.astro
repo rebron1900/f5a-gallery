@@ -52,7 +52,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             提交主题
           </a>
-          <a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank" class="btn">
+          <a href={`${base}/contributing`} class="btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             查看指南
           </a>
@@ -111,11 +111,11 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     <section class="themes-section">
       <div class="themes-header">
         <h2 class="section-title">主题色卡</h2>
-        <a href="#" class="themes-view-all">查看全部 →</a>
+        <a href={`${base}/themes`} class="themes-view-all">查看全部 →</a>
       </div>
 
       <div class="theme-grid">
-        {themes.map(({ slug, theme }, i) => {
+        {themes.slice(0, 20).map(({ slug, theme }, i) => {
           const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
           return (
             <div
@@ -138,7 +138,27 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
           );
         })}
       </div>
+
+      {themes.length > 20 && (
+        <div class="themes-more">
+          <a href={`${base}/themes`} class="btn">查看更多主题 ({themes.length})</a>
+        </div>
+      )}
     </section>
+
+    <!-- Theme Preview Popup -->
+    <div class="theme-popup-overlay" id="theme-popup-overlay">
+      <div class="theme-popup" id="theme-popup">
+        <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
+        <div class="theme-popup-name" id="theme-popup-name"></div>
+        <div class="theme-popup-kb" id="theme-popup-kb"></div>
+        <div class="theme-popup-actions">
+          <button class="btn btn-sm" id="popup-download">💾 下载</button>
+          <button class="btn btn-sm" id="popup-copy">📋 复制 JSON</button>
+          <a class="btn btn-primary btn-sm" id="popup-detail" href="#">详情 →</a>
+        </div>
+      </div>
+    </div>
 
     <!-- ===== Bottom CTA (mobile) ===== -->
     <div class="hero-actions hero-actions-bottom">
@@ -146,7 +166,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         提交主题
       </a>
-      <a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank" class="btn btn-primary">
+      <a href={`${base}/contributing`} class="btn btn-primary">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         查看指南
       </a>
@@ -163,9 +183,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <div class="footer-col">
           <h3>快速链接</h3>
           <ul>
-            <li><a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank">主题提交指南</a></li>
-            <li><a href="https://github.com/rebron1900/f5a-gallery#readme" target="_blank">JSON 格式说明</a></li>
-            <li><a href="https://github.com/rebron1900/f5a-gallery/blob/main/README.md" target="_blank">贡献指南</a></li>
+            <li><a href={base + '/contributing'}>主题提交指南</a></li>
+            <li><a href={base + '/contributing'}>JSON 格式说明</a></li>
+            <li><a href={base + '/contributing'}>贡献指南</a></li>
           </ul>
         </div>
         <div class="footer-col">
@@ -218,12 +238,69 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
     document.querySelectorAll('.theme-card').forEach(function (card) {
       card.addEventListener('click', function () {
-        updateKeyboard(card.dataset.slug);
+        var slug = card.dataset.slug;
+        updateKeyboard(slug);
+        showPopup(slug);
         // Scroll keyboard preview into view on mobile
         var preview = document.querySelector('.hero-preview');
         if (preview && window.innerWidth <= 768) {
           preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+      });
+    });
+
+    // --- Theme Popup ---
+    var popupOverlay = document.getElementById('theme-popup-overlay');
+    var popupKb = document.getElementById('theme-popup-kb');
+    var popupName = document.getElementById('theme-popup-name');
+    var popupDetail = document.getElementById('popup-detail');
+    var popupDownload = document.getElementById('popup-download');
+    var popupCopy = document.getElementById('popup-copy');
+    var popupClose = document.getElementById('theme-popup-close');
+    var currentPopupSlug = '';
+
+    function showPopup(slug) {
+      if (!themes[slug]) return;
+      currentPopupSlug = slug;
+      var theme = themes[slug];
+      // Render mini keyboard
+      var html = window.renderKeyboard(theme.colors, layout, {
+        keyHGap: 2, keyVGap: 2, keyRadius: 3, borderEnabled: true
+      });
+      popupKb.innerHTML = html;
+      popupName.textContent = theme.name;
+      popupDetail.href = base + '/theme/' + slug;
+      popupOverlay.classList.add('open');
+    }
+
+    function closePopup() {
+      popupOverlay.classList.remove('open');
+      currentPopupSlug = '';
+    }
+
+    popupClose.addEventListener('click', closePopup);
+    popupOverlay.addEventListener('click', function(e) {
+      if (e.target === popupOverlay) closePopup();
+    });
+
+    popupDownload.addEventListener('click', function() {
+      if (!themes[currentPopupSlug]) return;
+      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = currentPopupSlug + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    popupCopy.addEventListener('click', function() {
+      if (!themes[currentPopupSlug]) return;
+      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
+      navigator.clipboard.writeText(json).then(function() {
+        popupCopy.textContent = '✅ 已复制';
+        setTimeout(function() { popupCopy.textContent = '📋 复制 JSON'; }, 2000);
       });
     });
   </script>
@@ -425,6 +502,74 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       border-radius: 3px;
     }
 
+    /* ===== View More ===== */
+    .themes-more {
+      text-align: center;
+      padding: 24px 0 0;
+    }
+
+    /* ===== Theme Popup ===== */
+    .theme-popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .theme-popup-overlay.open {
+      display: flex;
+    }
+
+    .theme-popup {
+      background: var(--bg-white);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .theme-popup-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none;
+      font-size: 16px; color: var(--text-sub);
+      cursor: pointer; border-radius: var(--radius-sm);
+    }
+
+    .theme-popup-close:hover {
+      background: var(--green-pale);
+    }
+
+    .theme-popup-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .theme-popup-kb {
+      margin-bottom: 16px;
+    }
+
+    .theme-popup-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
     /* ===== Footer ===== */
     .site-footer {
       background: var(--bg-footer);
@@ -558,6 +703,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       .footer-bottom {
         margin: 0 16px;
       }
+
+      .theme-popup { padding: 16px; max-width: 100%; }
+      .theme-popup-actions { flex-wrap: wrap; }
     }
 
     @media (max-width: 480px) {
