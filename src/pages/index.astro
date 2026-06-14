@@ -120,7 +120,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       </div>
 
       <div class="theme-grid">
-        {themes.slice(0, 20).map(({ slug, theme }, i) => {
+        {themes.slice(0, 12).map(({ slug, theme }, i) => {
           const palette = PALETTE_KEYS.map(k => int32ToCSS(theme[k]));
           return (
             <div
@@ -144,7 +144,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         })}
       </div>
 
-      {themes.length > 20 && (
+      {themes.length > 12 && (
         <div class="themes-more">
           <a href={`${base}/themes`} class="btn">查看更多主题 ({themes.length})</a>
         </div>
@@ -219,7 +219,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
   </div>
 
-  <script define:vars={{ themesJson, layoutJson, defaultSlug }}>
+  <script define:vars={{ themesJson, layoutJson, defaultSlug, base }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
 
@@ -292,9 +292,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
     document.querySelectorAll('.theme-card').forEach(function (card) {
       card.addEventListener('click', function () {
-        var slug = card.dataset.slug;
-        updateKeyboard(slug);
-        showPopup(slug, card);
+        showPopup(card.dataset.slug, card);
       });
     });
 
