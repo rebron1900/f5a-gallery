@@ -81,7 +81,7 @@ img { max-width: 100%; display: block; }
   justify-content: space-between;
   padding: 16px 0;
   border-bottom: 1px solid var(--border);
-  margin-bottom: var(--section-gap);
+  margin-bottom: 24px;
 }
 
 .nav-logo {

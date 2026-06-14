@@ -248,9 +248,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     /* ===== Hero ===== */
     .hero {
       display: flex;
-      gap: 48px;
+      gap: 40px;
       align-items: flex-start;
-      padding: 40px 0 48px;
+      padding: 32px 0 40px;
     }
 
     .hero-text {
@@ -276,14 +276,14 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     .hero-desc {
       font-size: 15px;
       color: var(--text-sub);
-      line-height: 1.8;
-      margin-bottom: 24px;
+      line-height: 1.7;
+      margin-bottom: 20px;
     }
 
     .hero-actions {
       display: flex;
       gap: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     /* Stats */
@@ -548,11 +548,12 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     @media (max-width: 768px) {
       .hero {
         flex-direction: column;
-        gap: 24px;
-        padding: 24px 0 32px;
+        gap: 16px;
+        padding: 16px 0 24px;
       }
 
-      .hero-title { font-size: 28px; }
+      .hero-title { font-size: 28px; margin-bottom: 8px; }
+      .hero-desc { margin-bottom: 16px; line-height: 1.6; }
 
       .hero-stats {
         flex-direction: row;
@@ -573,6 +574,8 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
 
       .preview-card { padding: 12px; }
 
+      .themes-section { padding-bottom: 32px; }
+
       .themes-header {
         flex-direction: row;
         align-items: center;
@@ -590,10 +593,15 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     }
 
     @media (max-width: 480px) {
+      .hero { gap: 12px; padding: 12px 0 20px; }
       .hero-title { font-size: 24px; }
       .hero-title-sm { font-size: 17px; }
+      .hero-desc { font-size: 13px; margin-bottom: 12px; }
 
-      .hero-stats { flex-direction: column; gap: 8px; }
+      .stat-card { padding: 8px 6px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 11px; }
+      .stat-sub { font-size: 11px; }
 
       .color-legend { gap: 8px; }
       .legend-chip { font-size: 11px; }
