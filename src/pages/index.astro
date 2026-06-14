@@ -297,25 +297,26 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       background: var(--bg-white);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 16px;
-      text-align: center;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .stat-icon {
       color: var(--green-mid);
-      margin-bottom: 6px;
       display: flex;
-      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
     }
 
     .stat-label {
       font-size: 12px;
       color: var(--text-sub);
-      margin-bottom: 4px;
     }
 
     .stat-value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: 700;
       color: var(--text-primary);
       line-height: 1.2;
