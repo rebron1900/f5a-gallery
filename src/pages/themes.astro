@@ -322,7 +322,7 @@ const layoutJson = JSON.stringify(layoutData.default);
   <style>
     /* Page header */
     .themes-page {
-      padding: 24px 32px 48px;
+      padding: 24px 0 48px;
     }
 
     .themes-page-header {
@@ -486,57 +486,7 @@ const layoutJson = JSON.stringify(layoutData.default);
       color: #a08030;
     }
 
-    .builtin-badge {
-      display: inline-block;
-      background: rgba(90, 126, 99, 0.1);
-      color: var(--green-mid);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
 
-    /* Theme cards */
-    .theme-card {
-      cursor: pointer;
-    }
-
-    /* Popup */
-    .theme-popup {
-      display: none;
-      position: fixed;
-      background: var(--bg-white);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      max-width: 380px;
-      width: 90vw;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      z-index: 2000;
-      border: 1px solid var(--border);
-    }
-    .theme-popup-close {
-      position: absolute;
-      top: 10px; right: 12px;
-      width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-      border: none; background: none;
-      font-size: 15px; color: var(--text-sub);
-      cursor: pointer; border-radius: var(--radius-sm);
-    }
-    .theme-popup-close:hover { background: var(--green-pale); }
-    .theme-popup-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-    .theme-popup-kb { margin-bottom: 14px; }
-    .theme-popup-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
 
     /* Empty state */
     .empty-state {

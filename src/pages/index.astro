@@ -234,19 +234,6 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       });
     }
 
-    document.querySelectorAll('.theme-card').forEach(function (card) {
-      card.addEventListener('click', function () {
-        var slug = card.dataset.slug;
-        updateKeyboard(slug);
-        showPopup(slug);
-        // Scroll keyboard preview into view on mobile
-        var preview = document.querySelector('.hero-preview');
-        if (preview && window.innerWidth <= 768) {
-          preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      });
-    });
-
     // --- Theme Popup ---
     var popup = document.getElementById('theme-popup');
     var popupKb = document.getElementById('theme-popup-kb');
@@ -470,51 +457,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       font-weight: 500;
     }
 
-    /* Card palette & likes */
-    .theme-card-palette {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 12px;
-    }
 
-    .theme-card-swatch {
-      flex: 1;
-      height: 28px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    .theme-card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-    }
-
-    .theme-card-likes {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--text-sub);
-    }
-
-    .theme-card-likes svg {
-      width: 14px;
-      height: 14px;
-      stroke: var(--text-sub);
-      fill: none;
-    }
-
-    .builtin-badge {
-      display: inline-block;
-      background: rgba(90, 126, 99, 0.1);
-      color: var(--green-mid);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
 
     /* ===== View More ===== */
     .themes-more {
@@ -522,48 +465,6 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       padding: 24px 0 0;
     }
 
-    /* ===== Theme Popup ===== */
-    .theme-popup {
-      display: none;
-      position: fixed;
-      background: var(--bg-white);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      max-width: 380px;
-      width: 90vw;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      z-index: 2000;
-      border: 1px solid var(--border);
-    }
-
-    .theme-popup-close {
-      position: absolute;
-      top: 10px; right: 12px;
-      width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-      border: none; background: none;
-      font-size: 15px; color: var(--text-sub);
-      cursor: pointer; border-radius: var(--radius-sm);
-    }
-
-    .theme-popup-close:hover { background: var(--green-pale); }
-
-    .theme-popup-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-
-    .theme-popup-kb { margin-bottom: 14px; }
-
-    .theme-popup-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
 
     /* ===== Footer ===== */
     .site-footer {
@@ -630,13 +531,6 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       gap: 12px;
     }
 
-    .footer-logo {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-sub);
-      opacity: 0.5;
-    }
-
     /* Mobile: buttons at bottom */
     .hero-actions-bottom {
       display: none;
@@ -664,8 +558,6 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       .stat-card { padding: 8px 10px; gap: 8px; }
       .stat-value { font-size: 20px; }
 
-      /* Hide top buttons, show bottom buttons on mobile */
-      .hero-actions-top { display: none; }
       .hero-actions-bottom {
         display: flex;
         gap: 12px;

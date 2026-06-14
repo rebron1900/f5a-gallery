@@ -85,14 +85,31 @@
     var isReturn = key.type === "ReturnKey";
     var isLayoutSwitch = key.type === "LayoutSwitchKey" || key.type === "LayerSwitchKey";
 
-    var bg = isSpace ? colors.spaceBarColor
-      : (isReturn || isAccent) ? colors.accentKeyBackgroundColor
-      : (isAlt || isLayoutSwitch) ? colors.altKeyBackgroundColor
-      : colors.keyBackgroundColor;
+    var bg;
+    if (isSpace) {
+      bg = colors.spaceBarColor;
+    } else if (isReturn) {
+      bg = colors.accentKeyBackgroundColor;
+    } else if (isLayoutSwitch) {
+      bg = colors.altKeyBackgroundColor;
+    } else if (isAccent) {
+      bg = colors.accentKeyBackgroundColor;
+    } else if (isAlt) {
+      bg = colors.altKeyBackgroundColor;
+    } else {
+      bg = colors.keyBackgroundColor;
+    }
 
-    var tx = isReturn || isAccent ? colors.accentKeyTextColor
-      : isAlt || isLayoutSwitch ? colors.altKeyTextColor
-      : colors.keyTextColor;
+    var tx;
+    if (isReturn) {
+      tx = colors.accentKeyTextColor;
+    } else if (isAccent) {
+      tx = colors.accentKeyTextColor;
+    } else if (isAlt || isLayoutSwitch) {
+      tx = colors.altKeyTextColor;
+    } else {
+      tx = colors.keyTextColor;
+    }
 
     return { background: bg, text: tx, altText: colors.altKeyTextColor, border: colors.keyShadowColor };
   }

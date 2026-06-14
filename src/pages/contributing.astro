@@ -52,26 +52,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   "isDark": false,
   "colors": {
     "backgroundColor": "#F5F5F5",
+    "barColor": "#E8E8E8",
+    "keyboardColor": "#F0F0F0",
     "keyBackgroundColor": "#FFFFFF",
-    "altKeyBackgroundColor": "#E0E0E0",
-    "accentKeyBackgroundColor": "#4CAF50",
     "keyTextColor": "#333333",
+    "candidateTextColor": "#333333",
+    "candidateLabelColor": "#999999",
+    "candidateCommentColor": "#AAAAAA",
+    "altKeyBackgroundColor": "#E0E0E0",
     "altKeyTextColor": "#666666",
+    "accentKeyBackgroundColor": "#4CAF50",
     "accentKeyTextColor": "#FFFFFF",
-    "keyBorderColor": "#CCCCCC",
-    "keyShadowColor": "#00000010",
     "keyPressHighlightColor": "#FFFFFF40",
+    "keyShadowColor": "#00000010",
     "popupBackgroundColor": "#FFFFFF",
     "popupTextColor": "#333333",
-    "popupBorderColor": "#DDDDDD",
-    "candidateTextColor": "#333333",
-    "candidateCommentColor": "#999999",
-    "candidateActiveBackgroundColor": "#4CAF5030",
-    "candidateActiveForegroundColor": "#4CAF50",
-    "genericActiveForegroundColor": "#4CAF50",
-    "genericActiveBackgroundColor": "#4CAF5020",
+    "spaceBarColor": "#E8E8E8",
+    "dividerColor": "#E0E0E0",
     "clipboardEntryColor": "#2196F3",
-    "dividerColor": "#E0E0E0"
+    "genericActiveBackgroundColor": "#4CAF5020",
+    "genericActiveForegroundColor": "#4CAF50"
   }
 }`}</code></pre>
           </div>
@@ -89,26 +89,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
               </thead>
               <tbody>
                 <tr><td><code>backgroundColor</code></td><td>键盘整体背景色</td></tr>
+                <tr><td><code>barColor</code></td><td>工具栏颜色</td></tr>
+                <tr><td><code>keyboardColor</code></td><td>键盘底部背景色</td></tr>
                 <tr><td><code>keyBackgroundColor</code></td><td>普通按键背景色</td></tr>
-                <tr><td><code>altKeyBackgroundColor</code></td><td>功能键（Shift、回退等）背景色</td></tr>
-                <tr><td><code>accentKeyBackgroundColor</code></td><td>强调键（空格、发送等）背景色</td></tr>
                 <tr><td><code>keyTextColor</code></td><td>普通按键文字颜色</td></tr>
-                <tr><td><code>altKeyTextColor</code></td><td>功能键文字颜色</td></tr>
-                <tr><td><code>accentKeyTextColor</code></td><td>强调键文字颜色</td></tr>
-                <tr><td><code>keyBorderColor</code></td><td>按键边框颜色</td></tr>
-                <tr><td><code>keyShadowColor</code></td><td>按键阴影颜色</td></tr>
-                <tr><td><code>keyPressHighlightColor</code></td><td>按键按下时的高亮颜色</td></tr>
-                <tr><td><code>popupBackgroundColor</code></td><td>候选词弹出框背景色</td></tr>
-                <tr><td><code>popupTextColor</code></td><td>候选词弹出框文字颜色</td></tr>
-                <tr><td><code>popupBorderColor</code></td><td>候选词弹出框边框颜色</td></tr>
                 <tr><td><code>candidateTextColor</code></td><td>候选词文字颜色</td></tr>
+                <tr><td><code>candidateLabelColor</code></td><td>候选词标签颜色</td></tr>
                 <tr><td><code>candidateCommentColor</code></td><td>候选词注释/拼音颜色</td></tr>
-                <tr><td><code>candidateActiveBackgroundColor</code></td><td>当前选中候选词背景色</td></tr>
-                <tr><td><code>candidateActiveForegroundColor</code></td><td>当前选中候选词文字颜色</td></tr>
-                <tr><td><code>genericActiveForegroundColor</code></td><td>通用活跃状态前景色（如指示器）</td></tr>
-                <tr><td><code>genericActiveBackgroundColor</code></td><td>通用活跃状态背景色</td></tr>
-                <tr><td><code>clipboardEntryColor</code></td><td>剪贴板条目强调色</td></tr>
+                <tr><td><code>altKeyBackgroundColor</code></td><td>功能键（Shift、回退等）背景色</td></tr>
+                <tr><td><code>altKeyTextColor</code></td><td>功能键文字颜色</td></tr>
+                <tr><td><code>accentKeyBackgroundColor</code></td><td>强调键（回车等）背景色</td></tr>
+                <tr><td><code>accentKeyTextColor</code></td><td>强调键文字颜色</td></tr>
+                <tr><td><code>keyPressHighlightColor</code></td><td>按键按下时的高亮颜色</td></tr>
+                <tr><td><code>keyShadowColor</code></td><td>按键阴影/边框颜色</td></tr>
+                <tr><td><code>popupBackgroundColor</code></td><td>弹出菜单背景色</td></tr>
+                <tr><td><code>popupTextColor</code></td><td>弹出菜单文字颜色</td></tr>
+                <tr><td><code>spaceBarColor</code></td><td>空格键背景色</td></tr>
                 <tr><td><code>dividerColor</code></td><td>分隔线颜色</td></tr>
+                <tr><td><code>clipboardEntryColor</code></td><td>剪贴板条目背景色</td></tr>
+                <tr><td><code>genericActiveBackgroundColor</code></td><td>通用激活态背景色</td></tr>
+                <tr><td><code>genericActiveForegroundColor</code></td><td>通用激活态文字颜色</td></tr>
               </tbody>
             </table>
           </div>
@@ -215,7 +215,7 @@ npm run build`}</code></pre>
   <style>
     /* ===== Page Layout ===== */
     .page {
-      padding: 32px 32px 64px;
+      padding: 32px 0 64px;
     }
 
     .page-header {
