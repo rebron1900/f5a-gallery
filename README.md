@@ -1,6 +1,6 @@
-# 靓企鹅主题商店
+# 小企鹅主题商店
 
-fcitx5-android-fx (靓企鹅版) 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android) 键盘主题的网站。
+fcitx5-android（支持原版和靓企鹅版） 键盘主题画廊 — 一个在线浏览和预览 [fcitx5-android](https://github.com/fcitx5-android/fcitx5-android) 键盘主题的网站。
 
 🔗 **在线访问**：[https://rebron1900.github.io/f5a-gallery/](https://rebron1900.github.io/f5a-gallery/)
 
@@ -13,7 +13,7 @@ fcitx5-android-fx (靓企鹅版) 键盘主题画廊 — 一个在线浏览和预
 
 ## 键盘预览
 
-每个主题详情页都有一个键盘模拟器，展示该主题在 fcitx5-android-fx（靓企鹅版）上的实际效果。模拟器使用 QWERTY 标准布局，包含：
+每个主题详情页都有一个键盘模拟器，展示该主题在 fcitx5-android（支持原版和靓企鹅版）上的实际效果。模拟器使用 QWERTY 标准布局，包含：
 
 - 字母键（带 alt 符号预览）
 - 功能键（Shift / Backspace / Return / 切换键）
@@ -23,7 +23,7 @@ fcitx5-android-fx (靓企鹅版) 键盘主题画廊 — 一个在线浏览和预
 
 ## 主题 JSON 格式
 
-每个主题是一个 JSON 文件，使用 fcitx5-android-fx（靓企鹅版）原生格式（signed int32 颜色，平铺结构）：
+每个主题是一个 JSON 文件，使用 fcitx5-android（支持原版和靓企鹅版）原生格式（signed int32 颜色，平铺结构）：
 
 ```json
 {
@@ -56,7 +56,7 @@ fcitx5-android-fx (靓企鹅版) 键盘主题画廊 — 一个在线浏览和预
 }
 ```
 
-> 颜色值为 signed 32-bit ARGB 整数，如 `-16777216`（黑色）、`-1`（白色）。fcitx5-android-fx（靓企鹅版）直接读取此格式，无需转换。
+> 颜色值为 signed 32-bit ARGB 整数，如 `-16777216`（黑色）、`-1`（白色）。fcitx5-android（支持原版和靓企鹅版）直接读取此格式，无需转换。
 
 ### 21 种颜色 Token 说明
 
