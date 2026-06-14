@@ -13,10 +13,6 @@
     "builtin": false,
     "issue": 1
   },
-  "cozy-retro-light": {
-    "author": "rebron1900",
-    "builtin": false
-  },
   "deep-blue": {
     "author": "fxliang",
     "builtin": true
@@ -45,14 +41,6 @@
   "nord-light": {
     "author": "fxliang",
     "builtin": true
-  },
-  "pastel-retro-light": {
-    "author": "rebron1900",
-    "builtin": false
-  },
-  "pink-panther-light": {
-    "author": "rebron1900",
-    "builtin": false
   },
   "pixel-dark": {
     "author": "fxliang",
