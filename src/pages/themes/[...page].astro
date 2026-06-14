@@ -1,32 +1,39 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import KeyboardPreview from '../components/KeyboardPreview.astro';
+import Layout from '../../layouts/Layout.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 
-const themesDir = join(process.cwd(), 'src/content/themes');
-const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
+export function getStaticPaths({ paginate }) {
+  const themesDir = join(process.cwd(), 'src/content/themes');
+  const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 
-interface Theme {
-  name: string;
-  author: string;
-  isDark: boolean;
-  builtin?: boolean;
-  colors: Record<string, string>;
+  interface Theme {
+    name: string;
+    author: string;
+    isDark: boolean;
+    builtin?: boolean;
+    colors: Record<string, string>;
+  }
+
+  const themes: { slug: string; theme: Theme }[] = files.map(f => {
+    const slug = f.replace('.json', '');
+    const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
+    return { slug, theme: data as Theme };
+  });
+
+  // Sort alphabetically for stable pagination
+  themes.sort((a, b) => a.slug.localeCompare(b.slug));
+
+  return paginate(themes, { pageSize: 20 });
 }
 
-const themes: { slug: string; theme: Theme }[] = files.map(f => {
-  const slug = f.replace('.json', '');
-  const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
-  return { slug, theme: data as Theme };
-});
-
+const { page } = Astro.props;
+const themes = page.data;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // Palette swatches for cards
 const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
 
-// Extract hue from hex color
 function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
   hex = hex.replace('#', '');
   if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
@@ -60,7 +67,6 @@ function getColorFamily(hex: string): string {
   return 'purple';
 }
 
-// Pre-compute color families for each theme
 const themeFamilies = themes.map(({ slug, theme }) => {
   const bg = theme.colors.backgroundColor || '#cccccc';
   return { slug, theme, family: getColorFamily(bg) };
@@ -81,9 +87,14 @@ const COLOR_FAMILIES = [
 const layoutData = JSON.parse(readFileSync(join(process.cwd(), 'src/data/default-layout.json'), 'utf-8'));
 const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.theme])));
 const layoutJson = JSON.stringify(layoutData.default);
+
+// Pagination URL helpers
+const prevUrl = page.url.prev ? base + page.url.prev : null;
+const nextUrl = page.url.next ? base + page.url.next : null;
+const themesBase = base + '/themes';
 ---
 
-<Layout title="主题列表">
+<Layout title={page.currentPage > 1 ? `主题列表 (第${page.currentPage}页)` : '主题列表'}>
   <div class="container themes-page">
 
     <!-- Header -->
@@ -95,7 +106,7 @@ const layoutJson = JSON.stringify(layoutData.default);
         </a>
       </div>
       <h1>主题列表</h1>
-      <p class="themes-page-sub">共 <strong>{themes.length}</strong> 个主题</p>
+      <p class="themes-page-sub">共 <strong>{page.total}</strong> 个主题，第 {page.currentPage} / {page.lastPage} 页</p>
     </div>
 
     <!-- Filter Bar -->
@@ -130,7 +141,7 @@ const layoutJson = JSON.stringify(layoutData.default);
 
     <!-- Theme Grid -->
     <div class="theme-grid" id="theme-grid">
-      {themeFamilies.map(({ slug, theme, family }, i) => {
+      {themeFamilies.map(({ slug, theme, family }) => {
         const palette = PALETTE_KEYS.map(k => theme.colors[k] || '#ccc');
         return (
           <div
@@ -162,14 +173,47 @@ const layoutJson = JSON.stringify(layoutData.default);
       })}
     </div>
 
-    <!-- Empty state -->
+    <!-- Empty state (filter) -->
     <div class="empty-state" id="empty-state" style="display:none;">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <p>没有匹配的主题</p>
       <button class="btn" id="clear-filters">清除筛选</button>
     </div>
 
-    <!-- Theme Preview Popup (positioned by JS) -->
+    <!-- Pagination -->
+    {page.lastPage > 1 && (
+      <nav class="pagination" aria-label="分页">
+        {prevUrl ? (
+          <a href={prevUrl} class="page-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            上一页
+          </a>
+        ) : <span class="page-link disabled">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            上一页
+          </span>}
+
+        <div class="page-numbers">
+          {Array.from({ length: page.lastPage }, (_, i) => i + 1).map(n => (
+            n === page.currentPage
+              ? <span class="page-num active">{n}</span>
+              : <a href={n === 1 ? themesBase : `${themesBase}/${n}`} class="page-num">{n}</a>
+          ))}
+        </div>
+
+        {nextUrl ? (
+          <a href={nextUrl} class="page-link">
+            下一页
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        ) : <span class="page-link disabled">
+            下一页
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>}
+      </nav>
+    )}
+
+    <!-- Theme Preview Popup -->
     <div class="theme-popup" id="theme-popup">
       <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
       <div class="theme-popup-name" id="theme-popup-name"></div>
@@ -207,7 +251,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       if (emptyState) emptyState.style.display = visible === 0 ? '' : 'none';
     }
 
-    // Mode toggle buttons
     document.querySelectorAll('[data-filter-type="mode"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         document.querySelectorAll('[data-filter-type="mode"]').forEach(function (b) {
@@ -219,7 +262,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       });
     });
 
-    // Color dot buttons
     document.querySelectorAll('[data-filter-type="color"]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         document.querySelectorAll('[data-filter-type="color"]').forEach(function (b) {
@@ -231,7 +273,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       });
     });
 
-    // Clear filters
     var clearBtn = document.getElementById('clear-filters');
     if (clearBtn) {
       clearBtn.addEventListener('click', function () {
@@ -267,7 +308,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;
       popupDetail.href = base + '/theme/' + slug;
-      // Position above the card
       var rect = cardEl.getBoundingClientRect();
       popup.style.display = 'block';
       var popupRect = popup.getBoundingClientRect();
@@ -284,7 +324,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       currentPopupSlug = '';
     }
 
-    // Card click → show popup
     cards.forEach(function (card) {
       card.addEventListener('click', function () {
         showPopup(card.dataset.slug, card);
@@ -498,8 +537,6 @@ const layoutJson = JSON.stringify(layoutData.default);
       color: #a08030;
     }
 
-
-
     /* Empty state */
     .empty-state {
       text-align: center;
@@ -510,6 +547,69 @@ const layoutJson = JSON.stringify(layoutData.default);
       font-size: 15px;
       color: var(--text-sub);
       margin: 12px 0 16px;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 32px 0 8px;
+    }
+
+    .page-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--green-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-white);
+      transition: all 0.15s;
+    }
+
+    .page-link:hover {
+      border-color: var(--green-mid);
+      background: var(--green-pale);
+    }
+
+    .page-link.disabled {
+      color: var(--text-sub);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .page-numbers {
+      display: flex;
+      gap: 4px;
+    }
+
+    .page-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-body);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+
+    .page-num:hover {
+      background: var(--bg);
+    }
+
+    .page-num.active {
+      background: var(--green-mid);
+      color: #fff;
+      border-color: var(--green-mid);
     }
 
     /* ===== Mobile ===== */
@@ -553,6 +653,10 @@ const layoutJson = JSON.stringify(layoutData.default);
 
       .theme-popup { padding: 16px; max-width: 100%; }
       .theme-popup-actions { flex-wrap: wrap; }
+
+      .pagination { gap: 4px; }
+      .page-link { padding: 6px 10px; font-size: 12px; }
+      .page-num { width: 30px; height: 30px; font-size: 12px; }
     }
 
     @media (max-width: 480px) {
