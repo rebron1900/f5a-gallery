@@ -257,6 +257,7 @@ const layoutJson = JSON.stringify(layoutData.default);
     var currentPopupSlug = '';
 
     function showPopup(slug, cardEl) {
+      if (typeof window.renderKeyboard !== 'function') return;
       if (!themes[slug]) return;
       currentPopupSlug = slug;
       var theme = themes[slug];
@@ -313,6 +314,17 @@ const layoutJson = JSON.stringify(layoutData.default);
       if (!themes[currentPopupSlug]) return;
       var json = JSON.stringify(themes[currentPopupSlug], null, 2);
       navigator.clipboard.writeText(json).then(function() {
+        popupCopy.textContent = '已复制';
+        setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
+      }).catch(function() {
+        var ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       });
@@ -428,7 +440,7 @@ const layoutJson = JSON.stringify(layoutData.default);
       gap: 5px;
       padding: 4px 10px 4px 4px;
       border: 1.5px solid var(--border);
-      border-radius: 20px;
+      border-radius: var(--radius-pill);
       background: var(--bg-white);
       cursor: pointer;
       transition: all 0.15s;

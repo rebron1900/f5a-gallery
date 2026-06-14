@@ -220,6 +220,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     }
 
     function updateKeyboard(slug) {
+      if (typeof window.renderKeyboard !== 'function') return;
       if (!themes[slug]) return;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme.colors, layout, {
@@ -245,6 +246,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     var currentPopupSlug = '';
 
     function showPopup(slug, cardEl) {
+      if (typeof window.renderKeyboard !== 'function') return;
       if (!themes[slug]) return;
       currentPopupSlug = slug;
       var theme = themes[slug];
@@ -301,6 +303,17 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (!themes[currentPopupSlug]) return;
       var json = JSON.stringify(themes[currentPopupSlug], null, 2);
       navigator.clipboard.writeText(json).then(function() {
+        popupCopy.textContent = '已复制';
+        setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
+      }).catch(function() {
+        var ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       });

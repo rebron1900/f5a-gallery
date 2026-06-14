@@ -115,6 +115,18 @@ const colorLabels: Record<string, string> = {
         var btn = document.getElementById('copy-json');
         btn.textContent = '已复制';
         setTimeout(function() { btn.textContent = '复制 JSON'; }, 2000);
+      }).catch(function() {
+        var ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        var btn = document.getElementById('copy-json');
+        btn.textContent = '已复制';
+        setTimeout(function() { btn.textContent = '复制 JSON'; }, 2000);
       });
     });
 
