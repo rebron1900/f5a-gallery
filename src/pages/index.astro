@@ -248,9 +248,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     /* ===== Hero ===== */
     .hero {
       display: flex;
-      gap: 40px;
+      gap: 32px;
       align-items: flex-start;
-      padding: 32px 0 40px;
+      padding: 24px 0 32px;
     }
 
     .hero-text {
@@ -259,31 +259,31 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     }
 
     .hero-title-sm {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .hero-title {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
 
     .hero-desc {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--text-sub);
-      line-height: 1.7;
-      margin-bottom: 20px;
+      line-height: 1.6;
+      margin-bottom: 16px;
     }
 
     .hero-actions {
       display: flex;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     /* Stats */
@@ -549,12 +549,12 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     @media (max-width: 768px) {
       .hero {
         flex-direction: column;
-        gap: 16px;
-        padding: 16px 0 24px;
+        gap: 12px;
+        padding: 12px 0 20px;
       }
 
-      .hero-title { font-size: 28px; margin-bottom: 8px; }
-      .hero-desc { margin-bottom: 16px; line-height: 1.6; }
+      .hero-title { font-size: 24px; margin-bottom: 6px; }
+      .hero-desc { margin-bottom: 12px; line-height: 1.6; font-size: 13px; }
 
       .hero-stats {
         flex-direction: row;
@@ -594,10 +594,10 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     }
 
     @media (max-width: 480px) {
-      .hero { gap: 12px; padding: 12px 0 20px; }
-      .hero-title { font-size: 24px; }
-      .hero-title-sm { font-size: 17px; }
-      .hero-desc { font-size: 13px; margin-bottom: 12px; }
+      .hero { gap: 8px; padding: 8px 0 16px; }
+      .hero-title { font-size: 22px; }
+      .hero-title-sm { font-size: 15px; }
+      .hero-desc { font-size: 12px; margin-bottom: 10px; }
 
       .stat-card { padding: 8px 6px; }
       .stat-value { font-size: 20px; }
