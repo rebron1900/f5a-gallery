@@ -175,7 +175,7 @@
       collapse:'<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
     };
     var toolbarOrder = ['back','undo','redo','paste','grid','doc','more','collapse'];
-    var toolbarHtml = '<div class="keyboard-toolbar" style="background:' + int32ToCSS(colors.barColor) + ';color:' + int32ToCSS(colors.keyTextColor) + '">';
+    var toolbarHtml = '<div class="keyboard-toolbar" style="color:' + int32ToCSS(colors.keyTextColor) + '">';
     toolbarOrder.forEach(function(key) {
       var flex = key === 'collapse' ? ' style="flex:0.6"' : '';
       toolbarHtml += '<div class="toolbar-btn"' + flex + '><svg viewBox="0 0 24 24" width="18" height="18">' + TOOLBAR_ICONS[key] + '</svg></div>';
