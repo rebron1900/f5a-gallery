@@ -475,7 +475,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (!themes[slug]) return;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 6, keyVGap: 6, keyRadius: 10, borderEnabled: false, isDark: theme.isDark
+        keyHGap: 6, keyVGap: 6, keyRadius: 10, borderEnabled: true, isDark: theme.isDark
       });
       document.getElementById('keyboard-container').innerHTML = html;
       document.getElementById('preview-theme-name').textContent = theme.name;
@@ -502,7 +502,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       currentPopupSlug = slug;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: false, isDark: theme.isDark
+        keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: true, isDark: theme.isDark
       });
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;
