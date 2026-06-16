@@ -90,7 +90,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <div class="preview-card">
           <div class="preview-title" id="preview-theme-name">{defaultTheme.name}</div>
           <div id="keyboard-container">
-            <KeyboardPreview colors={defaultTheme} />
+            <KeyboardPreview colors={defaultTheme} isDark={defaultTheme.isDark} />
           </div>
           <div class="color-legend" id="color-legend">
             <span class="legend-chip">
@@ -243,7 +243,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (!themes[slug]) return;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 3, keyVGap: 3, keyRadius: 4, borderEnabled: true
+        keyHGap: 6, keyVGap: 6, keyRadius: 10, borderEnabled: false, isDark: theme.isDark
       });
       document.getElementById('keyboard-container').innerHTML = html;
       document.getElementById('preview-theme-name').textContent = theme.name;
@@ -270,7 +270,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       currentPopupSlug = slug;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 2, keyVGap: 2, keyRadius: 3, borderEnabled: true
+        keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: false, isDark: theme.isDark
       });
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;

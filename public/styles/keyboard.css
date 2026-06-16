@@ -1,19 +1,20 @@
-/* Keyboard preview styles — extracted from f5a-see-me/style.css */
+/* Keyboard preview styles — frosted glass design */
 
 .keyboard-preview {
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
-  padding: 6px 4px;
+  padding: 10px 8px;
   width: 100%;
   max-width: 520px;
   margin: 0 auto;
+  gap: 6px;
 }
 
 .keyboard-row {
   display: flex;
-  gap: 3px;
+  gap: 6px;
 }
 
 .keyboard-slot {
@@ -21,6 +22,7 @@
   min-width: 0;
 }
 
+/* --- Frosted glass key style --- */
 .keyboard-key {
   display: flex;
   flex-direction: column;
@@ -29,8 +31,53 @@
   height: var(--key-height, 42px);
   position: relative;
   user-select: none;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  transition: transform 0.1s ease;
 }
 
+/* Dark theme keys: darker translucent glass */
+[data-dark="1"] .keyboard-key {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Functional keys: stronger glass tint --- */
+.keyboard-key.alt-key,
+.keyboard-key.language-key {
+  background: rgba(255, 255, 255, 0.45) !important;
+}
+
+[data-dark="1"] .keyboard-key.alt-key,
+[data-dark="1"] .keyboard-key.language-key {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Space bar: very subtle tint */
+.keyboard-key.space-key {
+  background: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: none;
+}
+
+[data-dark="1"] .keyboard-key.space-key {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Return/accent key: themed glass tint */
+.keyboard-key.accent-key {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-dark="1"] .keyboard-key.accent-key {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* --- Text styles --- */
 .keyboard-main {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: clamp(13px, 3.5vw, 20px);
@@ -45,10 +92,10 @@
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
-/* Key variant styles */
+/* Key variant text overrides */
 .keyboard-key.space-key .keyboard-main {
   font-size: clamp(11px, 2.5vw, 14px);
   font-weight: 400;
@@ -67,20 +114,22 @@
   font-size: clamp(12px, 3vw, 16px);
 }
 
-/* Mobile: scale keyboard to fit viewport */
+/* --- Mobile breakpoints --- */
 @media (max-width: 768px) {
   .keyboard-preview {
     max-width: 100%;
-    padding: 4px 3px;
-    border-radius: 8px;
+    padding: 8px 6px;
+    border-radius: 14px;
+    gap: 5px;
   }
 
   .keyboard-row {
-    gap: 2px;
+    gap: 5px;
   }
 
   .keyboard-key {
     height: var(--key-height, 38px);
+    border-radius: 8px !important;
   }
 
   .keyboard-main {
@@ -108,16 +157,18 @@
 @media (max-width: 480px) {
   .keyboard-preview {
     max-width: 100%;
-    padding: 3px 2px;
-    border-radius: 6px;
+    padding: 6px 4px;
+    border-radius: 12px;
+    gap: 4px;
   }
 
   .keyboard-row {
-    gap: 2px;
+    gap: 4px;
   }
 
   .keyboard-key {
     height: var(--key-height, 34px);
+    border-radius: 7px !important;
   }
 
   .keyboard-main {

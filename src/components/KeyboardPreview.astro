@@ -4,10 +4,17 @@ import defaultLayout from '../data/default-layout.json';
 
 interface Props {
   colors: ThemeColors;
+  isDark?: boolean;
 }
 
-const { colors } = Astro.props;
+const { colors, isDark = false } = Astro.props;
 const layout = defaultLayout.default;
-const html = renderKeyboard(colors, layout);
+const html = renderKeyboard(colors, layout, {
+  keyHGap: 6,
+  keyVGap: 6,
+  keyRadius: 10,
+  borderEnabled: false,
+  isDark,
+});
 ---
 <Fragment set:html={html} />

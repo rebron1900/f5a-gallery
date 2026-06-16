@@ -352,7 +352,7 @@ const themesBase = base + '/themes';
       currentPopupSlug = slug;
       var theme = themes[slug];
       var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 2, keyVGap: 2, keyRadius: 3, borderEnabled: true
+        keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: false, isDark: theme.isDark
       });
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;

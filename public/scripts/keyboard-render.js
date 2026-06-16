@@ -124,10 +124,11 @@
 
   function renderKeyboard(colors, layout, opts) {
     opts = opts || {};
-    var hGap = opts.keyHGap != null ? opts.keyHGap : 3;
-    var vGap = opts.keyVGap != null ? opts.keyVGap : 3;
-    var radius = opts.keyRadius != null ? opts.keyRadius : 4;
-    var border = opts.borderEnabled !== false;
+    var hGap = opts.keyHGap != null ? opts.keyHGap : 6;
+    var vGap = opts.keyVGap != null ? opts.keyVGap : 6;
+    var radius = opts.keyRadius != null ? opts.keyRadius : 10;
+    var border = opts.borderEnabled === true;
+    var isDark = opts.isDark === true;
 
     var rows = layout;
     var rowCount = rows.length;
@@ -157,7 +158,7 @@
       return '<div class="keyboard-row" style="--key-height:' + keyH + 'px;gap:' + hGap + 'px">' + keysHtml + '</div>';
     }).join("");
 
-    return '<div class="keyboard-preview" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + html + '</div>';
+    return '<div class="keyboard-preview" data-dark="' + (isDark ? '1' : '0') + '" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + html + '</div>';
   }
 
   root.int32ToCSS = int32ToCSS;

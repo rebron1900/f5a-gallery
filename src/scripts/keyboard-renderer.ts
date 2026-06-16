@@ -224,12 +224,14 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   keyVGap?: number;
   keyRadius?: number;
   borderEnabled?: boolean;
+  isDark?: boolean;
 }): string {
   const {
-    keyHGap = 3,
-    keyVGap = 3,
-    keyRadius = 4,
-    borderEnabled = true,
+    keyHGap = 6,
+    keyVGap = 6,
+    keyRadius = 10,
+    borderEnabled = false,
+    isDark = false,
   } = options || {};
 
   const rows = layout;
@@ -264,5 +266,5 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
     return `<div class="keyboard-row" style="--key-height:${keyHeight}px;gap:${keyHGap}px">${keysHtml}</div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${html}</div>`;
+  return `<div class="keyboard-preview" data-dark="${isDark ? '1' : '0'}" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${html}</div>`;
 }
