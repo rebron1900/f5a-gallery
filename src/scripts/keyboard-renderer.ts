@@ -241,11 +241,10 @@ function renderToolbar(barColor: string, textColor: string): string {
     { key: 'grid' },
     { key: 'doc' },
     { key: 'more' },
-    { key: 'collapse', flex: 0.6 },
+    { key: 'collapse' },
   ];
-  const buttons = icons.map(({ key, flex }) => {
-    const w = flex ? `flex:${flex}` : '';
-    return `<div class="toolbar-btn" style="${w}"><svg viewBox="0 0 24 24" width="18" height="18">${TOOLBAR_ICONS[key]}</svg></div>`;
+  const buttons = icons.map(({ key }) => {
+    return `<div class="toolbar-btn"><svg viewBox="0 0 24 24" width="18" height="18">${TOOLBAR_ICONS[key]}</svg></div>`;
   }).join('');
   return `<div class="keyboard-toolbar" style="color:${textColor}">${buttons}</div>`;
 }
