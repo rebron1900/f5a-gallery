@@ -269,7 +269,7 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   const rows = layout;
   const rowCount = rows.length;
   const rowHeight = rowCount > 0 ? Math.max(34, Math.round(48 * (100 / rowCount) / 25)) : 42;
-  const keyHeight = Math.max(1, rowHeight - keyVGap * 2);
+  const keyHeight = Math.max(28, rowHeight - keyVGap * 2);
 
   const html = rows.map((row) => {
     const widths = resolveRowWidths(row);

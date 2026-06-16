@@ -297,221 +297,6 @@ const themesBase = base + '/themes';
     var visibleCountEl = document.getElementById('visible-count');
     var emptyState = document.getElementById('empty-state');
 
-    // GitHub OAuth 配置
-    var GITHUB_CLIENT_ID = 'Ov23liGMe0MVlrDtZ07h';
-    var GITHUB_REDIRECT_URI = 'https://small-rice-5955.me-d1b.workers.dev/callback';
-    var GITHUB_API = 'https://api.github.com';
-
-    // 获取 GitHub token
-    function getGitHubToken() {
-      return localStorage.getItem('github_token');
-    }
-
-    // 保存 GitHub token
-    function setGitHubToken(token) {
-      localStorage.setItem('github_token', token);
-    }
-
-    // 清除 GitHub token
-    function clearGitHubToken() {
-      localStorage.removeItem('github_token');
-      localStorage.removeItem('github_user');
-    }
-
-    // 获取 GitHub 用户信息
-    function getGitHubUser() {
-      var userStr = localStorage.getItem('github_user');
-      return userStr ? JSON.parse(userStr) : null;
-    }
-
-    // 保存 GitHub 用户信息
-    function setGitHubUser(user) {
-      localStorage.setItem('github_user', JSON.stringify(user));
-    }
-
-    // GitHub 登录
-    function loginWithGitHub() {
-      var authUrl = 'https://github.com/login/oauth/authorize' +
-        '?client_id=' + GITHUB_CLIENT_ID +
-        '&redirect_uri=' + encodeURIComponent(GITHUB_REDIRECT_URI) +
-        '&scope=' + encodeURIComponent('public_repo') +
-        '&state=' + Math.random().toString(36).substring(7);
-      window.location.href = authUrl;
-    }
-
-    // GitHub 退出
-    function logoutGitHub() {
-      clearGitHubToken();
-      updateLoginUI();
-      window.location.reload();
-    }
-
-    // 更新登录 UI
-    function updateLoginUI() {
-      var token = getGitHubToken();
-      var user = getGitHubUser();
-      var loginBtn = document.getElementById('github-login-btn');
-      var userInfo = document.getElementById('github-user-info');
-
-      if (token && user) {
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (userInfo) {
-          userInfo.style.display = 'inline-flex';
-          var avatar = document.getElementById('github-avatar');
-          var username = document.getElementById('github-username');
-          if (avatar) avatar.src = user.avatar_url;
-          if (username) username.textContent = user.login;
-        }
-      } else {
-        if (loginBtn) loginBtn.style.display = 'inline-flex';
-        if (userInfo) userInfo.style.display = 'none';
-      }
-    }
-
-    // 处理 OAuth 回调（token 通过 URL hash 传递）
-    function handleOAuthCallback() {
-      var hash = window.location.hash;
-      if (hash && hash.indexOf('#token=') === 0) {
-        var token = decodeURIComponent(hash.substring(7));
-        setGitHubToken(token);
-        window.history.replaceState({}, document.title, window.location.pathname);
-        fetch(GITHUB_API + '/user', {
-          headers: {
-            'Authorization': 'token ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-          },
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(user) {
-          setGitHubUser(user);
-          updateLoginUI();
-          loadAllReactions();
-        })
-        .catch(function(error) {
-          console.error('User info error:', error);
-          updateLoginUI();
-        });
-      }
-    }
-
-    // 实时获取 reactions
-    function fetchReactions(slug, issueNumber) {
-      if (!issueNumber) return Promise.resolve(0);
-      var headers = {
-        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-      };
-      var token = getGitHubToken();
-      if (token) headers['Authorization'] = 'token ' + token;
-
-      return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: headers,
-      })
-      .then(function(response) {
-        if (!response.ok) return [];
-        return response.json();
-      })
-      .then(function(reactions) {
-        if (Array.isArray(reactions)) {
-          return reactions.length;
-        }
-        return 0;
-      })
-      .catch(function() {
-        return 0;
-      });
-    }
-
-    // 切换 reaction（点赞/取消点赞）
-    function toggleReaction(slug, issueNumber) {
-      var token = getGitHubToken();
-      if (!token) {
-        if (confirm('需要 GitHub 登录才能点赞，是否登录？')) {
-          loginWithGitHub();
-        }
-        return;
-      }
-
-      if (!issueNumber) {
-        alert('该主题暂无对应 issue');
-        return;
-      }
-
-      fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: {
-          'Authorization': 'token ' + token,
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
-      })
-      .then(function(response) { return response.json(); })
-      .then(function(reactions) {
-        var userReaction = reactions.find(function(r) {
-          return r.content === 'heart';
-        });
-
-        if (userReaction) {
-          return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions/' + userReaction.id, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'token ' + token,
-              'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-            },
-          }).catch(function() {}); // 忽略 404
-        } else {
-          return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'token ' + token,
-              'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content: 'heart' }),
-          });
-        }
-      })
-      .then(function() {
-        return fetchReactions(slug, issueNumber);
-      })
-      .then(function(count) {
-        var countEl = document.querySelector('.reaction-count[data-slug="' + slug + '"]');
-        if (countEl) {
-          countEl.textContent = count;
-        }
-      })
-      .catch(function(error) {
-        console.error('Reaction error:', error);
-        alert('操作失败，请重试');
-      });
-    }
-
-    // 加载所有主题的 reactions
-    function loadAllReactions() {
-      var likeButtons = document.querySelectorAll('.theme-card-likes[data-slug]');
-      likeButtons.forEach(function(card) {
-        var slug = card.getAttribute('data-slug');
-        var issue = card.getAttribute('data-issue');
-        if (issue && issue !== '0' && issue !== '') {
-          fetchReactions(slug, parseInt(issue)).then(function(count) {
-            var countEl = card.querySelector('.reaction-count');
-            if (countEl) {
-              countEl.textContent = count;
-            }
-          });
-        }
-      });
-    }
-
-    // 暴露函数给全局
-    window.loginWithGitHub = loginWithGitHub;
-    window.logoutGitHub = logoutGitHub;
-    window.toggleReaction = toggleReaction;
-
-    // 页面加载时初始化
-    document.addEventListener('DOMContentLoaded', function() {
-      handleOAuthCallback();
-      updateLoginUI();
-      loadAllReactions();
-    });
-
     function applyFilters() {
       var visible = 0;
       cards.forEach(function (card) {
@@ -584,19 +369,28 @@ const themesBase = base + '/themes';
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;
       popupDetail.href = base + '/theme/' + slug;
-      var rect = cardEl.getBoundingClientRect();
+
+      if (window.innerWidth <= 768) {
+        popup.classList.add('mobile-sheet');
+        document.body.style.overflow = 'hidden';
+      } else {
+        popup.classList.remove('mobile-sheet');
+        var rect = cardEl.getBoundingClientRect();
+        var popupRect = popup.getBoundingClientRect();
+        var top = rect.top - popupRect.height - 12;
+        if (top < 8) top = 8;
+        var left = rect.left + (rect.width - popupRect.width) / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
+        popup.style.top = top + 'px';
+        popup.style.left = left + 'px';
+      }
       popup.style.display = 'block';
-      var popupRect = popup.getBoundingClientRect();
-      var top = rect.top - popupRect.height - 12;
-      if (top < 8) top = 8;
-      var left = rect.left + (rect.width - popupRect.width) / 2;
-      left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
-      popup.style.top = top + 'px';
-      popup.style.left = left + 'px';
     }
 
     function closePopup() {
       popup.style.display = 'none';
+      popup.classList.remove('mobile-sheet');
+      document.body.style.overflow = '';
       currentPopupSlug = '';
     }
 
@@ -636,20 +430,11 @@ const themesBase = base + '/themes';
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       }).catch(function() {
-        var ta = document.createElement('textarea');
-        ta.value = json;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        popupCopy.textContent = '已复制';
-        setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
+        console.error('Copy failed');
       });
     });
 
-    // QR code for 靓企鹅 import
+    // QR code
     var qrModal = document.getElementById('qr-modal');
     var qrClose = document.getElementById('qr-modal-close');
     var qrCodeEl = document.getElementById('qr-code');
@@ -658,7 +443,9 @@ const themesBase = base + '/themes';
     var qrDataCache = null;
 
     function showQrModal(slug) {
+      if (!qrModal) return;
       qrModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
       qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">加载中…</p>';
       qrFilename.textContent = '';
 
@@ -691,16 +478,16 @@ const themesBase = base + '/themes';
       }
     }
 
-    popupQr.addEventListener('click', function() {
-      if (!currentPopupSlug) return;
-      showQrModal(currentPopupSlug);
-    });
+    function closeQrModal() {
+      if (qrModal) { qrModal.style.display = 'none'; document.body.style.overflow = ''; }
+    }
 
-    qrClose.addEventListener('click', function() {
-      qrModal.style.display = 'none';
+    if (popupQr) popupQr.addEventListener('click', function() {
+      if (currentPopupSlug) showQrModal(currentPopupSlug);
     });
-    qrModal.addEventListener('click', function(e) {
-      if (e.target === qrModal) qrModal.style.display = 'none';
+    if (qrClose) qrClose.addEventListener('click', closeQrModal);
+    if (qrModal) qrModal.addEventListener('click', function(e) {
+      if (e.target === qrModal) closeQrModal();
     });
   </script>
 
@@ -782,7 +569,7 @@ const themesBase = base + '/themes';
     }
 
     .filter-btn {
-      padding: 6px 14px;
+      padding: 8px 16px;
       font-size: 13px;
       font-weight: 500;
       border: none;
@@ -814,7 +601,8 @@ const themesBase = base + '/themes';
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px 4px 4px;
+      padding: 6px 12px 6px 6px;
+      min-height: 44px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-pill);
       background: var(--bg-white);
@@ -929,8 +717,8 @@ const themesBase = base + '/themes';
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 34px;
-      height: 34px;
+      width: 40px;
+      height: 40px;
       font-size: 13px;
       font-weight: 500;
       color: var(--text-body);
@@ -992,71 +780,12 @@ const themesBase = base + '/themes';
       .theme-popup-actions { flex-wrap: wrap; }
 
       .pagination { gap: 4px; }
-      .page-link { padding: 6px 10px; font-size: 12px; }
-      .page-num { width: 30px; height: 30px; font-size: 12px; }
+      .page-link { padding: 8px 12px; font-size: 12px; min-height: 40px; }
+      .page-num { width: 36px; height: 36px; font-size: 12px; }
     }
 
     @media (max-width: 480px) {
       .themes-page-header h1 { font-size: 20px; }
     }
-
-    /* QR Modal */
-    .qr-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    .qr-modal-content {
-      background: var(--bg-white);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      text-align: center;
-      max-width: 340px;
-      width: 90%;
-      position: relative;
-    }
-    .qr-modal-content h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-    .qr-modal-content > p {
-      font-size: 13px;
-      color: var(--text-sub);
-      margin-bottom: 20px;
-    }
-    .qr-code {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .qr-code svg { width: 100%; height: 100%; }
-    .qr-filename {
-      font-size: 12px;
-      color: var(--text-sub);
-      font-family: var(--font-mono);
-    }
-    .qr-modal-close {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      background: none;
-      font-size: 16px;
-      color: var(--text-sub);
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-    }
-    .qr-modal-close:hover { background: var(--bg); }
   </style>
 </Layout>

@@ -57,9 +57,8 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         <h1 class="hero-title-sm">探索键盘主题</h1>
         <h2 class="hero-title">发现你的风格</h2>
         <p class="hero-desc">
-          小企鹅主题商店是 fcitx5-android（支持原版和靓企鹅版）键盘主题商店。<br/>
-          浏览主题，实时预览键盘效果，<br/>
-          找到最适合你的配色方案。
+          小企鹅主题商店是 fcitx5-android（支持原版和靓企鹅版）键盘主题商店。
+          浏览主题，实时预览键盘效果，找到最适合你的配色方案。
         </p>
         <div class="hero-actions">
           <a href="https://github.com/rebron1900/f5a-gallery/issues/new/choose" target="_blank" class="btn btn-primary">
@@ -237,225 +236,10 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
 
-    // GitHub OAuth 配置
-    var GITHUB_CLIENT_ID = 'Ov23liGMe0MVlrDtZ07h';
-    var GITHUB_REDIRECT_URI = 'https://small-rice-5955.me-d1b.workers.dev/callback';
-    var GITHUB_API = 'https://api.github.com';
-
-    // 获取 GitHub token
-    function getGitHubToken() {
-      return localStorage.getItem('github_token');
+    function int32ToCSS(n) {
+      var u = n >= 0 ? n : n + 0x100000000;
+      return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
     }
-
-    // 保存 GitHub token
-    function setGitHubToken(token) {
-      localStorage.setItem('github_token', token);
-    }
-
-    // 清除 GitHub token
-    function clearGitHubToken() {
-      localStorage.removeItem('github_token');
-      localStorage.removeItem('github_user');
-    }
-
-    // 获取 GitHub 用户信息
-    function getGitHubUser() {
-      var userStr = localStorage.getItem('github_user');
-      return userStr ? JSON.parse(userStr) : null;
-    }
-
-    // 保存 GitHub 用户信息
-    function setGitHubUser(user) {
-      localStorage.setItem('github_user', JSON.stringify(user));
-    }
-
-    // GitHub 登录
-    function loginWithGitHub() {
-      var authUrl = 'https://github.com/login/oauth/authorize' +
-        '?client_id=' + GITHUB_CLIENT_ID +
-        '&redirect_uri=' + encodeURIComponent(GITHUB_REDIRECT_URI) +
-        '&scope=' + encodeURIComponent('public_repo') +
-        '&state=' + Math.random().toString(36).substring(7);
-      window.location.href = authUrl;
-    }
-
-    // GitHub 退出
-    function logoutGitHub() {
-      clearGitHubToken();
-      updateLoginUI();
-      // 重新加载页面以更新点赞状态
-      window.location.reload();
-    }
-
-    // 更新登录 UI
-    function updateLoginUI() {
-      var token = getGitHubToken();
-      var user = getGitHubUser();
-      var loginBtn = document.getElementById('github-login-btn');
-      var userInfo = document.getElementById('github-user-info');
-
-      if (token && user) {
-        loginBtn.style.display = 'none';
-        userInfo.style.display = 'inline-flex';
-        document.getElementById('github-avatar').src = user.avatar_url;
-        document.getElementById('github-username').textContent = user.login;
-      } else {
-        loginBtn.style.display = 'inline-flex';
-        userInfo.style.display = 'none';
-      }
-    }
-
-    // 处理 OAuth 回调（token 通过 URL hash 传递）
-    function handleOAuthCallback() {
-      var hash = window.location.hash;
-      if (hash && hash.indexOf('#token=') === 0) {
-        var token = decodeURIComponent(hash.substring(7));
-        setGitHubToken(token);
-        // 清除 hash
-        window.history.replaceState({}, document.title, window.location.pathname);
-        // 获取用户信息
-        fetch(GITHUB_API + '/user', {
-          headers: {
-            'Authorization': 'token ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-          },
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(user) {
-          setGitHubUser(user);
-          updateLoginUI();
-          // 重新加载 reactions
-          loadAllReactions();
-        })
-        .catch(function(error) {
-          console.error('User info error:', error);
-          updateLoginUI();
-        });
-      }
-    }
-
-    // 实时获取 reactions
-    function fetchReactions(slug, issueNumber) {
-      if (!issueNumber) return Promise.resolve(0);
-      var headers = {
-        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-      };
-      var token = getGitHubToken();
-      if (token) headers['Authorization'] = 'token ' + token;
-
-      return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: headers,
-      })
-      .then(function(response) {
-        if (!response.ok) return [];
-        return response.json();
-      })
-      .then(function(reactions) {
-        if (Array.isArray(reactions)) {
-          return reactions.length;
-        }
-        return 0;
-      })
-      .catch(function() {
-        return 0;
-      });
-    }
-
-    // 切换 reaction（点赞/取消点赞）
-    function toggleReaction(slug, issueNumber) {
-      var token = getGitHubToken();
-      if (!token) {
-        if (confirm('需要 GitHub 登录才能点赞，是否登录？')) {
-          loginWithGitHub();
-        }
-        return;
-      }
-
-      if (!issueNumber) {
-        alert('该主题暂无对应 issue');
-        return;
-      }
-
-      // 先获取当前用户的 reaction
-      fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: {
-          'Authorization': 'token ' + token,
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
-      })
-      .then(function(response) { return response.json(); })
-      .then(function(reactions) {
-        var userReaction = reactions.find(function(r) {
-          return r.content === 'heart';
-        });
-
-        if (userReaction) {
-          // 取消点赞
-          return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions/' + userReaction.id, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': 'token ' + token,
-              'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-            },
-          }).catch(function() {}); // 忽略 404（已被删除）
-        } else {
-          // 添加点赞
-          return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'token ' + token,
-              'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content: 'heart' }),
-          });
-        }
-      })
-      .then(function() {
-        // 重新获取 reactions 数量
-        return fetchReactions(slug, issueNumber);
-      })
-      .then(function(count) {
-        // 更新显示
-        var countEl = document.querySelector('.reaction-count[data-slug="' + slug + '"]');
-        if (countEl) {
-          countEl.textContent = count;
-        }
-      })
-      .catch(function(error) {
-        console.error('Reaction error:', error);
-        alert('操作失败，请重试');
-      });
-    }
-
-    // 页面加载时初始化
-    document.addEventListener('DOMContentLoaded', function() {
-      handleOAuthCallback();
-      updateLoginUI();
-      loadAllReactions();
-    });
-
-    // 加载所有主题的 reactions
-    function loadAllReactions() {
-      var cards = document.querySelectorAll('.theme-card-likes[data-slug]');
-      cards.forEach(function(card) {
-        var slug = card.getAttribute('data-slug');
-        var issue = card.getAttribute('data-issue');
-        if (issue && issue !== '0' && issue !== '') {
-          fetchReactions(slug, parseInt(issue)).then(function(count) {
-            var countEl = card.querySelector('.reaction-count');
-            if (countEl) {
-              countEl.textContent = count;
-            }
-          });
-        }
-      });
-    }
-
-    // 暴露函数给全局
-    window.loginWithGitHub = loginWithGitHub;
-    window.logoutGitHub = logoutGitHub;
-    window.toggleReaction = toggleReaction;
 
     function updateLegend(theme) {
       var map = {
@@ -507,20 +291,29 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       popupKb.innerHTML = html;
       popupName.textContent = theme.name;
       popupDetail.href = base + '/theme/' + slug;
-      // Position above the card
-      var rect = cardEl.getBoundingClientRect();
+
+      // Mobile: use bottom-sheet, Desktop: position above card
+      if (window.innerWidth <= 768) {
+        popup.classList.add('mobile-sheet');
+        document.body.style.overflow = 'hidden';
+      } else {
+        popup.classList.remove('mobile-sheet');
+        var rect = cardEl.getBoundingClientRect();
+        var popupRect = popup.getBoundingClientRect();
+        var top = rect.top - popupRect.height - 12;
+        if (top < 8) top = 8;
+        var left = rect.left + (rect.width - popupRect.width) / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
+        popup.style.top = top + 'px';
+        popup.style.left = left + 'px';
+      }
       popup.style.display = 'block';
-      var popupRect = popup.getBoundingClientRect();
-      var top = rect.top - popupRect.height - 12;
-      if (top < 8) top = 8;
-      var left = rect.left + (rect.width - popupRect.width) / 2;
-      left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
-      popup.style.top = top + 'px';
-      popup.style.left = left + 'px';
     }
 
     function closePopup() {
       popup.style.display = 'none';
+      popup.classList.remove('mobile-sheet');
+      document.body.style.overflow = '';
       currentPopupSlug = '';
     }
 
@@ -538,6 +331,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         closePopup();
       }
     });
+
     popupDownload.addEventListener('click', function() {
       if (!themes[currentPopupSlug]) return;
       if (typeof JSZip === 'undefined') return;
@@ -561,20 +355,11 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
       }).catch(function() {
-        var ta = document.createElement('textarea');
-        ta.value = json;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        popupCopy.textContent = '已复制';
-        setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
+        console.error('Copy failed');
       });
     });
 
-    // QR code for 靓企鹅 import
+    // QR code
     var qrModal = document.getElementById('qr-modal');
     var qrClose = document.getElementById('qr-modal-close');
     var qrCodeEl = document.getElementById('qr-code');
@@ -583,7 +368,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     var qrDataCache = null;
 
     function showQrModal(slug) {
+      if (!qrModal) return;
       qrModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
       qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">加载中…</p>';
       qrFilename.textContent = '';
 
@@ -616,16 +403,16 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       }
     }
 
-    popupQr.addEventListener('click', function() {
-      if (!currentPopupSlug) return;
-      showQrModal(currentPopupSlug);
-    });
+    function closeQrModal() {
+      if (qrModal) { qrModal.style.display = 'none'; document.body.style.overflow = ''; }
+    }
 
-    qrClose.addEventListener('click', function() {
-      qrModal.style.display = 'none';
+    if (popupQr) popupQr.addEventListener('click', function() {
+      if (currentPopupSlug) showQrModal(currentPopupSlug);
     });
-    qrModal.addEventListener('click', function(e) {
-      if (e.target === qrModal) qrModal.style.display = 'none';
+    if (qrClose) qrClose.addEventListener('click', closeQrModal);
+    if (qrModal) qrModal.addEventListener('click', function(e) {
+      if (e.target === qrModal) closeQrModal();
     });
   </script>
 
@@ -854,64 +641,5 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       .color-legend { gap: 8px; }
       .legend-chip { font-size: 11px; }
     }
-
-    /* QR Modal */
-    .qr-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-    .qr-modal-content {
-      background: var(--bg-white);
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      text-align: center;
-      max-width: 340px;
-      width: 90%;
-      position: relative;
-    }
-    .qr-modal-content h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-    .qr-modal-content > p {
-      font-size: 13px;
-      color: var(--text-sub);
-      margin-bottom: 20px;
-    }
-    .qr-code {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-    .qr-code svg { width: 100%; height: 100%; }
-    .qr-filename {
-      font-size: 12px;
-      color: var(--text-sub);
-      font-family: var(--font-mono);
-    }
-    .qr-modal-close {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      background: none;
-      font-size: 16px;
-      color: var(--text-sub);
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-    }
-    .qr-modal-close:hover { background: var(--bg); }
   </style>
 </Layout>

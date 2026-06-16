@@ -138,7 +138,7 @@
     var rows = layout;
     var rowCount = rows.length;
     var rowH = rowCount > 0 ? Math.max(34, Math.round(48 * (100 / rowCount) / 25)) : 42;
-    var keyH = Math.max(1, rowH - vGap * 2);
+    var keyH = Math.max(28, rowH - vGap * 2);
 
     var html = rows.map(function (row) {
       var widths = resolveRowWidths(row);

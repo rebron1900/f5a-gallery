@@ -85,7 +85,9 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
 
     <slot />
 
-    <script is:inline src={`${base}/scripts/keyboard-render.js?v=3`}></script>
+    <script is:inline src={`${base}/scripts/keyboard-render.js?v=4`}></script>
+    <script is:inline src={`${base}/scripts/github-auth.js?v=1`}></script>
+    <script is:inline src={`${base}/scripts/reactions.js?v=1`}></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1/qrcode.min.js"></script>
     <script is:inline>
@@ -198,7 +200,7 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: 5px 12px;
+        padding: 8px 16px;
         font-size: 13px;
         font-weight: 500;
         color: #fff;
@@ -207,6 +209,7 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
         border-radius: 6px;
         cursor: pointer;
         transition: background 0.15s;
+        min-height: 44px;
       }
 
       .nav-login-btn:hover {
@@ -230,13 +233,14 @@ const keyboardCss = readFileSync(join(process.cwd(), 'public/styles/keyboard.css
       }
 
       .nav-logout-btn {
-        padding: 3px 8px;
-        font-size: 11px;
+        padding: 6px 12px;
+        font-size: 13px;
         color: var(--text-sub);
         background: none;
         border: 1px solid var(--border);
         border-radius: 4px;
         cursor: pointer;
+        min-height: 36px;
       }
 
       .nav-logout-btn:hover {
