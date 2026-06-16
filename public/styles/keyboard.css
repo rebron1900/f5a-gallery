@@ -1,4 +1,4 @@
-/* Keyboard preview styles — frosted glass design */
+/* Keyboard preview styles — frosted glass overlay */
 
 .keyboard-preview {
   display: flex;
@@ -22,7 +22,7 @@
   min-width: 0;
 }
 
-/* --- Frosted glass key style --- */
+/* --- Frosted glass key: keep theme color, add glass texture --- */
 .keyboard-key {
   display: flex;
   flex-direction: column;
@@ -32,49 +32,32 @@
   position: relative;
   user-select: none;
   border-radius: 10px !important;
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
-  transition: transform 0.1s ease;
+  border-width: 0 !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Dark theme keys: darker translucent glass */
-[data-dark="1"] .keyboard-key {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.15);
+/* Light theme glass overlay */
+[data-dark="0"] .keyboard-key::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
 }
 
-/* --- Functional keys: stronger glass tint --- */
-.keyboard-key.alt-key,
-.keyboard-key.language-key {
-  background: rgba(255, 255, 255, 0.45) !important;
-}
-
-[data-dark="1"] .keyboard-key.alt-key,
-[data-dark="1"] .keyboard-key.language-key {
-  background: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* Space bar: very subtle tint */
-.keyboard-key.space-key {
-  background: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: none;
-}
-
-[data-dark="1"] .keyboard-key.space-key {
-  background: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* Return/accent key: themed glass tint */
-.keyboard-key.accent-key {
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-[data-dark="1"] .keyboard-key.accent-key {
-  border-color: rgba(255, 255, 255, 0.15) !important;
+/* Dark theme glass overlay */
+[data-dark="1"] .keyboard-key::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
 }
 
 /* --- Text styles --- */
@@ -84,6 +67,8 @@
   font-weight: 600;
   line-height: 1;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .keyboard-alt {
@@ -92,7 +77,9 @@
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  opacity: 0.6;
+  opacity: 0.7;
+  position: relative;
+  z-index: 1;
 }
 
 /* Key variant text overrides */
