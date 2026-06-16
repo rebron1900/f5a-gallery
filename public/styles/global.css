@@ -193,6 +193,29 @@ img { max-width: 100%; display: block; }
   border-color: var(--green-dark);
 }
 
+.btn-github {
+  background: #24292e;
+  border-color: #24292e;
+  color: #fff;
+}
+
+.btn-github:hover {
+  background: #444d56;
+  border-color: #444d56;
+}
+
+#github-login-area {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#github-user-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* ===== Section Title ===== */
 .section-title {
   font-size: 24px;
@@ -273,12 +296,16 @@ img { max-width: 100%; display: block; }
   gap: 4px;
   font-size: 12px;
   color: var(--text-sub);
-  text-decoration: none;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: color 0.15s;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
 }
 
 .theme-card-likes:hover {
+  background: var(--bg);
   color: var(--accent);
 }
 
@@ -288,11 +315,12 @@ img { max-width: 100%; display: block; }
 }
 
 .theme-card-likes.disabled {
-  cursor: default;
   opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .theme-card-likes.disabled:hover {
+  background: none;
   color: var(--text-sub);
 }
 
@@ -304,9 +332,8 @@ img { max-width: 100%; display: block; }
 .theme-card-likes svg {
   width: 14px;
   height: 14px;
-  stroke: var(--text-sub);
   fill: none;
-  transition: stroke 0.15s, fill 0.15s;
+  stroke: currentColor;
 }
 
 /* ===== Detail Page ===== */
