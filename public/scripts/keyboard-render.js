@@ -8,9 +8,14 @@
 
   function int32ToCSS(n) {
     var u = n >= 0 ? n : n + 0x100000000;
-    return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0')
-               + ((u >> 8) & 0xff).toString(16).padStart(2, '0')
-               + (u & 0xff).toString(16).padStart(2, '0');
+    var a = (u >> 24) & 0xff;
+    var r = (u >> 16) & 0xff;
+    var g = (u >> 8) & 0xff;
+    var b = u & 0xff;
+    if (a < 255) {
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + (a / 255).toFixed(2) + ')';
+    }
+    return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
   }
 
   function escapeHtml(s) {
