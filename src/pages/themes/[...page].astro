@@ -408,12 +408,19 @@ const themesBase = base + '/themes';
     // 实时获取 reactions
     function fetchReactions(slug, issueNumber) {
       if (!issueNumber) return Promise.resolve(0);
+      var headers = {
+        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      };
+      var token = getGitHubToken();
+      if (token) headers['Authorization'] = 'token ' + token;
+
       return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: {
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
+        headers: headers,
       })
-      .then(function(response) { return response.json(); })
+      .then(function(response) {
+        if (!response.ok) return [];
+        return response.json();
+      })
       .then(function(reactions) {
         if (Array.isArray(reactions)) {
           return reactions.length;
@@ -459,7 +466,7 @@ const themesBase = base + '/themes';
               'Authorization': 'token ' + token,
               'Accept': 'application/vnd.github.squirrel-girl-preview+json',
             },
-          });
+          }).catch(function() {}); // 忽略 404
         } else {
           return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
             method: 'POST',

@@ -348,13 +348,19 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
     // 实时获取 reactions
     function fetchReactions(slug, issueNumber) {
       if (!issueNumber) return Promise.resolve(0);
+      var headers = {
+        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      };
+      var token = getGitHubToken();
+      if (token) headers['Authorization'] = 'token ' + token;
 
       return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
-        headers: {
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
+        headers: headers,
       })
-      .then(function(response) { return response.json(); })
+      .then(function(response) {
+        if (!response.ok) return [];
+        return response.json();
+      })
       .then(function(reactions) {
         if (Array.isArray(reactions)) {
           return reactions.length;
@@ -402,7 +408,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
               'Authorization': 'token ' + token,
               'Accept': 'application/vnd.github.squirrel-girl-preview+json',
             },
-          });
+          }).catch(function() {}); // 忽略 404（已被删除）
         } else {
           // 添加点赞
           return fetch(GITHUB_API + '/repos/rebron1900/f5a-gallery/issues/' + issueNumber + '/reactions', {
