@@ -181,7 +181,8 @@
     });
     toolbarHtml += '</div>';
 
-    return '<div class="keyboard-preview" data-dark="' + (isDark ? '1' : '0') + '" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + toolbarHtml + html + '</div>';
+    var borderColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
+    return '<div class="keyboard-preview" data-dark="' + (isDark ? '1' : '0') + '" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px;border:1px solid ' + borderColor + '">' + toolbarHtml + html + '</div>';
   }
 
   root.int32ToCSS = int32ToCSS;

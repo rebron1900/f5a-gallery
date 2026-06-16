@@ -299,5 +299,6 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
   }).join("");
 
   const toolbar = renderToolbar(int32ToCSS(colors.barColor), int32ToCSS(colors.keyTextColor));
-  return `<div class="keyboard-preview" data-dark="${isDark ? '1' : '0'}" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${toolbar}${html}</div>`;
+  const borderColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)';
+  return `<div class="keyboard-preview" data-dark="${isDark ? '1' : '0'}" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px;border:1px solid ${borderColor}">${toolbar}${html}</div>`;
 }
