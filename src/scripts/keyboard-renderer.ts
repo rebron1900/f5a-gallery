@@ -219,6 +219,37 @@ function escapeHtml(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
+// --- Toolbar icons (SVG paths, 18x18 viewBox) ---
+
+const TOOLBAR_ICONS = {
+  back:    '<path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  undo:    '<path d="M3 10h10a5 5 0 0 1 0 10H9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 6L3 10l4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  redo:    '<path d="M21 10H11a5 5 0 0 0 0 10h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  paste:   '<rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" fill="none"/>',
+  grid:    '<rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/>',
+  doc:     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  more:    '<circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/>',
+  collapse:'<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+
+function renderToolbar(barColor: string, textColor: string): string {
+  const icons: Array<{ key: keyof typeof TOOLBAR_ICONS; flex?: number }> = [
+    { key: 'back' },
+    { key: 'undo' },
+    { key: 'redo' },
+    { key: 'paste' },
+    { key: 'grid' },
+    { key: 'doc' },
+    { key: 'more' },
+    { key: 'collapse', flex: 0.6 },
+  ];
+  const buttons = icons.map(({ key, flex }) => {
+    const w = flex ? `flex:${flex}` : '';
+    return `<div class="toolbar-btn" style="${w}"><svg viewBox="0 0 24 24" width="18" height="18">${TOOLBAR_ICONS[key]}</svg></div>`;
+  }).join('');
+  return `<div class="keyboard-toolbar" style="background:${barColor};color:${textColor}">${buttons}</div>`;
+}
+
 // --- Main render function ---
 
 export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
@@ -268,5 +299,6 @@ export function renderKeyboard(colors: ThemeColors, layout: Layout, options?: {
     return `<div class="keyboard-row" style="--key-height:${keyHeight}px;gap:${keyHGap}px">${keysHtml}</div>`;
   }).join("");
 
-  return `<div class="keyboard-preview" data-dark="${isDark ? '1' : '0'}" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${html}</div>`;
+  const toolbar = renderToolbar(int32ToCSS(colors.barColor), int32ToCSS(colors.keyTextColor));
+  return `<div class="keyboard-preview" data-dark="${isDark ? '1' : '0'}" style="background:${int32ToCSS(colors.keyboardColor)};gap:${keyVGap}px">${toolbar}${html}</div>`;
 }

@@ -163,7 +163,26 @@
       return '<div class="keyboard-row" style="--key-height:' + keyH + 'px;gap:' + hGap + 'px">' + keysHtml + '</div>';
     }).join("");
 
-    return '<div class="keyboard-preview" data-dark="' + (isDark ? '1' : '0') + '" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + html + '</div>';
+    // Toolbar
+    var TOOLBAR_ICONS = {
+      back:    '<path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      undo:    '<path d="M3 10h10a5 5 0 0 1 0 10H9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 6L3 10l4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      redo:    '<path d="M21 10H11a5 5 0 0 0 0 10h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 6l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+      paste:   '<rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" fill="none"/>',
+      grid:    '<rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/>',
+      doc:     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+      more:    '<circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/>',
+      collapse:'<path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    };
+    var toolbarOrder = ['back','undo','redo','paste','grid','doc','more','collapse'];
+    var toolbarHtml = '<div class="keyboard-toolbar" style="background:' + int32ToCSS(colors.barColor) + ';color:' + int32ToCSS(colors.keyTextColor) + '">';
+    toolbarOrder.forEach(function(key) {
+      var flex = key === 'collapse' ? ' style="flex:0.6"' : '';
+      toolbarHtml += '<div class="toolbar-btn"' + flex + '><svg viewBox="0 0 24 24" width="18" height="18">' + TOOLBAR_ICONS[key] + '</svg></div>';
+    });
+    toolbarHtml += '</div>';
+
+    return '<div class="keyboard-preview" data-dark="' + (isDark ? '1' : '0') + '" style="background:' + int32ToCSS(colors.keyboardColor) + ';gap:' + vGap + 'px">' + toolbarHtml + html + '</div>';
   }
 
   root.int32ToCSS = int32ToCSS;
