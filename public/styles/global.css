@@ -273,6 +273,32 @@ img { max-width: 100%; display: block; }
   gap: 4px;
   font-size: 12px;
   color: var(--text-sub);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.theme-card-likes:hover {
+  color: var(--accent);
+}
+
+.theme-card-likes:hover svg {
+  stroke: var(--accent);
+  fill: var(--accent);
+}
+
+.theme-card-likes.disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.theme-card-likes.disabled:hover {
+  color: var(--text-sub);
+}
+
+.theme-card-likes.disabled:hover svg {
+  stroke: var(--text-sub);
+  fill: none;
 }
 
 .theme-card-likes svg {
@@ -280,6 +306,7 @@ img { max-width: 100%; display: block; }
   height: 14px;
   stroke: var(--text-sub);
   fill: none;
+  transition: stroke 0.15s, fill 0.15s;
 }
 
 /* ===== Detail Page ===== */

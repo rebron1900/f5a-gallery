@@ -11,6 +11,13 @@ const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 const themeMeta: Record<string, { author: string; builtin: boolean }> =
   JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
 
+// Load reaction counts (fetched at build time from GitHub API)
+const reactionsPath = join(process.cwd(), 'public/reactions.json');
+let reactions: Record<string, { total: number; url: string }> = {};
+try {
+  reactions = JSON.parse(readFileSync(reactionsPath, 'utf-8'));
+} catch { /* reactions.json may not exist on first build */ }
+
 interface Theme {
   name: string;
   isDark: boolean;
@@ -135,10 +142,17 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
                 {palette.map(c => <div class="theme-card-swatch" style={`background:${c}`}></div>)}
               </div>
               <div class="theme-card-footer">
-                <div class="theme-card-likes">
-                  <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                  0
-                </div>
+                {reactions[slug] ? (
+                  <a class="theme-card-likes" href={reactions[slug].url} target="_blank" rel="noopener" title="去 GitHub 点赞" onclick="event.stopPropagation()">
+                    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    {reactions[slug].total}
+                  </a>
+                ) : (
+                  <div class="theme-card-likes disabled">
+                    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    —
+                  </div>
+                )}
                 {themeMeta[slug]?.builtin && <span class="builtin-badge">内置</span>}
               </div>
             </div>
