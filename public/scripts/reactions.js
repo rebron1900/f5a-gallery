@@ -13,7 +13,7 @@
 
     return fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions', {
       headers: {
-        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+        'Accept': 'application/vnd.github+json',
       },
     })
     .then(function(res) {
@@ -45,7 +45,7 @@
     var apiUrl = window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions';
     var headers = {
       'Authorization': 'token ' + token,
-      'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      'Accept': 'application/vnd.github+json',
     };
 
     // Check if user already reacted
