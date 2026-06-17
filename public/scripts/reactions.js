@@ -10,14 +10,11 @@
 
   function fetchReactions(slug, issueNumber) {
     if (!issueNumber) return Promise.resolve(0);
-    var headers = {
-      'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-    };
-    var token = window.getGitHubToken && window.getGitHubToken();
-    if (token) headers['Authorization'] = 'token ' + token;
 
     return fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions', {
-      headers: headers,
+      headers: {
+        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      },
     })
     .then(function(res) {
       if (!res.ok) return [];

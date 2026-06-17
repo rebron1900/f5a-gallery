@@ -296,8 +296,10 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       if (window.innerWidth <= 768) {
         popup.classList.add('mobile-sheet');
         document.body.style.overflow = 'hidden';
+        popup.style.display = 'block';
       } else {
         popup.classList.remove('mobile-sheet');
+        popup.style.display = 'block';
         var rect = cardEl.getBoundingClientRect();
         var popupRect = popup.getBoundingClientRect();
         var top = rect.top - popupRect.height - 12;
@@ -307,7 +309,6 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
         popup.style.top = top + 'px';
         popup.style.left = left + 'px';
       }
-      popup.style.display = 'block';
     }
 
     function closePopup() {
