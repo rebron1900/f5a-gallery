@@ -162,24 +162,46 @@
     });
   }
 
-  // --- Init: check user reactions for all visible cards after login ---
+  // --- Init: load counts + check user state ---
 
-  function initUserReactionState() {
-    var token = window.getGitHubToken && window.getGitHubToken();
-    if (!token) return;
-
+  function initReactions() {
     var cards = document.querySelectorAll('.theme-card-likes[data-slug]');
+    var token = window.getGitHubToken && window.getGitHubToken();
+    var user = window.getGitHubUser && window.getGitHubUser();
+
+    // Batch fetch with delay to avoid rate limit (60/hr unauthenticated)
+    var queue = [];
     cards.forEach(function(card) {
       var slug = card.getAttribute('data-slug');
       var issue = parseInt(card.getAttribute('data-issue'));
       if (!issue) return;
-
-      checkUserReactions(issue).then(function(state) {
-        if (state.liked) card.classList.add('liked');
-        var favBtn = document.querySelector('.theme-card-fav[data-slug="' + slug + '"]');
-        if (favBtn && state.favorited) favBtn.classList.add('favorited');
-      });
+      queue.push({ slug: slug, issue: issue, card: card });
     });
+
+    // Process queue: 1 request per 300ms
+    var idx = 0;
+    function processNext() {
+      if (idx >= queue.length) return;
+      var item = queue[idx++];
+
+      // Fetch count (unauthenticated)
+      fetchReactionCount(item.issue, 'heart').then(function(count) {
+        var countEl = item.card.querySelector('.reaction-count');
+        if (countEl) countEl.textContent = count;
+      });
+
+      // Check user state if logged in
+      if (token && user) {
+        checkUserReactions(item.issue).then(function(state) {
+          if (state.liked) item.card.classList.add('liked');
+          var favBtn = document.querySelector('.theme-card-fav[data-slug="' + item.slug + '"]');
+          if (favBtn && state.favorited) favBtn.classList.add('favorited');
+        });
+      }
+
+      setTimeout(processNext, 300);
+    }
+    processNext();
   }
 
   // Expose globally
@@ -189,9 +211,8 @@
   window.fetchLikes = fetchLikes;
   window.fetchFavorites = fetchFavorites;
 
-  // Auto-check user state after login
+  // Auto-load reactions on DOMContentLoaded
   document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to let auth module initialize
-    setTimeout(initUserReactionState, 100);
+    setTimeout(initReactions, 200);
   });
 })();
