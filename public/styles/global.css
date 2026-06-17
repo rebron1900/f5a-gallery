@@ -150,15 +150,6 @@ img { max-width: 100%; display: block; }
   gap: 12px;
 }
 
-.nav-github {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-body);
-}
-
 /* ===== Buttons ===== */
 .btn {
   display: inline-flex;
