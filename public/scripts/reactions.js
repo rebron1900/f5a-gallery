@@ -169,7 +169,6 @@
     var token = window.getGitHubToken && window.getGitHubToken();
     var user = window.getGitHubUser && window.getGitHubUser();
 
-    // Batch fetch with delay to avoid rate limit (60/hr unauthenticated)
     var queue = [];
     cards.forEach(function(card) {
       var slug = card.getAttribute('data-slug');
@@ -178,26 +177,49 @@
       queue.push({ slug: slug, issue: issue, card: card });
     });
 
-    // Process queue: 1 request per 300ms
     var idx = 0;
     function processNext() {
       if (idx >= queue.length) return;
       var item = queue[idx++];
 
-      // Fetch count (unauthenticated)
-      fetchReactionCount(item.issue, 'heart').then(function(count) {
-        var countEl = item.card.querySelector('.reaction-count');
-        if (countEl) countEl.textContent = count;
-      });
+      // Fetch ALL reactions for this issue, then split by type
+      fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + item.issue + '/reactions', {
+        headers: { 'Accept': 'application/vnd.github+json' },
+      })
+      .then(function(res) {
+        if (!res.ok) {
+          console.warn('[Reactions] HTTP ' + res.status + ' for issue #' + item.issue);
+          return [];
+        }
+        return res.json();
+      })
+      .then(function(reactions) {
+        if (!Array.isArray(reactions)) return;
+        var likes = reactions.filter(function(r) { return r.content === 'heart'; }).length;
+        var favs = reactions.filter(function(r) { return r.content === 'rocket'; }).length;
 
-      // Check user state if logged in
-      if (token && user) {
-        checkUserReactions(item.issue).then(function(state) {
-          if (state.liked) item.card.classList.add('liked');
-          var favBtn = document.querySelector('.theme-card-fav[data-slug="' + item.slug + '"]');
-          if (favBtn && state.favorited) favBtn.classList.add('favorited');
-        });
-      }
+        var likeCountEl = item.card.querySelector('.reaction-count');
+        if (likeCountEl) likeCountEl.textContent = likes;
+
+        var favCountEl = item.card.querySelector('.fav-count');
+        if (favCountEl) favCountEl.textContent = favs > 0 ? favs : '';
+
+        // Check user state
+        if (token && user) {
+          reactions.forEach(function(r) {
+            if (r.user && r.user.login === user.login) {
+              if (r.content === 'heart') item.card.classList.add('liked');
+              if (r.content === 'rocket') {
+                var favBtn = item.card.parentElement.querySelector('.theme-card-fav[data-slug="' + item.slug + '"]');
+                if (favBtn) favBtn.classList.add('favorited');
+              }
+            }
+          });
+        }
+      })
+      .catch(function(err) {
+        console.warn('[Reactions] Failed for issue #' + item.issue, err);
+      });
 
       setTimeout(processNext, 300);
     }

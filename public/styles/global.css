@@ -278,8 +278,14 @@ img { max-width: 100%; display: block; }
 .theme-card-footer {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
   margin-top: auto;
+}
+
+.theme-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .theme-card-likes {

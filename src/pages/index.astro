@@ -141,25 +141,27 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
                 {palette.map(c => <div class="theme-card-swatch" style={`background:${c}`}></div>)}
               </div>
               <div class="theme-card-footer">
-                <button
-                  class={`theme-card-likes${themeMeta[slug]?.builtin ? ' disabled' : ''}`}
-                  data-slug={slug}
-                  data-issue={themeMeta[slug]?.issue || ''}
-                  onclick={themeMeta[slug]?.builtin ? '' : `toggleReaction('${slug}', ${themeMeta[slug]?.issue || 0})`}
-                >
-                  <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                  <span class="reaction-count" data-slug={slug}>{reactions[slug]?.total || 0}</span>
-                </button>
-                <button
-                  class={`theme-card-fav${themeMeta[slug]?.builtin ? ' disabled' : ''}`}
-                  data-slug={slug}
-                  data-issue={themeMeta[slug]?.issue || ''}
-                  onclick={themeMeta[slug]?.builtin ? '' : `toggleFavorite('${slug}', ${themeMeta[slug]?.issue || 0})`}
-                  title="收藏"
-                >
-                  <svg viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  <span class="fav-count" data-slug={slug}></span>
-                </button>
+                <div class="theme-card-actions">
+                  <button
+                    class={`theme-card-likes${themeMeta[slug]?.builtin ? ' disabled' : ''}`}
+                    data-slug={slug}
+                    data-issue={themeMeta[slug]?.issue || ''}
+                    onclick={themeMeta[slug]?.builtin ? '' : `toggleReaction('${slug}', ${themeMeta[slug]?.issue || 0})`}
+                  >
+                    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    <span class="reaction-count" data-slug={slug}>{reactions[slug]?.total || 0}</span>
+                  </button>
+                  <button
+                    class={`theme-card-fav${themeMeta[slug]?.builtin ? ' disabled' : ''}`}
+                    data-slug={slug}
+                    data-issue={themeMeta[slug]?.issue || ''}
+                    onclick={themeMeta[slug]?.builtin ? '' : `toggleFavorite('${slug}', ${themeMeta[slug]?.issue || 0})`}
+                    title="收藏"
+                  >
+                    <svg viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="fav-count" data-slug={slug}></span>
+                  </button>
+                </div>
                 {themeMeta[slug]?.builtin && <span class="builtin-badge">内置</span>}
               </div>
             </div>
