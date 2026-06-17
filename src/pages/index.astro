@@ -11,13 +11,6 @@ const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
 const themeMeta: Record<string, { author: string; builtin: boolean }> =
   JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
 
-// Load reaction counts (fetched at build time from GitHub API)
-const reactionsPath = join(process.cwd(), 'public/reactions.json');
-let reactions: Record<string, { total: number; url: string }> = {};
-try {
-  reactions = JSON.parse(readFileSync(reactionsPath, 'utf-8'));
-} catch { /* reactions.json may not exist on first build */ }
-
 interface Theme {
   name: string;
   isDark: boolean;
@@ -149,7 +142,7 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
                     onclick={themeMeta[slug]?.builtin ? '' : `toggleReaction('${slug}', ${themeMeta[slug]?.issue || 0})`}
                   >
                     <svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                    <span class="reaction-count" data-slug={slug}>{reactions[slug]?.total || 0}</span>
+                    <span class="reaction-count" data-slug={slug}>0</span>
                   </button>
                   <button
                     class={`theme-card-fav${themeMeta[slug]?.builtin ? ' disabled' : ''}`}
@@ -244,10 +237,9 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       </div>
     </footer>
 
-  <script define:vars={{ themesJson, layoutJson, defaultSlug, base, reactionsJson: JSON.stringify(reactions) }}>
+  <script define:vars={{ themesJson, layoutJson, defaultSlug, base }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
-    window.__REACTIONS_DATA__ = JSON.parse(reactionsJson);
 
     function int32ToCSS(n) {
       var u = n >= 0 ? n : n + 0x100000000;

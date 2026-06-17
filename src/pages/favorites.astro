@@ -28,7 +28,6 @@ const themes: { slug: string; theme: Theme }[] = files.map(f => {
 
 const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
 const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.theme])));
-const metaJson = JSON.stringify(themeMeta);
 const layoutData = JSON.parse(readFileSync(join(process.cwd(), 'src/data/default-layout.json'), 'utf-8'));
 const layoutJson = JSON.stringify(layoutData.default);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -51,7 +50,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <p class="themes-page-sub" id="fav-status">登录后查看你收藏的主题</p>
     </div>
 
-    <!-- Login prompt -->
     <div id="fav-login-prompt" class="fav-login-prompt" style="display:none;">
       <p>需要 GitHub 登录才能查看收藏</p>
       <button class="btn btn-primary" onclick="loginWithGitHub()">
@@ -60,22 +58,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </button>
     </div>
 
-    <!-- Loading -->
     <div id="fav-loading" class="fav-loading" style="display:none;">
       <p>正在加载收藏...</p>
     </div>
 
-    <!-- Empty -->
     <div id="fav-empty" class="fav-empty" style="display:none;">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       <p>还没有收藏的主题</p>
       <a href={`${base}/themes`} class="btn">去浏览主题</a>
     </div>
 
-    <!-- Theme Grid (same as themes list) -->
     <div class="theme-grid" id="fav-grid" style="display:none;"></div>
 
-    <!-- Theme Popup -->
     <div class="theme-popup" id="theme-popup">
       <button class="theme-popup-close" id="theme-popup-close" aria-label="关闭">✕</button>
       <div class="theme-popup-name" id="theme-popup-name"></div>
@@ -88,7 +82,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </div>
     </div>
 
-    <!-- QR Modal -->
     <div class="qr-modal" id="qr-modal" style="display:none;">
       <div class="qr-modal-content">
         <button class="qr-modal-close" id="qr-modal-close" aria-label="关闭">✕</button>
@@ -100,10 +93,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
   </div>
 
-  <script define:vars={{ themesJson, metaJson, layoutJson, base }}>
+  <script define:vars={{ themesJson, layoutJson, base }}>
     var themes = JSON.parse(themesJson);
-    var themeMeta = JSON.parse(metaJson);
     var layout = JSON.parse(layoutJson);
+    var API_BASE = 'https://small-rice-5955.me-d1b.workers.dev';
 
     var PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
 
@@ -117,31 +110,30 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
 
     function renderCard(slug, theme) {
+      var themeMeta = {};
+      try { themeMeta = JSON.parse(document.getElementById('fav-grid').dataset.meta || '{}'); } catch(e) {}
       var meta = themeMeta[slug] || {};
       var palette = PALETTE_KEYS.map(function(k) { return int32ToCSS(theme[k]); });
-      var swatches = palette.map(function(c) {
-        return '<div class="theme-card-swatch" style="background:' + c + '"></div>';
-      }).join('');
-      var badge = theme.isDark
-        ? '<span class="dark-badge">暗色</span>'
-        : '<span class="light-badge">亮色</span>';
+      var swatches = palette.map(function(c) { return '<div class="theme-card-swatch" style="background:' + c + '"></div>'; }).join('');
+      var badge = theme.isDark ? '<span class="dark-badge">暗色</span>' : '<span class="light-badge">亮色</span>';
 
       return '<div class="theme-card" data-slug="' + slug + '" data-dark="' + (theme.isDark ? '1' : '0') + '">'
         + '<div class="theme-card-name">' + escapeHtml(theme.name) + '</div>'
         + '<div class="theme-card-meta">@' + escapeHtml(meta.author || 'unknown') + ' ' + badge + '</div>'
         + '<div class="theme-card-palette">' + swatches + '</div>'
         + '<div class="theme-card-footer">'
-        + '<button class="theme-card-likes" data-slug="' + slug + '" data-issue="' + (meta.issue || '') + '" onclick="toggleReaction(\'' + slug + '\', ' + (meta.issue || 0) + ')">'
+        + '<div class="theme-card-actions">'
+        + '<button class="theme-card-likes" data-slug="' + slug + '">'
         + '<svg viewBox="0 0 24 24" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>'
         + '<span class="reaction-count" data-slug="' + slug + '">0</span>'
         + '</button>'
-        + '<button class="theme-card-fav favorited" data-slug="' + slug + '" data-issue="' + (meta.issue || '') + '" onclick="toggleFavorite(\'' + slug + '\', ' + (meta.issue || 0) + ')" title="取消收藏">'
+        + '<button class="theme-card-fav favorited" data-slug="' + slug + '" onclick="toggleFavorite(\'' + slug + '\')" title="取消收藏">'
         + '<svg viewBox="0 0 24 24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
         + '</button>'
-        + '</div></div>';
+        + '</div></div></div>';
     }
 
-    // --- Popup (same as themes list page) ---
+    // Popup (same as themes list)
     var popup = document.getElementById('theme-popup');
     var popupKb = document.getElementById('theme-popup-kb');
     var popupName = document.getElementById('theme-popup-name');
@@ -152,17 +144,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     var currentPopupSlug = '';
 
     function showPopup(slug, cardEl) {
-      if (typeof window.renderKeyboard !== 'function') return;
-      if (!themes[slug]) return;
+      if (typeof window.renderKeyboard !== 'function' || !themes[slug]) return;
       currentPopupSlug = slug;
       var theme = themes[slug];
-      var html = window.renderKeyboard(theme, layout, {
-        keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: false, isDark: theme.isDark
-      });
-      popupKb.innerHTML = html;
+      popupKb.innerHTML = window.renderKeyboard(theme, layout, { keyHGap: 5, keyVGap: 5, keyRadius: 8, borderEnabled: false, isDark: theme.isDark });
       popupName.textContent = theme.name;
       popupDetail.href = base + '/theme/' + slug;
-
       if (window.innerWidth <= 768) {
         popup.classList.add('mobile-sheet');
         document.body.style.overflow = 'hidden';
@@ -171,11 +158,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         popup.classList.remove('mobile-sheet');
         popup.style.display = 'block';
         var rect = cardEl.getBoundingClientRect();
-        var popupRect = popup.getBoundingClientRect();
-        var top = rect.top - popupRect.height - 12;
+        var pr = popup.getBoundingClientRect();
+        var top = rect.top - pr.height - 12;
         if (top < 8) top = 8;
-        var left = rect.left + (rect.width - popupRect.width) / 2;
-        left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
+        var left = rect.left + (rect.width - pr.width) / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - pr.width - 8));
         popup.style.top = top + 'px';
         popup.style.left = left + 'px';
       }
@@ -190,32 +177,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     popupClose.addEventListener('click', closePopup);
     document.addEventListener('click', function(e) {
-      if (currentPopupSlug && !popup.contains(e.target) && !e.target.closest('.theme-card')) {
-        closePopup();
-      }
+      if (currentPopupSlug && !popup.contains(e.target) && !e.target.closest('.theme-card')) closePopup();
     });
 
     popupDownload.addEventListener('click', function() {
-      if (!themes[currentPopupSlug]) return;
-      if (typeof JSZip === 'undefined') return;
-      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
+      if (!themes[currentPopupSlug] || typeof JSZip === 'undefined') return;
       var zip = new JSZip();
-      zip.file(currentPopupSlug + '.json', json);
+      zip.file(currentPopupSlug + '.json', JSON.stringify(themes[currentPopupSlug], null, 2));
       zip.generateAsync({ type: 'blob' }).then(function(blob) {
         var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url; a.download = currentPopupSlug + '.zip'; a.click();
+        var a = document.createElement('a'); a.href = url; a.download = currentPopupSlug + '.zip'; a.click();
         URL.revokeObjectURL(url);
       });
     });
 
     popupCopy.addEventListener('click', function() {
       if (!themes[currentPopupSlug]) return;
-      var json = JSON.stringify(themes[currentPopupSlug], null, 2);
-      navigator.clipboard.writeText(json).then(function() {
+      navigator.clipboard.writeText(JSON.stringify(themes[currentPopupSlug], null, 2)).then(function() {
         popupCopy.textContent = '已复制';
         setTimeout(function() { popupCopy.textContent = '复制 JSON'; }, 2000);
-      }).catch(function() { console.error('Copy failed'); });
+      });
     });
 
     // QR
@@ -233,10 +214,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">加载中…</p>';
       qrFilename.textContent = '';
       function renderQr(data) {
-        var qrStr = data[slug];
-        if (!qrStr) { qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">该主题暂无二维码</p>'; return; }
+        var s = data[slug];
+        if (!s) { qrCodeEl.innerHTML = '<p style="color:var(--text-sub)">该主题暂无二维码</p>'; return; }
         if (typeof qrcode !== 'undefined') {
-          var qr = qrcode(0, 'M'); qr.addData(qrStr); qr.make();
+          var qr = qrcode(0, 'M'); qr.addData(s); qr.make();
           qrCodeEl.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4 });
           var svg = qrCodeEl.querySelector('svg');
           if (svg) { svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%'); }
@@ -254,126 +235,105 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     if (qrClose) qrClose.addEventListener('click', closeQrModal);
     if (qrModal) qrModal.addEventListener('click', function(e) { if (e.target === qrModal) closeQrModal(); });
 
-    // --- Load favorites ---
+    // --- Load favorites via Worker API ---
     function loadFavorites() {
       var token = window.getGitHubToken && window.getGitHubToken();
-      var user = window.getGitHubUser && window.getGitHubUser();
-      if (!token || !user) {
+      if (!token) {
         document.getElementById('fav-login-prompt').style.display = 'block';
         return;
       }
 
       document.getElementById('fav-loading').style.display = 'block';
-      var GITHUB_API = window.GITHUB_API;
-      var REPO = 'rebron1900/f5a-gallery';
-      var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' };
 
-      var issueToSlug = {};
-      Object.keys(themeMeta).forEach(function(slug) {
-        var issue = themeMeta[slug].issue;
-        if (issue) issueToSlug[issue] = slug;
-      });
+      fetch(API_BASE + '/api/user/reactions', {
+        headers: { 'Authorization': 'token ' + token, 'Accept': 'application/json' },
+      })
+      .then(function(res) {
+        if (!res.ok) throw new Error('Failed');
+        return res.json();
+      })
+      .then(function(data) {
+        document.getElementById('fav-loading').style.display = 'none';
+        var favSlugs = data.favorites || [];
+        if (favSlugs.length === 0) {
+          document.getElementById('fav-empty').style.display = 'block';
+          document.getElementById('fav-status').textContent = '暂无收藏';
+          return;
+        }
 
-      var issueNumbers = Object.keys(issueToSlug).map(Number).filter(Boolean);
-      if (issueNumbers.length === 0) { showEmpty(); return; }
+        var grid = document.getElementById('fav-grid');
+        grid.innerHTML = favSlugs.filter(function(s) { return themes[s]; }).map(function(slug) {
+          return renderCard(slug, themes[slug]);
+        }).join('');
+        grid.style.display = 'grid';
+        document.getElementById('fav-status').textContent = '共 ' + favSlugs.length + ' 个收藏主题';
 
-      var favSlugs = [];
-      var checked = 0;
+        // Bind interactions
+        grid.querySelectorAll('.theme-card').forEach(function(card) {
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            showPopup(card.dataset.slug, card);
+          });
 
-      issueNumbers.forEach(function(issueNum) {
-        fetch(GITHUB_API + '/repos/' + REPO + '/issues/' + issueNum + '/reactions', { headers: headers })
-        .then(function(res) { return res.ok ? res.json() : []; })
-        .then(function(reactions) {
-          if (reactions.some(function(r) { return r.content === 'rocket' && r.user && r.user.login === user.login; })) {
-            favSlugs.push(issueToSlug[issueNum]);
+          // Handle un-favorite
+          var favBtn = card.querySelector('.theme-card-fav');
+          if (favBtn) {
+            favBtn.addEventListener('click', function() {
+              window.toggleFavorite(card.dataset.slug);
+              setTimeout(function() {
+                if (!favBtn.classList.contains('favorited')) {
+                  card.style.transition = 'opacity 0.3s, transform 0.3s';
+                  card.style.opacity = '0';
+                  card.style.transform = 'scale(0.9)';
+                  setTimeout(function() {
+                    card.remove();
+                    var remaining = grid.querySelectorAll('.theme-card');
+                    if (remaining.length === 0) {
+                      document.getElementById('fav-empty').style.display = 'block';
+                      grid.style.display = 'none';
+                    }
+                    document.getElementById('fav-status').textContent = '共 ' + remaining.length + ' 个收藏主题';
+                  }, 300);
+                }
+              }, 500);
+            });
           }
-        })
-        .catch(function() {})
-        .finally(function() {
-          checked++;
-          if (checked === issueNumbers.length) renderFavorites(favSlugs);
         });
-      });
-    }
 
-    function renderFavorites(slugs) {
-      document.getElementById('fav-loading').style.display = 'none';
-      if (slugs.length === 0) { showEmpty(); return; }
-
-      var grid = document.getElementById('fav-grid');
-      grid.innerHTML = slugs.map(function(slug) {
-        return renderCard(slug, themes[slug]);
-      }).join('');
-      grid.style.display = 'grid';
-      document.getElementById('fav-status').textContent = '共 ' + slugs.length + ' 个收藏主题';
-
-      // Bind card clicks for popup + handle un-favorite
-      grid.querySelectorAll('.theme-card').forEach(function(card) {
-        card.addEventListener('click', function(e) {
-          if (e.target.closest('button') || e.target.closest('a')) return;
-          showPopup(card.dataset.slug, card);
-        });
-        var favBtn = card.querySelector('.theme-card-fav');
-        if (favBtn) {
-          favBtn.addEventListener('click', function() {
-            // After toggle, if no longer favorited, remove card
-            setTimeout(function() {
-              if (!favBtn.classList.contains('favorited')) {
-                card.style.transition = 'opacity 0.3s, transform 0.3s';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.9)';
-                setTimeout(function() {
-                  card.remove();
-                  var remaining = grid.querySelectorAll('.theme-card');
-                  if (remaining.length === 0) showEmpty();
-                  document.getElementById('fav-status').textContent = '共 ' + remaining.length + ' 个收藏主题';
-                }, 300);
-              }
-            }, 500);
+        // Load counts for displayed cards
+        if (typeof window.fetchAllReactions === 'function') {
+          window.fetchAllReactions(favSlugs).then(function(counts) {
+            favSlugs.forEach(function(slug) {
+              var d = counts[slug];
+              if (!d) return;
+              var el = grid.querySelector('.reaction-count[data-slug="' + slug + '"]');
+              if (el) el.textContent = d.likes || 0;
+            });
           });
         }
+      })
+      .catch(function() {
+        document.getElementById('fav-loading').style.display = 'none';
+        document.getElementById('fav-empty').style.display = 'block';
+        document.getElementById('fav-status').textContent = '加载失败';
       });
-    }
-
-    function showEmpty() {
-      document.getElementById('fav-loading').style.display = 'none';
-      document.getElementById('fav-empty').style.display = 'block';
-      document.getElementById('fav-status').textContent = '暂无收藏';
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
         var token = window.getGitHubToken && window.getGitHubToken();
-        if (token) { loadFavorites(); }
-        else { document.getElementById('fav-login-prompt').style.display = 'block'; }
+        if (token) loadFavorites();
+        else document.getElementById('fav-login-prompt').style.display = 'block';
       }, 200);
     });
   </script>
 
   <style>
-    .fav-login-prompt {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .fav-login-prompt p {
-      font-size: 15px;
-      color: var(--text-sub);
-      margin-bottom: 20px;
-    }
-    .fav-loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-sub);
-    }
-    .fav-empty {
-      text-align: center;
-      padding: 60px 20px;
-    }
+    .fav-login-prompt { text-align: center; padding: 60px 20px; }
+    .fav-login-prompt p { font-size: 15px; color: var(--text-sub); margin-bottom: 20px; }
+    .fav-loading { text-align: center; padding: 60px 20px; color: var(--text-sub); }
+    .fav-empty { text-align: center; padding: 60px 20px; }
     .fav-empty svg { margin-bottom: 16px; }
-    .fav-empty p {
-      font-size: 15px;
-      color: var(--text-sub);
-      margin-bottom: 20px;
-    }
+    .fav-empty p { font-size: 15px; color: var(--text-sub); margin-bottom: 20px; }
   </style>
 </Layout>
