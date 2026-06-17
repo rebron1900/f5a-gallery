@@ -104,9 +104,12 @@
   window.loadAllReactions = loadAllReactions;
 
   // Auto-load reactions on DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof window.loadAllReactions === 'function') {
-      window.loadAllReactions();
-    }
-  });
+  // DISABLED: build-time reactions.json already provides counts.
+  // Real-time fetch on every page load hits GitHub rate limits (60/hr unauthenticated).
+  // Only individual card updates happen after toggleReaction.
+  // document.addEventListener('DOMContentLoaded', function() {
+  //   if (typeof window.loadAllReactions === 'function') {
+  //     window.loadAllReactions();
+  //   }
+  // });
 })();

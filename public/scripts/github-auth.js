@@ -116,7 +116,6 @@
     .then(function(user) {
       setGitHubUser(user);
       updateLoginUI();
-      if (typeof window.loadAllReactions === 'function') window.loadAllReactions();
     })
     .catch(function(err) {
       console.error('[OAuth] User info error:', err);
