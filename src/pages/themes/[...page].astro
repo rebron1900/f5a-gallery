@@ -300,9 +300,10 @@ const themesBase = base + '/themes';
       </div>
     </footer>
 
-  <script define:vars={{ themesJson, layoutJson, base }}>
+  <script define:vars={{ themesJson, layoutJson, base, reactionsJson: JSON.stringify(reactions) }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
+    window.__REACTIONS_DATA__ = JSON.parse(reactionsJson);
     var currentMode = 'all';
     var currentColor = 'all';
     var cards = document.querySelectorAll('.theme-card[data-slug]');

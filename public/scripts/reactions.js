@@ -169,61 +169,71 @@
     var token = window.getGitHubToken && window.getGitHubToken();
     var user = window.getGitHubUser && window.getGitHubUser();
 
+    // Use build-time data first (from reactions.json)
+    var buildData = window.__REACTIONS_DATA__ || {};
+
     var queue = [];
     cards.forEach(function(card) {
       var slug = card.getAttribute('data-slug');
       var issue = parseInt(card.getAttribute('data-issue'));
       if (!issue) return;
-      queue.push({ slug: slug, issue: issue, card: card });
+
+      var data = buildData[slug];
+      if (data) {
+        // Use build-time data immediately
+        var likeCountEl = card.querySelector('.reaction-count');
+        if (likeCountEl) likeCountEl.textContent = data.likes || data.total || 0;
+        var favCountEl = card.querySelector('.fav-count');
+        if (favCountEl) favCountEl.textContent = data.favorites > 0 ? data.favorites : '';
+      } else {
+        // Queue for API fetch
+        queue.push({ slug: slug, issue: issue, card: card });
+      }
     });
 
+    // Only fetch from API for themes missing from build data
     var idx = 0;
     function processNext() {
       if (idx >= queue.length) return;
       var item = queue[idx++];
 
-      // Fetch ALL reactions for this issue, then split by type
       fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + item.issue + '/reactions', {
         headers: { 'Accept': 'application/vnd.github+json' },
       })
       .then(function(res) {
-        if (!res.ok) {
-          console.warn('[Reactions] HTTP ' + res.status + ' for issue #' + item.issue);
-          return [];
-        }
+        if (!res.ok) { console.warn('[Reactions] HTTP ' + res.status + ' for issue #' + item.issue); return []; }
         return res.json();
       })
       .then(function(reactions) {
         if (!Array.isArray(reactions)) return;
         var likes = reactions.filter(function(r) { return r.content === 'heart'; }).length;
         var favs = reactions.filter(function(r) { return r.content === 'rocket'; }).length;
-
         var likeCountEl = item.card.querySelector('.reaction-count');
         if (likeCountEl) likeCountEl.textContent = likes;
-
         var favCountEl = item.card.querySelector('.fav-count');
         if (favCountEl) favCountEl.textContent = favs > 0 ? favs : '';
-
-        // Check user state
-        if (token && user) {
-          reactions.forEach(function(r) {
-            if (r.user && r.user.login === user.login) {
-              if (r.content === 'heart') item.card.classList.add('liked');
-              if (r.content === 'rocket') {
-                var favBtn = item.card.parentElement.querySelector('.theme-card-fav[data-slug="' + item.slug + '"]');
-                if (favBtn) favBtn.classList.add('favorited');
-              }
-            }
-          });
-        }
       })
-      .catch(function(err) {
-        console.warn('[Reactions] Failed for issue #' + item.issue, err);
-      });
+      .catch(function(err) { console.warn('[Reactions] Failed for issue #' + item.issue, err); });
 
       setTimeout(processNext, 300);
     }
     processNext();
+
+    // Check user state if logged in (independent of count fetching)
+    if (token && user) {
+      cards.forEach(function(card) {
+        var issue = parseInt(card.getAttribute('data-issue'));
+        if (!issue) return;
+        var slug = card.getAttribute('data-slug');
+        checkUserReactions(issue).then(function(state) {
+          if (state.liked) card.classList.add('liked');
+          if (state.favorited) {
+            var favBtn = card.parentElement.querySelector('.theme-card-fav[data-slug="' + slug + '"]');
+            if (favBtn) favBtn.classList.add('favorited');
+          }
+        });
+      });
+    }
   }
 
   // Expose globally

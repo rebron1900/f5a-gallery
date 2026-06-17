@@ -244,9 +244,10 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       </div>
     </footer>
 
-  <script define:vars={{ themesJson, layoutJson, defaultSlug, base }}>
+  <script define:vars={{ themesJson, layoutJson, defaultSlug, base, reactionsJson: JSON.stringify(reactions) }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
+    window.__REACTIONS_DATA__ = JSON.parse(reactionsJson);
 
     function int32ToCSS(n) {
       var u = n >= 0 ? n : n + 0x100000000;

@@ -12,7 +12,7 @@
     "astro": "astro",
     "validate": "npx tsx scripts/validate-theme.ts",
     "generate-zips": "node scripts/generate-zips.mjs",
-    "prebuild": "python3 scripts/fix-theme-fields.py --apply && node scripts/generate-zips.mjs && python3 scripts/generate-qr-data.py",
+    "prebuild": "python3 scripts/fix-theme-fields.py --apply && node scripts/generate-zips.mjs && python3 scripts/generate-qr-data.py && python3 scripts/fetch-reactions.py",
     "generate-qr": "python3 scripts/generate-qr-data.py"
   },
   "dependencies": {

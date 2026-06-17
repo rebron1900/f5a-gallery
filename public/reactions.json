@@ -1,0 +1,32 @@
+{
+  "braun-minimal-dark": {
+    "likes": 1,
+    "favorites": 1,
+    "total": 1
+  },
+  "braun-minimal-light": {
+    "likes": 1,
+    "favorites": 1,
+    "total": 1
+  },
+  "github-dark-dim": {
+    "likes": 1,
+    "favorites": 1,
+    "total": 1
+  },
+  "sage-journey": {
+    "likes": 0,
+    "favorites": 0,
+    "total": 0
+  },
+  "wechat-dark": {
+    "likes": 1,
+    "favorites": 1,
+    "total": 1
+  },
+  "wechat-light": {
+    "likes": 1,
+    "favorites": 1,
+    "total": 1
+  }
+}
