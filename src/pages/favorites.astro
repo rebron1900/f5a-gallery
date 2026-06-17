@@ -1,0 +1,257 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+const themesDir = join(process.cwd(), 'src/content/themes');
+const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
+
+const themeMeta: Record<string, { author: string; builtin: boolean; issue?: number }> =
+  JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
+
+interface Theme {
+  name: string;
+  isDark: boolean;
+  [key: string]: any;
+}
+
+function int32ToCSS(n: number): string {
+  const u = n >= 0 ? n : n + 0x100000000;
+  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
+}
+
+const themes: { slug: string; theme: Theme }[] = files.map(f => {
+  const slug = f.replace('.json', '');
+  const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
+  return { slug, theme: data as Theme };
+});
+
+const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
+const themesJson = JSON.stringify(Object.fromEntries(themes.map(t => [t.slug, t.theme])));
+const metaJson = JSON.stringify(themeMeta);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Layout title="我的收藏">
+  <div class="container">
+    <div class="fav-page">
+      <div class="fav-header">
+        <h1 class="fav-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          我的收藏
+        </h1>
+        <p class="fav-desc" id="fav-desc">登录后查看你收藏的主题</p>
+      </div>
+
+      <div id="fav-login-prompt" class="fav-login-prompt">
+        <p>需要 GitHub 登录才能查看收藏</p>
+        <button class="btn btn-primary" onclick="loginWithGitHub()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub 登录
+        </button>
+      </div>
+
+      <div id="fav-loading" class="fav-loading" style="display:none;">
+        <p>正在加载收藏...</p>
+      </div>
+
+      <div id="fav-empty" class="fav-empty" style="display:none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-sub)" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <p>还没有收藏的主题</p>
+        <a href={`${base}/themes`} class="btn">去浏览主题</a>
+      </div>
+
+      <div id="fav-grid" class="theme-grid" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script define:vars={{ themesJson, metaJson, base }}>
+    var themes = JSON.parse(themesJson);
+    var themeMeta = JSON.parse(metaJson);
+
+    function int32ToCSS(n) {
+      var u = n >= 0 ? n : n + 0x100000000;
+      return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
+    }
+
+    var PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
+
+    function renderCard(slug, theme) {
+      var meta = themeMeta[slug] || {};
+      var palette = PALETTE_KEYS.map(function(k) { return int32ToCSS(theme[k]); });
+      var swatches = palette.map(function(c) {
+        return '<div class="theme-card-swatch" style="background:' + c + '"></div>';
+      }).join('');
+
+      return '<div class="theme-card" data-slug="' + slug + '">'
+        + '<div class="theme-card-name">' + escapeHtml(theme.name) + '</div>'
+        + '<div class="theme-card-meta">@' + escapeHtml(meta.author || 'unknown') + '</div>'
+        + '<div class="theme-card-palette">' + swatches + '</div>'
+        + '<div class="theme-card-footer">'
+        + '<a href="' + base + '/theme/' + slug + '" class="btn btn-sm">查看详情</a>'
+        + '</div></div>';
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function loadFavorites() {
+      var token = window.getGitHubToken && window.getGitHubToken();
+      var user = window.getGitHubUser && window.getGitHubUser();
+      if (!token || !user) return;
+
+      document.getElementById('fav-login-prompt').style.display = 'none';
+      document.getElementById('fav-loading').style.display = 'block';
+
+      var GITHUB_API = window.GITHUB_API;
+      var REPO = 'rebron1900/f5a-gallery';
+      var headers = {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github+json',
+      };
+
+      // Collect all issue numbers from theme-meta
+      var issueToSlug = {};
+      Object.keys(themeMeta).forEach(function(slug) {
+        var issue = themeMeta[slug].issue;
+        if (issue) issueToSlug[issue] = slug;
+      });
+
+      var issueNumbers = Object.keys(issueToSlug).map(Number).filter(Boolean);
+      if (issueNumbers.length === 0) {
+        showEmpty();
+        return;
+      }
+
+      // Check each issue for user's rocket reaction
+      var favSlugs = [];
+      var checked = 0;
+
+      issueNumbers.forEach(function(issueNum) {
+        fetch(GITHUB_API + '/repos/' + REPO + '/issues/' + issueNum + '/reactions', {
+          headers: headers,
+        })
+        .then(function(res) {
+          if (!res.ok) return [];
+          return res.json();
+        })
+        .then(function(reactions) {
+          var isFav = reactions.some(function(r) {
+            return r.content === 'rocket' && r.user && r.user.login === user.login;
+          });
+          if (isFav) favSlugs.push(issueToSlug[issueNum]);
+        })
+        .catch(function() {})
+        .finally(function() {
+          checked++;
+          if (checked === issueNumbers.length) {
+            renderFavorites(favSlugs);
+          }
+        });
+      });
+    }
+
+    function renderFavorites(slugs) {
+      document.getElementById('fav-loading').style.display = 'none';
+
+      if (slugs.length === 0) {
+        showEmpty();
+        return;
+      }
+
+      var grid = document.getElementById('fav-grid');
+      var html = slugs.map(function(slug) {
+        return renderCard(slug, themes[slug]);
+      }).join('');
+
+      grid.innerHTML = html;
+      grid.style.display = 'grid';
+      document.getElementById('fav-desc').textContent = '共 ' + slugs.length + ' 个收藏主题';
+    }
+
+    function showEmpty() {
+      document.getElementById('fav-loading').style.display = 'none';
+      document.getElementById('fav-empty').style.display = 'block';
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait for auth module to initialize
+      setTimeout(function() {
+        var token = window.getGitHubToken && window.getGitHubToken();
+        if (token) {
+          loadFavorites();
+        } else {
+          document.getElementById('fav-login-prompt').style.display = 'block';
+        }
+      }, 200);
+    });
+  </script>
+
+  <style>
+    .fav-page {
+      padding: 24px 0 60px;
+    }
+
+    .fav-header {
+      margin-bottom: 32px;
+    }
+
+    .fav-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .fav-title svg {
+      color: #f39c12;
+    }
+
+    .fav-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .fav-login-prompt {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .fav-login-prompt p {
+      font-size: 15px;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+
+    .fav-loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-sub);
+    }
+
+    .fav-empty {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .fav-empty svg {
+      margin-bottom: 16px;
+    }
+
+    .fav-empty p {
+      font-size: 15px;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .fav-title { font-size: 20px; }
+      .fav-page { padding: 16px 0 40px; }
+    }
+  </style>
+</Layout>

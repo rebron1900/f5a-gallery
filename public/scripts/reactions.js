@@ -1,18 +1,45 @@
 /**
  * GitHub Reactions shared module.
- * Loaded via <script src> in Layout.astro, attaches to window.
- * Depends on github-auth.js (getGitHubToken, loginWithGitHub, GITHUB_API).
+ * Likes = heart reaction, Favorites = rocket reaction on the same issue.
+ * Build-time reactions.json provides initial counts.
+ * User-specific state (liked/favorited) checked on demand after login.
  */
 (function() {
   'use strict';
 
   var REPO = 'rebron1900/f5a-gallery';
 
-  function fetchReactions(slug, issueNumber) {
+  // --- Count fetchers (unauthenticated, for build-time fallback) ---
+
+  function fetchReactionCount(issueNumber, content) {
     if (!issueNumber) return Promise.resolve(0);
+    return fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions', {
+      headers: { 'Accept': 'application/vnd.github+json' },
+    })
+    .then(function(res) {
+      if (!res.ok) return [];
+      return res.json();
+    })
+    .then(function(reactions) {
+      if (!Array.isArray(reactions)) return 0;
+      return reactions.filter(function(r) { return r.content === content; }).length;
+    })
+    .catch(function() { return 0; });
+  }
+
+  function fetchLikes(issueNumber) { return fetchReactionCount(issueNumber, 'heart'); }
+  function fetchFavorites(issueNumber) { return fetchReactionCount(issueNumber, 'rocket'); }
+
+  // --- Check current user's reactions for a specific issue ---
+
+  function checkUserReactions(issueNumber) {
+    var token = window.getGitHubToken && window.getGitHubToken();
+    var user = window.getGitHubUser && window.getGitHubUser();
+    if (!token || !user || !issueNumber) return Promise.resolve({ liked: false, favorited: false });
 
     return fetch(window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions', {
       headers: {
+        'Authorization': 'token ' + token,
         'Accept': 'application/vnd.github+json',
       },
     })
@@ -21,95 +48,150 @@
       return res.json();
     })
     .then(function(reactions) {
-      return Array.isArray(reactions) ? reactions.length : 0;
+      var liked = false, favorited = false;
+      reactions.forEach(function(r) {
+        if (r.user && r.user.login === user.login) {
+          if (r.content === 'heart') liked = true;
+          if (r.content === 'rocket') favorited = true;
+        }
+      });
+      return { liked: liked, favorited: favorited };
     })
-    .catch(function(err) {
-      console.warn('[Reactions] Fetch failed for', slug, err);
-      return 0;
-    });
+    .catch(function() { return { liked: false, favorited: false }; });
   }
+
+  // --- Toggle like (heart) ---
 
   function toggleReaction(slug, issueNumber) {
     var token = window.getGitHubToken && window.getGitHubToken();
     if (!token) {
-      if (confirm('需要 GitHub 登录才能点赞，是否登录？')) {
-        window.loginWithGitHub();
-      }
+      if (confirm('需要 GitHub 登录才能点赞，是否登录？')) window.loginWithGitHub();
       return;
     }
-    if (!issueNumber) {
-      alert('该主题暂无对应 issue');
-      return;
-    }
+    if (!issueNumber) { alert('该主题暂无对应 issue'); return; }
 
     var apiUrl = window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions';
-    var headers = {
-      'Authorization': 'token ' + token,
-      'Accept': 'application/vnd.github+json',
-    };
+    var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' };
+    var user = window.getGitHubUser && window.getGitHubUser();
+    var userLogin = user ? user.login : null;
 
-    // Check if user already reacted
     fetch(apiUrl, { headers: headers })
     .then(function(res) {
       if (!res.ok) throw new Error('Failed to fetch reactions');
       return res.json();
     })
     .then(function(reactions) {
-      var userReaction = reactions.find(function(r) { return r.content === 'heart'; });
+      var userReaction = userLogin
+        ? reactions.find(function(r) { return r.content === 'heart' && r.user && r.user.login === userLogin; })
+        : null;
       if (userReaction) {
-        // Unlike
-        return fetch(apiUrl + '/' + userReaction.id, {
-          method: 'DELETE',
-          headers: headers,
-        }).catch(function() {});
+        return fetch(apiUrl + '/' + userReaction.id, { method: 'DELETE', headers: headers })
+          .then(function() { return false; });
       } else {
-        // Like
         return fetch(apiUrl, {
           method: 'POST',
           headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }),
           body: JSON.stringify({ content: 'heart' }),
-        });
+        }).then(function() { return true; });
       }
     })
-    .then(function() {
-      return fetchReactions(slug, issueNumber);
+    .then(function(isLiked) {
+      // Update UI
+      var btn = document.querySelector('.theme-card-likes[data-slug="' + slug + '"]');
+      if (btn) btn.classList.toggle('liked', isLiked);
+      return fetchLikes(issueNumber);
     })
     .then(function(count) {
       var countEl = document.querySelector('.reaction-count[data-slug="' + slug + '"]');
       if (countEl) countEl.textContent = count;
     })
     .catch(function(err) {
-      console.error('[Reactions] Toggle failed:', err);
+      console.error('[Reactions] Toggle like failed:', err);
       alert('操作失败，请重试');
     });
   }
 
-  function loadAllReactions() {
+  // --- Toggle favorite (rocket) ---
+
+  function toggleFavorite(slug, issueNumber) {
+    var token = window.getGitHubToken && window.getGitHubToken();
+    if (!token) {
+      if (confirm('需要 GitHub 登录才能收藏，是否登录？')) window.loginWithGitHub();
+      return;
+    }
+    if (!issueNumber) { alert('该主题暂无对应 issue'); return; }
+
+    var apiUrl = window.GITHUB_API + '/repos/' + REPO + '/issues/' + issueNumber + '/reactions';
+    var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github+json' };
+    var user = window.getGitHubUser && window.getGitHubUser();
+    var userLogin = user ? user.login : null;
+
+    fetch(apiUrl, { headers: headers })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Failed to fetch reactions');
+      return res.json();
+    })
+    .then(function(reactions) {
+      var userReaction = userLogin
+        ? reactions.find(function(r) { return r.content === 'rocket' && r.user && r.user.login === userLogin; })
+        : null;
+      if (userReaction) {
+        return fetch(apiUrl + '/' + userReaction.id, { method: 'DELETE', headers: headers })
+          .then(function() { return false; });
+      } else {
+        return fetch(apiUrl, {
+          method: 'POST',
+          headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ content: 'rocket' }),
+        }).then(function() { return true; });
+      }
+    })
+    .then(function(isFavorited) {
+      // Update UI
+      var btn = document.querySelector('.theme-card-fav[data-slug="' + slug + '"]');
+      if (btn) btn.classList.toggle('favorited', isFavorited);
+      return fetchFavorites(issueNumber);
+    })
+    .then(function(count) {
+      var countEl = document.querySelector('.fav-count[data-slug="' + slug + '"]');
+      if (countEl) countEl.textContent = count;
+    })
+    .catch(function(err) {
+      console.error('[Reactions] Toggle favorite failed:', err);
+      alert('操作失败，请重试');
+    });
+  }
+
+  // --- Init: check user reactions for all visible cards after login ---
+
+  function initUserReactionState() {
+    var token = window.getGitHubToken && window.getGitHubToken();
+    if (!token) return;
+
     var cards = document.querySelectorAll('.theme-card-likes[data-slug]');
     cards.forEach(function(card) {
       var slug = card.getAttribute('data-slug');
-      var issue = card.getAttribute('data-issue');
-      if (issue && issue !== '0' && issue !== '') {
-        fetchReactions(slug, parseInt(issue)).then(function(count) {
-          var countEl = card.querySelector('.reaction-count');
-          if (countEl) countEl.textContent = count;
-        });
-      }
+      var issue = parseInt(card.getAttribute('data-issue'));
+      if (!issue) return;
+
+      checkUserReactions(issue).then(function(state) {
+        if (state.liked) card.classList.add('liked');
+        var favBtn = document.querySelector('.theme-card-fav[data-slug="' + slug + '"]');
+        if (favBtn && state.favorited) favBtn.classList.add('favorited');
+      });
     });
   }
 
   // Expose globally
-  window.fetchReactions = fetchReactions;
   window.toggleReaction = toggleReaction;
-  window.loadAllReactions = loadAllReactions;
+  window.toggleFavorite = toggleFavorite;
+  window.checkUserReactions = checkUserReactions;
+  window.fetchLikes = fetchLikes;
+  window.fetchFavorites = fetchFavorites;
 
-  // Auto-load reactions on DOMContentLoaded
-  // DISABLED: build-time reactions.json already provides counts.
-  // Real-time fetch on every page load hits GitHub rate limits (60/hr unauthenticated).
-  // Only individual card updates happen after toggleReaction.
-  // document.addEventListener('DOMContentLoaded', function() {
-  //   if (typeof window.loadAllReactions === 'function') {
-  //     window.loadAllReactions();
-  //   }
-  // });
+  // Auto-check user state after login
+  document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to let auth module initialize
+    setTimeout(initUserReactionState, 100);
+  });
 })();
