@@ -69,5 +69,10 @@
     "author": "rebron1900",
     "builtin": false,
     "issue": 10
+  },
+  "terminal-neon": {
+    "author": "rebron1900",
+    "builtin": false,
+    "issue": 11
   }
 }
