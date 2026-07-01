@@ -11,6 +11,7 @@
 
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
+import themeConfig from "../src/data/theme-config.json" with { type: "json" };
 
 const THEME_COLORS = [
   "backgroundColor", "barColor", "keyboardColor", "keyBackgroundColor",
@@ -37,8 +38,8 @@ for (const file of files) {
   if (data.backgroundImage !== null && data.backgroundImage !== undefined && typeof data.backgroundImage !== "object") {
     errors.push("'backgroundImage' must be null or an object");
   }
-  if (data.version !== undefined && data.version !== "2.1") {
-    errors.push(`'version' should be "2.1", got "${data.version}"`);
+  if (data.version !== undefined && data.version !== themeConfig.themeVersion) {
+    errors.push(`'version' should be "${themeConfig.themeVersion}", got "${data.version}"`);
   }
 
   // Validate all 21 color tokens exist as numbers (int32) at top level

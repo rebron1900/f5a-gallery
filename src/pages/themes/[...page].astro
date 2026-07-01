@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { int32ToCSS } from '../../lib/color';
 
 export function getStaticPaths({ paginate }) {
   const themesDir = join(process.cwd(), 'src/content/themes');
@@ -35,11 +36,6 @@ const themeMeta: Record<string, { author: string; builtin: boolean }> =
 
 // Palette swatches for cards
 const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
-function int32ToCSS(n: number): string {
-  const u = n >= 0 ? n : n + 0x100000000;
-  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
-}
-
 
 function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
   hex = hex.replace('#', '');
@@ -293,6 +289,8 @@ const themesBase = base + '/themes';
       </div>
     </footer>
 
+  <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1/qrcode.min.js"></script>
   <script define:vars={{ themesJson, layoutJson, base }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);

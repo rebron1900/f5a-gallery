@@ -3,6 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'src/content/themes/**'
+      - 'src/data/theme-meta.json'
   workflow_dispatch:
 
 permissions:

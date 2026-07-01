@@ -2,6 +2,11 @@
  * Keyboard renderer extracted from fxliang/f5a-see-me
  * Pure display only — no editing, no state management.
  * Colors use signed int32 ARGB values (converted to CSS hex at render time).
+ *
+ * !!! SYNC: Keep in sync with public/scripts/keyboard-render.js !!!
+ * The browser-side JS version is a hand-ported ES5 IIFE that mirrors this module.
+ * When adding/removing features or changing function signatures here, update the
+ * corresponding function in public/scripts/keyboard-render.js to match.
  */
 
 export interface ThemeColors {

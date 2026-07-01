@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import KeyboardPreview from '../../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { int32ToCSS } from '../../lib/color';
 
 export async function getStaticPaths() {
   const themesDir = join(process.cwd(), 'src/content/themes');
@@ -22,11 +23,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const themeMeta: Record<string, { author: string; builtin: boolean }> =
   JSON.parse(readFileSync(join(process.cwd(), 'src/data/theme-meta.json'), 'utf-8'));
 const meta = themeMeta[slug] || { author: 'unknown', builtin: false };
-
-function int32ToCSS(n: number): string {
-  const u = n >= 0 ? n : n + 0x100000000;
-  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
-}
 
 const colorLabels: Record<string, string> = {
   backgroundColor: '背景',
@@ -160,6 +156,8 @@ const colorLabels: Record<string, string> = {
       </div>
     </footer>
 
+  <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1/qrcode.min.js"></script>
   <script define:vars={{ theme, slug, base }}>
     document.getElementById('copy-json').addEventListener('click', function() {
       var json = JSON.stringify(theme, null, 2);

@@ -28,9 +28,7 @@ fcitx5-android（支持原版和靓企鹅版） 键盘主题画廊 — 一个在
 ```json
 {
   "name": "主题名称",
-  "author": "作者名",
   "isDark": true,
-  "builtin": true,
   "backgroundColor": -15592942,
   "barColor": -14803426,
   "keyboardColor": -13882324,
@@ -55,6 +53,8 @@ fcitx5-android（支持原版和靓企鹅版） 键盘主题画廊 — 一个在
   "version": "2.1"
 }
 ```
+
+> ⚠️ `author` 和 `builtin` 字段不由提交者提供。作者信息存储在 `src/data/theme-meta.json` 中，`builtin` 标志由系统自动管理。提交主题时请**勿**包含这两个字段。
 
 > 颜色值为 signed 32-bit ARGB 整数，如 `-16777216`（黑色）、`-1`（白色）。fcitx5-android（支持原版和靓企鹅版）直接读取此格式，无需转换。
 

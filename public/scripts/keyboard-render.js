@@ -2,6 +2,12 @@
  * Keyboard renderer — browser-side version.
  * Extracted from fxliang/f5a-see-me, plain JS (no TS/build needed).
  * Colors use signed int32 ARGB values (converted to CSS hex at render time).
+ *
+ * !!! SYNC: Keep in sync with src/scripts/keyboard-renderer.ts !!!
+ * The TypeScript module (src/scripts/keyboard-renderer.ts) is the single source of truth
+ * for keyboard rendering logic. This ES5 IIFE is a hand-ported browser-side mirror.
+ * When adding/removing features or changing function signatures there, update this file
+ * to match. Pay special attention to renderKeyboard(), int32ToCSS(), and resolveColors().
  */
 (function (root) {
   "use strict";

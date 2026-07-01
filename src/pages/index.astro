@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import KeyboardPreview from '../components/KeyboardPreview.astro';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { int32ToCSS } from '../lib/color';
 
 const themesDir = join(process.cwd(), 'src/content/themes');
 const files = readdirSync(themesDir).filter(f => f.endsWith('.json'));
@@ -15,11 +16,6 @@ interface Theme {
   name: string;
   isDark: boolean;
   [key: string]: any;
-}
-
-function int32ToCSS(n: number): string {
-  const u = n >= 0 ? n : n + 0x100000000;
-  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
 }
 
 const themes: { slug: string; theme: Theme }[] = files.map(f => {
@@ -237,21 +233,18 @@ const PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackground
       </div>
     </footer>
 
+  <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1/qrcode.min.js"></script>
   <script define:vars={{ themesJson, layoutJson, defaultSlug, base }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
 
-    function int32ToCSS(n) {
-      var u = n >= 0 ? n : n + 0x100000000;
-      return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
-    }
-
     function updateLegend(theme) {
       var map = {
-        'legend-popup': int32ToCSS(theme.popupTextColor),
-        'legend-clipboard': int32ToCSS(theme.clipboardEntryColor),
-        'legend-active': int32ToCSS(theme.genericActiveForegroundColor),
-        'legend-comment': int32ToCSS(theme.candidateCommentColor)
+        'legend-popup': window.int32ToCSS(theme.popupTextColor),
+        'legend-clipboard': window.int32ToCSS(theme.clipboardEntryColor),
+        'legend-active': window.int32ToCSS(theme.genericActiveForegroundColor),
+        'legend-comment': window.int32ToCSS(theme.candidateCommentColor)
       };
       Object.keys(map).forEach(function (id) {
         var el = document.getElementById(id);

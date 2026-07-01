@@ -13,6 +13,7 @@
 
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from "fs";
 import { join } from "path";
+import themeConfig from "../src/data/theme-config.json" with { type: "json" };
 
 const THEME_COLORS = [
   "backgroundColor", "barColor", "keyboardColor", "keyBackgroundColor",
@@ -121,7 +122,7 @@ async function main() {
     name: data.name,
     isDark: data.isDark,
     backgroundImage: null,
-    version: "2.1",
+    version: themeConfig.themeVersion,
   };
 
   // Copy all 21 color tokens as-is (native int32 values)

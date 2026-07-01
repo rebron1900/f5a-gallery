@@ -15,11 +15,6 @@ interface Theme {
   [key: string]: any;
 }
 
-function int32ToCSS(n: number): string {
-  const u = n >= 0 ? n : n + 0x100000000;
-  return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
-}
-
 const themes: { slug: string; theme: Theme }[] = files.map(f => {
   const slug = f.replace('.json', '');
   const data = JSON.parse(readFileSync(join(themesDir, f), 'utf-8'));
@@ -93,17 +88,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
   </div>
 
+  <script is:inline src="https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js"></script>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1/qrcode.min.js"></script>
   <script define:vars={{ themesJson, layoutJson, base }}>
     var themes = JSON.parse(themesJson);
     var layout = JSON.parse(layoutJson);
     var API_BASE = 'https://small-rice-5955.me-d1b.workers.dev';
 
     var PALETTE_KEYS = ['backgroundColor', 'keyBackgroundColor', 'altKeyBackgroundColor', 'accentKeyBackgroundColor', 'keyTextColor'];
-
-    function int32ToCSS(n) {
-      var u = n >= 0 ? n : n + 0x100000000;
-      return '#' + ((u >> 16) & 0xff).toString(16).padStart(2, '0') + ((u >> 8) & 0xff).toString(16).padStart(2, '0') + (u & 0xff).toString(16).padStart(2, '0');
-    }
 
     function escapeHtml(s) {
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -113,7 +105,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       var themeMeta = {};
       try { themeMeta = JSON.parse(document.getElementById('fav-grid').dataset.meta || '{}'); } catch(e) {}
       var meta = themeMeta[slug] || {};
-      var palette = PALETTE_KEYS.map(function(k) { return int32ToCSS(theme[k]); });
+      var palette = PALETTE_KEYS.map(function(k) { return window.int32ToCSS(theme[k]); });
       var swatches = palette.map(function(c) { return '<div class="theme-card-swatch" style="background:' + c + '"></div>'; }).join('');
       var badge = theme.isDark ? '<span class="dark-badge">暗色</span>' : '<span class="light-badge">亮色</span>';
 

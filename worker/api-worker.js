@@ -67,6 +67,26 @@ export default {
       } catch { return new Response('Service unavailable', { status: 502 }); }
     }
 
+    // POST /callback — frontend JS exchanges code for token via fetch
+    if (path === '/callback' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            client_id: env.GITHUB_CLIENT_ID,
+            client_secret: env.GITHUB_CLIENT_SECRET,
+            code: body.code,
+          }),
+        });
+        const tokenData = await tokenRes.json();
+        return json(tokenData, origin);
+      } catch (e) {
+        return json({ error: e.message }, origin, 500);
+      }
+    }
+
     // ===== API Routes =====
 
     // GET /api/reactions/:slug — get counts + current user state
@@ -134,6 +154,14 @@ export default {
       const user = await getUser(auth.substring(6));
       if (!user) return json({ error: 'Invalid token' }, origin, 401);
 
+      // Rate limit: max one toggle per second per user
+      const rateKey = `ratelimit:${user.id}`;
+      const lastToggle = parseInt(await env.REACTIONS_KV.get(rateKey) || '0');
+      const now = Date.now();
+      if (lastToggle && now - lastToggle < 1000) {
+        return json({ error: 'Rate limited. Please wait before toggling again.' }, origin, 429);
+      }
+
       const key = `likes:${slug}`;
       const userKey = `user:${user.id}:likes`;
       const userLikes = JSON.parse(await env.REACTIONS_KV.get(userKey) || '[]');
@@ -156,6 +184,7 @@ export default {
       await env.REACTIONS_KV.put(userKey, JSON.stringify(userLikes));
 
       const count = parseInt(await env.REACTIONS_KV.get(key) || '0');
+      await env.REACTIONS_KV.put(rateKey, String(now));
       return json({ liked, count }, origin);
     }
 
@@ -167,6 +196,14 @@ export default {
 
       const user = await getUser(auth.substring(6));
       if (!user) return json({ error: 'Invalid token' }, origin, 401);
+
+      // Rate limit: max one toggle per second per user
+      const rateKey = `ratelimit:${user.id}`;
+      const lastToggle = parseInt(await env.REACTIONS_KV.get(rateKey) || '0');
+      const now = Date.now();
+      if (lastToggle && now - lastToggle < 1000) {
+        return json({ error: 'Rate limited. Please wait before toggling again.' }, origin, 429);
+      }
 
       const key = `favorites:${slug}`;
       const userKey = `user:${user.id}:favorites`;
@@ -188,6 +225,7 @@ export default {
       await env.REACTIONS_KV.put(userKey, JSON.stringify(userFavs));
 
       const count = parseInt(await env.REACTIONS_KV.get(key) || '0');
+      await env.REACTIONS_KV.put(rateKey, String(now));
       return json({ favorited, count }, origin);
     }
 
@@ -203,6 +241,11 @@ export default {
       const favorites = JSON.parse(await env.REACTIONS_KV.get(`user:${user.id}:favorites`) || '[]');
 
       return json({ likes, favorites, user: { login: user.login, avatar: user.avatar } }, origin);
+    }
+
+    // Health check
+    if (path === '/' || path === '/health') {
+      return new Response('OK', { status: 200 });
     }
 
     return new Response('Not found', { status: 404 });
